@@ -1,19 +1,19 @@
 <template>
   <el-container class="layout-container-demo" style="margin: -8px">
-<!--    侧边栏最小高度为屏幕高度-->
 
 
     <el-aside width="200px">
       <el-scrollbar>
 
-        <el-menu default-openeds="[1]">
+        <el-menu  @open="handleOpen"  @close="handleClose">
           <el-sub-menu index="1">
             <template #title>
-              <el-icon><setting /></el-icon>config
-            </template>
+              <el-icon><setting /></el-icon>       <h4 class="mb-2">Config</h4>
 
-              <el-menu-item index="1-1">cluster config</el-menu-item>
-              <el-menu-item index="1-2">sync config</el-menu-item>
+            </template>
+              
+              <el-menu-item index="1-1" @click="()=>{this.$router.push('/cluster')}" ><el-icon><SetUp /></el-icon>cluster config</el-menu-item>
+              <el-menu-item index="1-2" @click="()=>{this.$router.push('/sync')}"  ><el-icon><Refresh /></el-icon>sync config</el-menu-item>
 
           </el-sub-menu>
 
@@ -46,7 +46,12 @@
 
 <script lang="ts" setup>
 import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
-
+const handleOpen = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
+const handleClose = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
 
 </script>
 

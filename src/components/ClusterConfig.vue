@@ -5,7 +5,7 @@
 
       <el-table-column prop="name" label="Name" >
         <template #default="scope" >
-            <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName" v-model="tableRowInput" @blur="handleExitEditMode"></el-input>
+            <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
             <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'name')"  >{{ scope.row.name }}</p>
         </template>
       </el-table-column>
@@ -13,7 +13,7 @@
         
       <el-table-column prop="config" label="Config" >
         <template #default="scope" >
-            <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @blur="handleExitEditMode"></el-input>
+            <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
             <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'config')"  >{{ scope.row.config }}</p>
         </template>
       </el-table-column>
@@ -43,7 +43,8 @@ import {
   apiClusterAdd,
   apiClusterConnect,
   apiClusterDelete,
-  apiClusterList
+  apiClusterList,
+  apiClusterUpdate
 } from "@/services/clusterConfig.js";
 
   
@@ -174,13 +175,30 @@ const handleIntoEditMode = (index, row, propName) => {
   }, 10)
 
   tableRowInput.value = row[propName]
-
-  // TODO use api to save
 }
 
-const handleExitEditMode = () => {
+const handleExitEditMode = async (index,row) => {
   console.log("lost focus")
   tableEditIndex.value = -1
+  row[tableEditFieldName.value] = tableRowInput.value
+
+  await apiClusterUpdate(row.id,row).then(async res => {
+    const status = res.status
+    if (status === 200) {
+      ElMessage({
+        message: `update config success`,
+        type: 'success'
+      })
+    }
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+
+  updateClusterConfig()
 }
 
 

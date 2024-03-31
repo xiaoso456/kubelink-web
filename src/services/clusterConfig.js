@@ -4,6 +4,19 @@ export function apiClusterGet(id) {
     })
 }
 
+export function apiClusterUpdate(id,clusterConfig) {
+    return fetch(`/api/cluster/config/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: clusterConfig.name,
+            config: clusterConfig.config
+        })
+    })
+}
+
 export function apiClusterList() {
     return fetch(`/api/cluster/config/list`, {
         method: 'GET'

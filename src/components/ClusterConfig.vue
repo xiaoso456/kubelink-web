@@ -1,7 +1,7 @@
 <template>
   
     <el-table :data="tableData">
-      <el-table-column prop="id" label="Id" width="40" />
+      <el-table-column prop="id" label="Id" width="80" />
 
       <el-table-column prop="name" label="Name" >
         <template #default="scope" >
@@ -14,7 +14,7 @@
       <el-table-column prop="config" label="Config" >
         <template #default="scope" >
             <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @blur="handleExitEditMode"></el-input>
-            <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'config')"  >{{ scope.row.config }}</p>
+            <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'config')"  >{{ scope.row.config }}</p>
         </template>
       </el-table-column>
 
@@ -38,6 +38,13 @@
   
 <script setup>
 import {ref} from "vue"
+import {
+  apiClusterActive,
+  apiClusterAdd,
+  apiClusterConnect,
+  apiClusterDelete,
+  apiClusterList
+} from "@/services/clusterConfig.js";
 
   
 const item = {
@@ -51,24 +58,111 @@ const tableEditFieldName = ref(undefined);
 const tableRowInput = ref(undefined);
 const focusRef = ref(null);
 
+const updateClusterConfig = () => {
+  apiClusterList().then(async res => {
+    tableData.value = await res.json()
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+
+}
+
+onMounted(() => {
+  updateClusterConfig()
+})
+
 const handleConnect = (index, row) => {
+  console.log(row.id)
+  apiClusterConnect(row.id).then(async res => {
+    const text = await res.json()
+    const textB = JSON.stringify(text, null, 2);
+    if(res.status === 200){
+      ElMessage({
+        message: textB,
+        type:'success'
+      })
+    }else{
+      ElMessage({
+        message: textB,
+        type:'error'
+      })
+    }
+
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+
   console.log(index, row)
 }
 
 const handleActive = (index, row) => {
-  console.log(index, row)
+  apiClusterActive(row.id).then(async res => {
+    const status = res.status
+    if(status === 200){
+      ElMessage({
+        message:`active config id [${row.id}] success`,
+        type:'success'
+      })
+    }
+
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
 }
 
-const handleDelete = (index, row) => {
-  // todo use delete api and refresh table data
-  console.log(index, row)
-  tableData.value.splice(index,1)
+const handleDelete = async (index, row) => {
+  await apiClusterDelete(row.id).then(async res => {
+    const status = res.status
+    if (status === 200) {
+      ElMessage({
+        message: `delete config id [${row.id}] success`,
+        type: 'success'
+      })
+    }
+
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+
+  updateClusterConfig()
+
 }
 
-const handleAddItem = () => {
-  // TODO use add api and refresh table data
+const handleAddItem = async () => {
+  await apiClusterAdd("config name", "config can be found in ~/.kube/config").then(async res => {
+    const status = res.status
+    if (status === 200) {
+      ElMessage({
+        message: `add config success`,
+        type: 'success'
+      })
+    }
 
-  tableData.value.push(item)
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+
+  updateClusterConfig()
 }
 
 const handleIntoEditMode = (index, row, propName) => {
@@ -89,8 +183,16 @@ const handleExitEditMode = () => {
   tableEditIndex.value = -1
 }
 
+
+
 </script>
 
 <style scoped>
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 </style>

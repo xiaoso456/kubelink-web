@@ -7,7 +7,6 @@ import Inspect from 'vite-plugin-inspect'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import path from 'path'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 
 const pathSrc = path.resolve(__dirname, 'src')
@@ -15,18 +14,6 @@ const pathSrc = path.resolve(__dirname, 'src')
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    server:{
-        port: 3000,
-        open: true,
-        https: false,
-        proxy: {
-            '/api': {
-                target: 'http://localhost:15151',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, '')
-            }
-        }
-    },
     resolve: {
         alias: {
             '@': pathSrc,

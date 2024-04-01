@@ -17,28 +17,68 @@
             :value="item.value"
           />
         </el-select>
-
       </template>
     </el-table-column>
     
     <el-table-column prop="namespace" label="Namespace" width="120">
-
+      <template #default="scope">
+        <el-select
+          @change="updateSyncConfigAndRefresh(scope.row.id,scope.row)"
+          default-first-option
+          filterable
+          allow-create
+          v-model="scope.row.namespace"
+          placeholder="Select"
+          size="small"
+        >
+          <el-option
+            v-for="item in namespaceOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
 
     </el-table-column>
     
-    <el-table-column prop="pod" label="Pod" />
-    <el-table-column prop="container" label="Container" />
-    <el-table-column prop="source" label="Source" />
-    <el-table-column prop="target" label="Target" />
+    <el-table-column prop="pod" label="Pod" >
+      <template #default="scope" >
+        <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'pod'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
+        <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'pod')"  >{{ scope.row.pod? scope.row.pod : '-' }}</p>
+      </template>
+    </el-table-column>
+    
+    <el-table-column prop="container" label="Container" >
+      <template #default="scope" >
+        <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'container'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
+        <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'container')"  >{{ scope.row.container?scope.row.container : '-' }}</p>
+      </template>
+    </el-table-column>
+
+    <el-table-column prop="source" label="Source" >
+      <template #default="scope" >
+        <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'source'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
+        <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'source')"  >{{ scope.row.source }}</p>
+      </template>
+    </el-table-column>
+
+    <el-table-column prop="target" label="Target" >
+      <template #default="scope" >
+        <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'target'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
+        <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'target')"  >{{ scope.row.target }}</p>
+      </template>
+    </el-table-column>
+    
     <el-table-column prop="autoSync" label="AutoSync" >
       <template #default="scope">
-        <el-switch v-model="scope.row.autoSync" />
+        <el-switch  @change="updateSyncConfigAndRefresh(scope.row.id,scope.row)"  v-model="scope.row.autoSync" />
       </template>
     </el-table-column>
 
     <el-table-column prop="enable" label="Enable" >
       <template #default="scope">
-        <el-switch v-model="scope.row.enable" />
+        <el-switch @change="updateSyncConfigAndRefresh(scope.row.id,scope.row)" v-model="scope.row.enable" />
       </template>
     </el-table-column>
 
@@ -55,7 +95,7 @@
 
 <script setup>
 import {onMounted, ref} from "vue"
-import {apiSyncTypeList,apiSyncConfigList,apiSyncConfigAdd,apiSyncConfigDelete,apiSyncConfigUpdate } from "@/services/syncConfig.js"
+import {apiSyncTypeList,apiSyncConfigList,apiSyncConfigAdd,apiSyncConfigDelete,apiSyncConfigUpdate,apiSyncOnly } from "@/services/syncConfig.js"
 
 const item = {
   id: 1,
@@ -80,6 +120,15 @@ const syncTypeOptions = ref([{
     value: 'Option1',
     label: 'Option1',
 }])
+
+const namespaceOptions = ref([{
+    value: 'default',
+    label: 'default',
+}])
+
+const refreshNamespaceOptions = ()=>{
+  // TODO
+}
 
 const refreshSyncTypeOptions = () =>{
   apiSyncTypeList().then(async res => {
@@ -120,7 +169,21 @@ onMounted(() => {
 })
 
 const handleSync = (index, row) => {
-  console.log(index, row)
+  apiSyncOnly(row.id).then(res=>{
+    const status = res.status
+    if (status === 200) {
+      ElMessage({
+        message: `sync task ${row.id} success`,
+        type: 'success'
+      })
+    }
+  }).catch(err=>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
 }
 
 const updateSyncConfigAndRefresh = async (id, row) => {

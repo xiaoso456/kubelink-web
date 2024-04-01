@@ -47,3 +47,9 @@ export function apiSyncConfigUpdate(id,config){
         body: JSON.stringify(config)
     })
 }
+
+export function apiSyncOnly(id){
+    return fetch(`/config/${id}/sync-only`, {
+        method: 'POST'
+    })
+}

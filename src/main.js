@@ -6,6 +6,8 @@ import SyncConfigTable from "./components/SyncConfigTable.vue";
 import ClusterConfig from "./components/ClusterConfig.vue";
 import * as VueRouter from 'vue-router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import { createPinia } from 'pinia'
+import piniaPersist from 'pinia-plugin-persist'
 
 const router = VueRouter.createRouter({
     history: VueRouter.createWebHashHistory(),
@@ -17,11 +19,13 @@ const router = VueRouter.createRouter({
 
     ],
 })
-
+const pinia = createPinia()
+pinia.use(piniaPersist)
 const app = createApp(App)
 // TODO use auto install
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
   }
 app.use(router)
+app.use(pinia)
 app.mount('#app')

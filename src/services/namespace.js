@@ -5,3 +5,9 @@ export function apiNamespaceList(){
         method: 'GET'
     })
 }
+
+export function apiPodList(namespace){
+    return fetch(`${prefix}/namespace/${namespace}/pods`, {
+        method: 'GET'
+    })
+}

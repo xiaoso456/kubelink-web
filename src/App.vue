@@ -34,9 +34,9 @@
 
     <el-container>
       <el-header style="text-align: right; font-size: 12px">
-        <div class="toolbar">
-
-          header
+        <div class="toolbar flex gap-2">
+          <el-tag  v-if="clusterInfo.activeId" type="primary">ID :{{ clusterInfo.activeId }}</el-tag>
+          <el-tag v-if="clusterInfo.activeName" type="success">Name :{{ clusterInfo.activeName }}</el-tag>
         </div>
       </el-header>
 
@@ -55,6 +55,9 @@
 
 <script  setup>
 import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
+import {useClusterInfo} from "@/store/clusterStore.js";
+import {apiClusterActive} from "@/services/clusterConfig.js";
+const clusterInfo = useClusterInfo()
 
 const isCollapse = ref(false)
 
@@ -64,7 +67,32 @@ const handleOpen = (key, keyPath) => {
 const handleClose = (key, keyPath) => {
   console.log(key, keyPath)
 }
+const activeClusterConfig = (id,name) =>{
+  apiClusterActive(id).then(async res => {
+    const status = res.status
+    if(status === 200){
+      clusterInfo.activeId = id
+      clusterInfo.activeName = name
 
+      ElMessage({
+        message:`active config id [${id}] success`,
+        type:'success'
+      })
+    }
+
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+}
+onMounted(()=>{
+  if(clusterInfo.activeId){
+    activeClusterConfig(clusterInfo.activeId,clusterInfo.activeName)
+  }
+})
 </script>
 
 <style scoped>
@@ -95,5 +123,8 @@ const handleClose = (key, keyPath) => {
   position: relative;
   height: 100vh;
   background-color: #161616 !important;
+}
+.el-tag{
+  margin: 5px 10px;
 }
 </style>

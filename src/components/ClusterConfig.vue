@@ -46,6 +46,7 @@ import {
   apiClusterList,
   apiClusterUpdate
 } from "@/services/clusterConfig.js";
+import {useClusterInfo} from "@/store/clusterStore.js";
 
   
 const item = {
@@ -58,6 +59,8 @@ const tableEditIndex = ref(undefined);
 const tableEditFieldName = ref(undefined);
 const tableRowInput = ref(undefined);
 const focusRef = ref(null);
+
+const clusterInfo = useClusterInfo()
 
 const updateClusterConfig = () => {
   apiClusterList().then(async res => {
@@ -73,6 +76,7 @@ const updateClusterConfig = () => {
 }
 
 onMounted(() => {
+
   updateClusterConfig()
 })
 
@@ -104,10 +108,14 @@ const handleConnect = (index, row) => {
   console.log(index, row)
 }
 
+
 const handleActive = (index, row) => {
   apiClusterActive(row.id).then(async res => {
     const status = res.status
     if(status === 200){
+      clusterInfo.activeId = row.id
+      clusterInfo.activeName = row.name
+
       ElMessage({
         message:`active config id [${row.id}] success`,
         type:'success'

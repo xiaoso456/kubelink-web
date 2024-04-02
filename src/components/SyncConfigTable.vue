@@ -1,5 +1,4 @@
 <template>
-
   <el-table :data="tableData">
     <el-table-column prop="id" label="Id" width="60"/>
     <el-table-column prop="syncType" label="SyncType" width="180">

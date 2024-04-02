@@ -2,20 +2,29 @@
   <el-container class="layout-container-demo" style="margin: -8px">
 
 
-    <el-aside width="200px">
-      <el-scrollbar>
+    <el-aside width="auto">
+      <el-scrollbar width="100%" style="height: 100vh">
 
-        <el-menu  @open="handleOpen"  @close="handleClose">
-          <el-sub-menu index="1">
-            <template #title>
-              <el-icon><setting /></el-icon>       <h4 class="mb-2">Config</h4>
+        <el-menu     class="el-menu-vertical-demo"
+                     default-active="1" collapse="false"  @open="handleOpen"  @close="handleClose">
+          <el-menu-item index="1" @click="()=>{$router.push('/cluster')}" >
+            <el-icon><SetUp /></el-icon>
+            <template #title>Cluster</template>
+          </el-menu-item>
+          <el-menu-item index="2" @click="()=>{$router.push('/sync')}" >
+            <el-icon><Refresh /></el-icon>
+            <template #title>Sync</template>
+          </el-menu-item>
+<!--          <el-sub-menu index="1" >-->
+<!--            <template #title >-->
+<!--              <el-icon><setting /></el-icon>       <h4 @click="()=>{this.$router.push('/cluster')}" class="mb-2">Config</h4>-->
 
-            </template>
-              
-              <el-menu-item index="1-1" @click="()=>{this.$router.push('/cluster')}" ><el-icon><SetUp /></el-icon>cluster config</el-menu-item>
-              <el-menu-item index="1-2" @click="()=>{this.$router.push('/sync')}"  ><el-icon><Refresh /></el-icon>sync config</el-menu-item>
+<!--            </template>-->
 
-          </el-sub-menu>
+<!--              <el-menu-item index="1-1" @click="()=>{this.$router.push('/cluster')}" ><el-icon><SetUp /></el-icon>cluster config</el-menu-item>-->
+<!--              <el-menu-item index="1-2" @click="()=>{this.$router.push('/sync')}"  ><el-icon><Refresh /></el-icon>sync config</el-menu-item>-->
+
+<!--          </el-sub-menu>-->
 
         </el-menu>
 
@@ -44,12 +53,15 @@
   </el-container>
 </template>
 
-<script lang="ts" setup>
+<script  setup>
 import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
-const handleOpen = (key: string, keyPath: string[]) => {
+
+const isCollapse = ref(false)
+
+const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
 }
-const handleClose = (key: string, keyPath: string[]) => {
+const handleClose = (key, keyPath) => {
   console.log(key, keyPath)
 }
 
@@ -58,12 +70,12 @@ const handleClose = (key: string, keyPath: string[]) => {
 <style scoped>
 .layout-container-demo .el-header {
   position: relative;
-  background-color: var(--el-color-primary-light-8);
+  background-color: #121212;
   color: var(--el-text-color-primary);
 }
 .layout-container-demo .el-aside {
   color: var(--el-text-color-primary);
-  background: var(--el-color-primary-light-8);
+  background: #161616;
 }
 .layout-container-demo .el-menu {
   border-right: none;
@@ -82,6 +94,6 @@ const handleClose = (key: string, keyPath: string[]) => {
 .el-aside {
   position: relative;
   height: 100vh;
-  background-color: #324157 !important;
+  background-color: #161616 !important;
 }
 </style>

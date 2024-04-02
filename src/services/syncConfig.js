@@ -1,18 +1,20 @@
+const prefix = import.meta.env.VITE_URL_PREFIX
+
 export function apiSyncTypeList() {
-    return fetch(`/api/sync/sync-type/list`, {
+    return fetch(`${prefix}/sync/sync-type/list`, {
         method: 'GET'
     })
 }
 
 
 export function apiSyncConfigList() {
-    return fetch(`/api/sync/config/list`, {
+    return fetch(`${prefix}/sync/config/list`, {
         method: 'GET'
     })
 }
 
 export function apiSyncConfigAdd(syncType,autoSync,enable,namespace,pod,container,source,target) {
-    return fetch(`/api/sync/config`, {
+    return fetch(`${prefix}/sync/config`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -33,13 +35,13 @@ export function apiSyncConfigAdd(syncType,autoSync,enable,namespace,pod,containe
 
 
 export function apiSyncConfigDelete(id) {
-    return fetch(`/api/sync/config/${id}`, {
+    return fetch(`${prefix}/sync/config/${id}`, {
         method: 'DELETE'
     })
 }
 
 export function apiSyncConfigUpdate(id,config){
-    return fetch(`/api/sync/config/${id}`, {
+    return fetch(`${prefix}/sync/config/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -49,7 +51,7 @@ export function apiSyncConfigUpdate(id,config){
 }
 
 export function apiSyncOnly(id){
-    return fetch(`/config/${id}/sync-only`, {
+    return fetch(`${prefix}/sync/config/${id}/sync-only`, {
         method: 'POST'
     })
 }

@@ -1,11 +1,12 @@
+const prefix = import.meta.env.VITE_URL_PREFIX
 export function apiClusterGet(id) {
-    return fetch(`/api/cluster/config/${id}`, {
+    return fetch(`${prefix}$/cluster/config/${id}`, {
         method: 'GET'
     })
 }
 
 export function apiClusterUpdate(id,clusterConfig) {
-    return fetch(`/api/cluster/config/${id}`, {
+    return fetch(`${prefix}/cluster/config/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -18,31 +19,31 @@ export function apiClusterUpdate(id,clusterConfig) {
 }
 
 export function apiClusterList() {
-    return fetch(`/api/cluster/config/list`, {
+    return fetch(`${prefix}/cluster/config/list`, {
         method: 'GET'
     })
 }
 
 export function apiClusterConnect(id) {
-    return fetch(`/api/cluster/config/${id}/connect`, {
+    return fetch(`${prefix}/cluster/config/${id}/connect`, {
         method: 'GET'
     })
 }
 
 export function apiClusterActive(id) {
-    return fetch(`/api/cluster/config/${id}/active`, {
+    return fetch(`${prefix}/cluster/config/${id}/active`, {
         method: 'PUT'
     })
 }
 
 export function apiClusterDelete(id) {
-    return fetch(`/api/cluster/config/${id}`, {
+    return fetch(`${prefix}/cluster/config/${id}`, {
         method: 'DELETE'
     })
 }
 
 export function apiClusterAdd(name, config) {
-    return fetch(`/api/cluster/config`, {
+    return fetch(`${prefix}/cluster/config`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

@@ -3,7 +3,7 @@
     <el-table :data="tableData">
       <el-table-column prop="id" label="Id" width="80" />
 
-      <el-table-column prop="name" label="Name" >
+      <el-table-column prop="name" label="Name" width="200">
         <template #default="scope" >
             <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
             <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'name')"  >{{ scope.row.name?scope.row.name:'-' }}</p>
@@ -13,7 +13,7 @@
         
       <el-table-column prop="config" label="Config" >
         <template #default="scope" >
-            <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
+            <el-input :autosize="{minRows:1,maxRows:3}" resize="none" type="textarea" ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
             <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'config')"  >{{ scope.row.config?scope.row.config:'-' }}</p>
         </template>
       </el-table-column>

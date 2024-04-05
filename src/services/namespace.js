@@ -11,3 +11,9 @@ export function apiPodList(namespace){
         method: 'GET'
     })
 }
+
+export function apiPodContainerList(namespace,pod){
+    return fetch(`${prefix}/namespace/${namespace}/pods/${pod}/containers`, {
+        method: 'GET'
+    })
+}

@@ -1,7 +1,7 @@
 <template>
   <el-table :data="tableData">
     <el-table-column prop="id" label="Id" width="60"/>
-    <el-table-column prop="syncType" label="SyncType" width="180">
+    <el-table-column prop="syncType" label="SyncType" width="120">
       <template #default="scope">
         <el-select
             @change="updateSyncConfigAndRefresh(scope.row.id,scope.row)"
@@ -109,21 +109,36 @@
 
     </el-table-column>
 
-    <el-table-column prop="source" label="Source">
+    <el-table-column prop="source" label="Source" >
       <template #default="scope">
         <el-input ref="focusRef" v-if="scope.$index === tableEditIndex && 'source'===tableEditFieldName"
                   v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"
                   @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
-        <p v-else @click="handleIntoEditMode(scope.$index,scope.row,'source')">{{ scope.row.source }}</p>
+        <el-tooltip
+            v-else
+            effect="light"
+            :content="scope.row.source"
+            placement="top-start"
+        >
+          <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'source')">{{ scope.row.source }}</p>
+        </el-tooltip>
       </template>
     </el-table-column>
 
-    <el-table-column prop="target" label="Target">
+    <el-table-column prop="target" label="Target" width="140">
       <template #default="scope">
         <el-input ref="focusRef" v-if="scope.$index === tableEditIndex && 'target'===tableEditFieldName"
                   v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"
                   @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
-        <p v-else @click="handleIntoEditMode(scope.$index,scope.row,'target')">{{ scope.row.target }}</p>
+        <el-tooltip
+            v-else
+            effect="light"
+            :content="scope.row.target"
+            placement="top-start"
+        >
+          <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'target')">{{ scope.row.target }}</p>
+        </el-tooltip>
+
       </template>
     </el-table-column>
 <!--    TODO support auto sync-->
@@ -143,6 +158,7 @@
       <template #default="scope">
         <el-button size="small" type="success" plain @click="handleSync(scope.$index,scope.row)">sync</el-button>
         <el-button size="small" type="danger" plain @click="handleDelete(scope.$index,scope.row)">delete</el-button>
+
       </template>
     </el-table-column>
   </el-table>
@@ -161,6 +177,7 @@ import {
   apiSyncOnly
 } from "@/services/syncConfig.js"
 import {apiNamespaceList, apiPodContainerList, apiPodList} from "@/services/namespace.js";
+import {apiActionSuspend} from "@/services/action.js";
 
 const item = {
   id: 1,
@@ -415,6 +432,11 @@ const handleExitEditMode = async (index, row) => {
 </script>
 
 <style lang="scss" scoped>
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 
 </style>

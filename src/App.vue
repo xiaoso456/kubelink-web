@@ -47,7 +47,7 @@
       </el-main>
 
       <el-footer>
-        footer
+<!--        footer-->
       </el-footer>
     </el-container>
   </el-container>

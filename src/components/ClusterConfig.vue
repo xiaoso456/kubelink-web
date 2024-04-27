@@ -1,6 +1,6 @@
 <template>
   
-    <el-table :data="tableData">
+    <el-table :data="tableData" class="common-margin">
       <el-table-column prop="id" label="Id" width="80" />
 
       <el-table-column prop="name" label="Name" width="200">
@@ -33,7 +33,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button class="mt-4" style="width: 100%" @click="handleAddItem">Add Item</el-button>
+    <el-button class="mt-4 common-margin"  @click="handleAddItem">Add Item</el-button>
   </template>
   
 <script setup>
@@ -54,7 +54,7 @@ const item = {
     name: 'remote-k8s',
     config: 'config...\naaa\nbbb\nccc'
 }
-const tableData = ref(Array.from({ length: 5 }).fill(item))
+const tableData = ref(Array.from({ length: 0 }).fill(item))
 const tableEditIndex = ref(undefined);
 const tableEditFieldName = ref(undefined);
 const tableRowInput = ref(undefined);
@@ -221,4 +221,8 @@ const handleExitEditMode = async (index,row) => {
   white-space: nowrap;
 }
 
+.common-margin{
+  margin: 0 10px 10px 10px;
+  width: calc(100% - 20px);
+}
 </style>

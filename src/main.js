@@ -4,6 +4,7 @@ import App from './App.vue'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 import SyncConfigTable from "./components/SyncConfigTable.vue";
 import ClusterConfig from "./components/ClusterConfig.vue";
+import Apps from "./components/Apps.vue";
 import * as VueRouter from 'vue-router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { createPinia } from 'pinia'
@@ -15,6 +16,7 @@ const router = VueRouter.createRouter({
         {path: '/', component: ClusterConfig},
         {path: '/sync', component: SyncConfigTable},
         {path: '/cluster', component: ClusterConfig},
+        {path: '/apps', component: Apps},
         {path: '/:pathMatch(.*)*', redirect: '/'},
 
     ],

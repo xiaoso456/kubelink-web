@@ -1,19 +1,23 @@
 <template>
-  <el-container class="layout-container-demo" style="margin: -8px">
+  <el-container class="layout-container-demo" style="margin: -8px;height: calc(100vh - 8px)">
 
 
     <el-aside width="auto">
       <el-scrollbar width="100%" style="height: 100vh">
 
         <el-menu     class="el-menu-vertical-demo"
-                     default-active="1" collapse="false"  @open="handleOpen"  @close="handleClose">
-          <el-menu-item index="1" @click="()=>{$router.push('/cluster')}" >
+                     :default-active="$route.path" collapse="false"  @open="handleOpen"  @close="handleClose">
+          <el-menu-item index="/cluster" @click="()=>{$router.push('/cluster')}" >
             <el-icon><SetUp /></el-icon>
             <template #title>Cluster</template>
           </el-menu-item>
-          <el-menu-item index="2" @click="()=>{$router.push('/sync')}" >
-            <el-icon><Refresh /></el-icon>
+          <el-menu-item index="/sync" @click="()=>{$router.push('/sync')}" >
+            <el-icon><Switch /></el-icon>
             <template #title>Sync</template>
+          </el-menu-item>
+          <el-menu-item index="/apps" @click="()=>{$router.push('/apps')}" >
+            <el-icon><Menu /></el-icon>
+            <template #title>Apps</template>
           </el-menu-item>
 <!--          <el-sub-menu index="1" >-->
 <!--            <template #title >-->

@@ -55,3 +55,9 @@ export function apiSyncOnly(id){
         method: 'POST'
     })
 }
+
+export function apiDeleteResource(id, type){
+    return fetch(`${prefix}/sync/config/${id}/delete-resource/${type}`, {
+        method: 'POST'
+    })
+}

@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData">
+  <el-table class="common-margin" :data="tableData">
     <el-table-column prop="id" label="Id" width="60"/>
     <el-table-column prop="syncType" label="SyncType" width="120">
       <template #default="scope">
@@ -117,9 +117,10 @@
         <el-tooltip
             v-else
             effect="light"
-            :content="scope.row.source"
             placement="top-start"
         >
+          <template #content>{{scope.row.source}}<el-button style="margin-left: 5px" size="small" type="danger" plain @click="handleDeleteResource(scope.$index,scope.row,'source')">delete</el-button>
+          </template>
           <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'source')">{{ scope.row.source }}</p>
         </el-tooltip>
       </template>
@@ -133,9 +134,10 @@
         <el-tooltip
             v-else
             effect="light"
-            :content="scope.row.target"
             placement="top-start"
         >
+          <template #content>{{scope.row.target}}<el-button style="margin-left: 5px" size="small" type="danger" plain @click="handleDeleteResource(scope.$index,scope.row,'target')">delete</el-button>
+          </template>
           <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'target')">{{ scope.row.target }}</p>
         </el-tooltip>
 
@@ -162,7 +164,7 @@
       </template>
     </el-table-column>
   </el-table>
-  <el-button class="mt-4" style="width: 100%" @click="handleAddItem">Add Item</el-button>
+  <el-button class="mt-4 common-margin" @click="handleAddItem">Add Item</el-button>
 
 </template>
 
@@ -174,7 +176,7 @@ import {
   apiSyncConfigAdd,
   apiSyncConfigDelete,
   apiSyncConfigUpdate,
-  apiSyncOnly
+  apiSyncOnly, apiDeleteResource
 } from "@/services/syncConfig.js"
 import {apiNamespaceList, apiPodContainerList, apiPodList} from "@/services/namespace.js";
 import {apiActionSuspend} from "@/services/action.js";
@@ -190,7 +192,7 @@ const item = {
   autoSync: true,
   enable: true
 }
-const tableData = ref(Array.from({length: 5}).fill(item))
+const tableData = ref(Array.from({length: 0}).fill(item))
 const tableEditIndex = ref(undefined);
 const tableEditFieldName = ref(undefined);
 const tableRowInput = ref(undefined);
@@ -428,6 +430,24 @@ const handleExitEditMode = async (index, row) => {
   refreshSyncList()
 }
 
+const handleDeleteResource = (index, row, type) => {
+  apiDeleteResource(row.id, type).then(res => {
+    const status = res.status
+    if (status === 200) {
+      ElMessage({
+        message: `delete file or folder success`,
+        type: 'success'
+      })
+    }
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+}
+
 
 </script>
 
@@ -438,5 +458,8 @@ const handleExitEditMode = async (index, row) => {
   white-space: nowrap;
 }
 
-
+.common-margin{
+  margin: 0 10px 10px 10px;
+  width: calc(100% - 20px);
+}
 </style>

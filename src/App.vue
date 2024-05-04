@@ -41,7 +41,30 @@
         <div class="toolbar flex gap-2">
           <el-tag  v-if="clusterInfo.activeId" type="primary">ID :{{ clusterInfo.activeId }}</el-tag>
           <el-tag v-if="clusterInfo.activeName" type="success">Name :{{ clusterInfo.activeName }}</el-tag>
+
+          <el-dropdown >
+            <span class="el-dropdown-link" @click="updateClusterConfig">
+              {{clusterInfo.activeName}}
+              <el-icon class="el-icon--right">
+                <arrow-down />
+              </el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                    v-for="item in namespaceList"
+                    @click="handleSelectNamespace(item)"
+                    :key="item.id"
+                >
+                  {{ item.name }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+
+
         </div>
+
       </el-header>
 
       <el-main>
@@ -60,10 +83,11 @@
 <script  setup>
 import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
 import {useClusterInfo} from "@/store/clusterStore.js";
-import {apiClusterActive} from "@/services/clusterConfig.js";
+import {apiClusterActive, apiClusterList} from "@/services/clusterConfig.js";
 const clusterInfo = useClusterInfo()
 
 const isCollapse = ref(false)
+const namespaceList = ref([])
 
 const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)
@@ -92,6 +116,42 @@ const activeClusterConfig = (id,name) =>{
     console.log(err)
   })
 }
+
+const updateClusterConfig = () => {
+  apiClusterList().then(async res => {
+    namespaceList.value = await res.json()
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+
+}
+
+const handleSelectNamespace = (item) => {
+  apiClusterActive(item.id).then(async res => {
+    const status = res.status
+    if(status === 200){
+      clusterInfo.activeId = item.id
+      clusterInfo.activeName = item.name
+
+      ElMessage({
+        message:`active config id [${item.id}] success`,
+        type:'success'
+      })
+    }
+
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+}
+
 onMounted(()=>{
   if(clusterInfo.activeId){
     activeClusterConfig(clusterInfo.activeId,clusterInfo.activeName)
@@ -130,5 +190,13 @@ onMounted(()=>{
 }
 .el-tag{
   margin: 5px 10px;
+}
+
+.el-dropdown-link {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  display: flex;
+  align-items: center;
+  outline: none;
 }
 </style>

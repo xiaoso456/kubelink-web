@@ -15,3 +15,16 @@ export function apiDeploymentContainerSuspend(namespace,deployment,container){
         method: 'PUT'
     })
 }
+
+export function apiDeploymentGet(namespace,deployment){
+
+    return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}`, {
+        method: 'GET'
+    })
+}
+
+export function apiDeploymentPodList(namespace,deployment){
+    return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}/pod/list`, {
+        method: 'GET'
+    })
+}

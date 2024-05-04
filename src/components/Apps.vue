@@ -52,18 +52,22 @@
 
 
 
-    <el-table height="65vh" :data="tableData" class="common-margin common-width">
+    <el-table  v-loading="tableLoading" height="65vh" :data="tableData" class="common-margin common-width">
       <el-table-column label="Id" width="80"   >
         <template #default="scope">
           {{ scope.$index + 1  }}
         </template>
       </el-table-column>
 
-      <el-table-column prop="namespace" label="Namespace" width="180" />
+      <el-table-column sortable prop="namespace" label="Namespace" width="180" />
 
-      <el-table-column prop="name" label="name" width="240" />
+      <el-table-column sortable prop="name" label="name" width="240" >
+        <template #default="scope">
+          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
+        </template>
+      </el-table-column>
 
-      <el-table-column prop="status" label="Status" width="80" >
+      <el-table-column sortable prop="status" label="Status" width="100" >
         <template #default="scope" >
           <div style="display: flex;align-items: center">
             <div :class="scope.row.status.runNum===scope.row.status.totalNum?'circle-green':'circle-yellow'"></div>
@@ -120,6 +124,7 @@ const dialogTitle = ref('')
 const dialogMessage = ref('')
 const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
+const tableLoading = ref(false)
 
 const appTypeOptions = [
   {
@@ -174,16 +179,17 @@ const refreshNamespaceOptions = () => {
 
 }
 
-const updateTableData = () => {
-  if(selectedOptionValue.value === 'Deployment'){
-    apiDeploymentList(selectedNamespaceOptionValue.value,searchInput.value).then(async res => {
+const updateTableData = async () => {
+  tableLoading.value = true
+  if (selectedOptionValue.value === 'Deployment') {
+    apiDeploymentList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
           name: item.metadata.name,
           namespace: item.metadata.namespace,
           status: {
-            runNum: item.status.availableReplicas === undefined? 0:item.status.availableReplicas,
+            runNum: item.status.availableReplicas === undefined ? 0 : item.status.availableReplicas,
             totalNum: item.spec.replicas,
           }
         }
@@ -195,8 +201,8 @@ const updateTableData = () => {
       })
       console.log(err)
     })
-  }else if(selectedOptionValue.value === 'Statefulset'){
-    apiStatefulsetList(selectedNamespaceOptionValue.value,searchInput.value).then(async res => {
+  } else if (selectedOptionValue.value === 'Statefulset') {
+    apiStatefulsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -215,8 +221,8 @@ const updateTableData = () => {
       })
       console.log(err)
     })
-  }else if(selectedOptionValue.value === 'Daemonset'){
-    apiDaemonsetList(selectedNamespaceOptionValue.value,searchInput.value).then(async res => {
+  } else if (selectedOptionValue.value === 'Daemonset') {
+    apiDaemonsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -236,6 +242,7 @@ const updateTableData = () => {
       console.log(err)
     })
   }
+  tableLoading.value = false
 
 }
 

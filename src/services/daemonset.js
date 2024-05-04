@@ -15,3 +15,16 @@ export function apiDaemonsetContainerSuspend(namespace,daemonset,container){
         method: 'PUT'
     })
 }
+
+export function apiDaemonsetGet(namespace,daemonset){
+
+    return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}`, {
+        method: 'GET'
+    })
+}
+
+export function apiDaemonsetPodList(namespace,daemonset){
+    return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}/pod/list`, {
+        method: 'GET'
+    })
+}

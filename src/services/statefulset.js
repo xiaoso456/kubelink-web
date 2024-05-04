@@ -15,3 +15,16 @@ export function apiStatefulsetContainerSuspend(namespace,statefulset,container){
         method: 'PUT'
     })
 }
+
+export function apiStatefulsetGet(namespace,statefulset){
+
+    return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}`, {
+        method: 'GET'
+    })
+}
+
+export function apiStatefulsetPodList(namespace,statefulset){
+    return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}/pod/list`, {
+        method: 'GET'
+    })
+}

@@ -10,97 +10,106 @@
       </el-segmented>
     </el-row>
 
+    <div v-if="selectedOption==='Info'">
+      <el-row>
 
-    <el-row>
+        <el-descriptions v-loading="baseInfoLoading"
+                         class="margin-top"
+                         title="Base Info"
+                         :column="3"
+                         :size="size"
+                         border
+        >
+          <template #extra>
 
-      <el-descriptions
-          class="margin-top"
-          title="Base Info"
-          :column="3"
-          :size="size"
-          border
-      >
-        <el-descriptions-item>
-          <template #label>
-            <div class="cell-item">
-              <el-icon :style="iconStyle">
-                <House />
-              </el-icon>
-              Namespace
-            </div>
+            <el-tooltip  placement="top-start" effect="light" content="Refresh data every 10s">
+              <el-button  round plain link @click="() => {isAutoRefresh = !isAutoRefresh;refreshData()}">
+                <el-icon :class="{'is-loading':isAutoRefresh}" >
+                  <Refresh />
+                </el-icon>
+              </el-button >
+            </el-tooltip>
+
           </template>
-          {{ appInfo.namespace }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template #label>
-            <div class="cell-item">
-              <el-icon :style="iconStyle">
-                <Document />
-              </el-icon>
-              Name
-            </div>
-          </template>
-          {{ appInfo.name }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template #label>
-            <div class="cell-item">
-              <el-icon :style="iconStyle">
-                <PieChart />
-              </el-icon>
-              Replicas
-            </div>
-          </template>
-          {{ appInfo.availableReplicas }}/{{ appInfo.replicas }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template #label>
-            <div class="cell-item">
-              <el-icon :style="iconStyle">
-                <Ticket />
-              </el-icon>
-              RestartPolicy
-            </div>
-          </template>
-          {{ appInfo.restartPolicy }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template #label>
-            <div class="cell-item">
-              <el-icon :style="iconStyle">
-                <TrendCharts />
-              </el-icon>
-              Generation
-            </div>
-          </template>
-          {{ appInfo.generation }}
-        </el-descriptions-item>
+          <el-descriptions-item>
+            <template #label>
+              <div class="cell-item">
+                <el-icon :style="iconStyle">
+                  <House />
+                </el-icon>
+                Namespace
+              </div>
+            </template>
+            {{ appInfo.namespace }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template #label>
+              <div class="cell-item">
+                <el-icon :style="iconStyle">
+                  <Document />
+                </el-icon>
+                Name
+              </div>
+            </template>
+            {{ appInfo.name }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template #label>
+              <div class="cell-item">
+                <el-icon :style="iconStyle">
+                  <PieChart />
+                </el-icon>
+                Replicas
+              </div>
+            </template>
+            {{ appInfo.availableReplicas }}/{{ appInfo.replicas }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template #label>
+              <div class="cell-item">
+                <el-icon :style="iconStyle">
+                  <Ticket />
+                </el-icon>
+                RestartPolicy
+              </div>
+            </template>
+            {{ appInfo.restartPolicy }}
+          </el-descriptions-item>
+          <el-descriptions-item>
+            <template #label>
+              <div class="cell-item">
+                <el-icon :style="iconStyle">
+                  <TrendCharts />
+                </el-icon>
+                Generation
+              </div>
+            </template>
+            {{ appInfo.generation }}
+          </el-descriptions-item>
 
-        <el-descriptions-item>
-          <template #label>
-            <div class="cell-item">
-              <el-icon :style="iconStyle">
-                <Calendar />
-              </el-icon>
-              CreatedTime
-            </div>
-          </template>
-          {{ formattedDate(appInfo.createdTime) }}
-        </el-descriptions-item>
-      </el-descriptions>
+          <el-descriptions-item>
+            <template #label>
+              <div class="cell-item">
+                <el-icon :style="iconStyle">
+                  <Calendar />
+                </el-icon>
+                CreatedTime
+              </div>
+            </template>
+            {{ formattedDate(appInfo.createdTime) }}
+          </el-descriptions-item>
+        </el-descriptions>
 
 
 
-    </el-row>
+      </el-row>
+      <el-row>
 
+        <el-text class="el-descriptions__title">Pods</el-text>
 
-    <el-row>
+        <el-table style="margin-top: 10px" :data="tablePodData"  v-loading="tablePodsLoading">
 
-      <el-text class="el-descriptions__title">Pods</el-text>
-
-      <el-table :data="tablePodData" >
-
-        <el-table-column prop="name" label="Name" width="200">
+          <el-table-column sortable prop="name" label="Name" width="200">
             <template #default="scope">
               <el-tooltip
                   effect="light"
@@ -108,7 +117,7 @@
                   placement="top-start"
               >
                 <template #content>
-                  <el-table :data="scope.row.podInfo.containers">
+                  <el-table :data="scope.row.podInfo.containers" >
 
                     <el-table-column prop="name" label="Name" min-width="240">
                       <template #default="scopeContainer">
@@ -148,42 +157,81 @@
                 {{ scope.row.name }}
               </el-tooltip>
             </template>
-        </el-table-column>
+          </el-table-column>
 
 
-        <el-table-column  label="Node" >
-          <template #default="scope">
-            {{ scope.row.nodeName  }}({{ scope.row.hostIP}})
-          </template>
+          <el-table-column sortable label="Node" >
+            <template #default="scope">
+              {{ scope.row.nodeName  }}({{ scope.row.hostIP}})
+            </template>
+          </el-table-column>
+
+          <el-table-column sortable prop="status" label="Status" >
+
+          </el-table-column>
+
+          <el-table-column sortable prop="podIP" label="PodIP" >
+            <template #default="scope">
+
+              {{ scope.row.podInfo.podIP  }}
+            </template>
+          </el-table-column>
+
+          <el-table-column sortable prop="restartTimes" label="RestartTimes" >
+
+          </el-table-column>
+
+          <el-table-column sortable label="CreatedTime" width="180">
+            <template #default="scope">
+              {{ formattedDate(scope.row.CreatedTime)  }}
+            </template>
+
+          </el-table-column>
+
+        </el-table>
+
+      </el-row>
+    </div>
+
+    <div v-if="selectedOption==='Condition'">
+
+      <el-row>
+
+        <el-text class="el-descriptions__title">{{route.params.appType}}</el-text>
+
+        <el-table style="margin-top: 10px" :data="appInfo.conditions">
+
+          <el-table-column label="Id" width="60">
+            <template #default="scope">
+              {{ scope.$index+1  }}
+            </template>
+          </el-table-column>
+
+          <el-table-column sortable prop="type" label="Type" width="120">
+          </el-table-column>
 
 
-        </el-table-column>
+          <el-table-column sortable prop="status" label="status" width="100">
+          </el-table-column>
 
-        <el-table-column prop="status" label="Status" >
+          <el-table-column sortable prop="reason" label="reason" >
+          </el-table-column>
 
-        </el-table-column>
+          <el-table-column sortable prop="message" label="message" >
+          </el-table-column>
 
-        <el-table-column prop="podIP" label="PodIP" >
-          <template #default="scope">
+          <el-table-column sortable prop="lastUpdateTime" label="lastUpdateTime" >
+            <template #default="scope">
+              {{ formattedDate(scope.row.lastUpdateTime)  }}
+            </template>
+          </el-table-column>
 
-                {{ scope.row.podInfo.podIP  }}
-          </template>
-        </el-table-column>
 
-        <el-table-column prop="restartTimes" label="RestartTimes" >
+        </el-table>
 
-        </el-table-column>
+      </el-row>
 
-        <el-table-column label="CreatedTime" width="180">
-          <template #default="scope">
-            {{ formattedDate(scope.row.CreatedTime)  }}
-          </template>
-
-        </el-table-column>
-
-      </el-table>
-
-    </el-row>
+    </div>
 
   </div>
 </template>
@@ -196,13 +244,16 @@ import {apiDaemonsetGet, apiDaemonsetPodList} from "@/services/daemonset.js";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-
+import {
+  Refresh
+} from '@element-plus/icons-vue'
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
-const options = ['Info' ]
-
-
+const options = ['Info','Condition' ]
+const tablePodsLoading = ref(true)
+const baseInfoLoading = ref(true)
+const isAutoRefresh = ref(false)
 const size = ref('large')
 
 const route = useRoute()
@@ -397,7 +448,25 @@ const appInfo =ref({
   restartPolicy: 'Always',
   availableReplicas: 1,
   replicas:1,
-  generation: 1
+  generation: 1,
+  conditions: [
+    {
+      "lastTransitionTime": "2023-11-04T15:03:15Z",
+      "lastUpdateTime": "2024-04-25T07:29:51Z",
+      "message": "ReplicaSet \"mysql-65fb6bb7c7\" has successfully progressed.",
+      "reason": "NewReplicaSetAvailable",
+      "status": "True",
+      "type": "Progressing"
+    },
+    {
+      "lastTransitionTime": "2024-05-02T05:41:50Z",
+      "lastUpdateTime": "2024-05-02T05:41:50Z",
+      "message": "Deployment has minimum availability.",
+      "reason": "MinimumReplicasAvailable",
+      "status": "True",
+      "type": "Available"
+    }
+  ],
 })
 
 // const tablePodDetailData = ref([
@@ -423,6 +492,7 @@ const formattedDate = (dateStr) =>{
 
 
 const updateAppInfo = () => {
+  baseInfoLoading.value = true
   if(route.params.appType === 'Deployment'){
     apiDeploymentGet(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
@@ -433,8 +503,10 @@ const updateAppInfo = () => {
         generation: resData.metadata.generation,
         restartPolicy: resData.spec.template.spec.restartPolicy,
         availableReplicas: resData.status.availableReplicas? resData.status.availableReplicas : 0,
-        replicas: resData.status.replicas? resData.status.replicas : 0
+        replicas: resData.status.replicas? resData.status.replicas : 0,
+        conditions: resData.status.conditions
       }
+      console.log(appInfo.value.conditions[0])
 
     }).catch(err => {
       ElMessage({
@@ -485,10 +557,12 @@ const updateAppInfo = () => {
       console.log(err)
     })
   }
+  baseInfoLoading.value = false
 }
 
 
 const updateTablePodData = () => {
+  tablePodsLoading.value = true
   if(route.params.appType === 'Deployment'){
     apiDeploymentPodList(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
@@ -577,11 +651,24 @@ const updateTablePodData = () => {
       console.log(err)
     })
   }
+  tablePodsLoading.value = false
 }
 
-onMounted(() => {
+const refreshData = () => {
   updateAppInfo()
   updateTablePodData()
+}
+
+setInterval(() => {
+  if(isAutoRefresh.value){
+    refreshData()
+  }
+
+}, 10000)
+
+
+onMounted(() => {
+  refreshData()
 })
 </script>
 

@@ -36,6 +36,7 @@ jobs:
           name: kube-link-web
           tag: v0.0.1-draft
           body: "This is a draft release"
+          allowUpdates: true
 
 
 

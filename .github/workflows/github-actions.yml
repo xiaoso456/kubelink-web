@@ -1,0 +1,39 @@
+name: build
+run-name: build vue page dist
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      # install node
+      - name: Install nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Npm install dependencies
+        run: npm install
+      - name: Npm build
+        run: npm run build
+      - name: Package to zip
+        run: |
+          cd dist
+          zip -r dist.zip .
+          mv dist.zip ../
+      - name: Upload to Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "dist.zip"
+          draft: true
+          name: v0.0.1-draft
+          body: "This is a draft release"
+
+
+
+

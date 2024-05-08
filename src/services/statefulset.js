@@ -28,3 +28,10 @@ export function apiStatefulsetPodList(namespace,statefulset){
         method: 'GET'
     })
 }
+
+export function apiStatefulsetServiceList(namespace,statefulset){
+    return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}/service/list`, {
+        method: 'GET'
+    })
+}
+

@@ -28,3 +28,9 @@ export function apiDeploymentPodList(namespace,deployment){
         method: 'GET'
     })
 }
+
+export function apiDeploymentServiceList(namespace,deployment){
+    return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}/service/list`, {
+        method: 'GET'
+    })
+}

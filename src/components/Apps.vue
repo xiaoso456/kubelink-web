@@ -124,7 +124,7 @@ const dialogTitle = ref('')
 const dialogMessage = ref('')
 const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
-const tableLoading = ref(false)
+const tableLoading = ref(true)
 
 const appTypeOptions = [
   {

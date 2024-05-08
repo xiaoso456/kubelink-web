@@ -193,6 +193,54 @@
       </el-row>
     </div>
 
+    <div v-if="selectedOption==='Network'">
+      <el-row>
+
+        <el-text class="el-descriptions__title">Service</el-text>
+
+        <el-table  v-loading="tableServiceLoading" style="margin-top: 10px" :data="appServiceInfo">
+
+          <el-table-column label="Id" width="60">
+            <template #default="scope">
+              {{ scope.$index+1  }}
+            </template>
+          </el-table-column>
+
+          <el-table-column sortable prop="name" label="Name" width="120">
+          </el-table-column>
+
+
+          <el-table-column sortable prop="namespace" label="namespace" width="160">
+          </el-table-column>
+
+          <el-table-column sortable prop="type" label="type" width="120">
+          </el-table-column>
+
+          <el-table-column sortable prop="clusterIP" label="clusterIP" >
+          </el-table-column>
+
+          <el-table-column label="mapping" >
+            <template #default="scope">
+              <el-row v-for="(item,index) in scope.row.ports">
+                {{ portInfoToStr(item) }}
+              </el-row>
+
+
+            </template>
+          </el-table-column>
+
+          <el-table-column sortable prop="createdTime" label="createdTime" >
+            <template #default="scope">
+              {{ formattedDate(scope.row.createdTime)  }}
+            </template>
+          </el-table-column>
+
+
+        </el-table>
+
+      </el-row>
+    </div>
+
     <div v-if="selectedOption==='Condition'">
 
       <el-row>
@@ -238,9 +286,9 @@
 <script  setup>
 import {ref} from 'vue'
 import {useRoute} from 'vue-router'
-import {apiDeploymentGet, apiDeploymentPodList} from "@/services/deployment.js";
-import {apiStatefulsetGet, apiStatefulsetPodList} from "@/services/statefulset.js";
-import {apiDaemonsetGet, apiDaemonsetPodList} from "@/services/daemonset.js";
+import {apiDeploymentGet, apiDeploymentPodList, apiDeploymentServiceList} from "@/services/deployment.js";
+import {apiStatefulsetGet, apiStatefulsetPodList, apiStatefulsetServiceList} from "@/services/statefulset.js";
+import {apiDaemonsetGet, apiDaemonsetPodList, apiDaemonsetServiceList} from "@/services/daemonset.js";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -250,9 +298,10 @@ import {
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
-const options = ['Info','Condition' ]
+const options = ['Info','Network','Condition' ]
 const tablePodsLoading = ref(true)
 const baseInfoLoading = ref(true)
+const tableServiceLoading = ref(true)
 const isAutoRefresh = ref(false)
 const size = ref('large')
 
@@ -469,6 +518,24 @@ const appInfo =ref({
   ],
 })
 
+const appServiceInfo = ref([{
+  name: 'mysql',
+  namespace: 'default',
+  createdTime: '2023-10-07T13:38:06Z',
+  type: 'ClusterIP',
+  clusterIP: '10.96.0.1',
+  ports: [
+    {
+      "name": "tcp-5005",
+      "nodePort": 31118,
+      "port": 5005,
+      "protocol": "TCP",
+      "targetPort": 5006
+    }
+  ],
+  sessionAffinity: 'None',
+}])
+
 // const tablePodDetailData = ref([
 //   [
 //     {
@@ -506,7 +573,6 @@ const updateAppInfo = () => {
         replicas: resData.status.replicas? resData.status.replicas : 0,
         conditions: resData.status.conditions
       }
-      console.log(appInfo.value.conditions[0])
 
     }).catch(err => {
       ElMessage({
@@ -654,9 +720,82 @@ const updateTablePodData = () => {
   tablePodsLoading.value = false
 }
 
+const updateAppNetworkInfo = () => {
+  tableServiceLoading.value = true
+  if(route.params.appType === 'Deployment'){
+    apiDeploymentServiceList(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.json()
+      appServiceInfo.value = resData.map(item => {
+        return {
+          name: item.metadata.name,
+          namespace: item.metadata.namespace,
+          createdTime: item.metadata.creationTimestamp,
+          type: item.spec.type,
+          clusterIP: item.spec.clusterIP,
+          ports: item.spec.ports,
+          sessionAffinity: item.spec.sessionAffinity
+        }
+      })
+
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Statefulset'){
+    apiStatefulsetServiceList(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.json()
+      appServiceInfo.value = resData.map(item => {
+        return {
+          name: item.metadata.name,
+          namespace: item.metadata.namespace,
+          createdTime: item.metadata.creationTimestamp,
+          type: item.spec.type,
+          clusterIP: item.spec.clusterIP,
+          ports: item.spec.ports,
+          sessionAffinity: item.spec.sessionAffinity
+        }
+      })
+
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Daemonset'){
+    apiDaemonsetServiceList(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.json()
+      appServiceInfo.value = resData.map(item => {
+        return {
+          name: item.metadata.name,
+          namespace: item.metadata.namespace,
+          createdTime: item.metadata.creationTimestamp,
+          type: item.spec.type,
+          clusterIP: item.spec.clusterIP,
+          ports: item.spec.ports,
+          sessionAffinity: item.spec.sessionAffinity
+        }
+      })
+
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }
+  tableServiceLoading.value = false
+}
+
 const refreshData = () => {
   updateAppInfo()
   updateTablePodData()
+  updateAppNetworkInfo()
 }
 
 setInterval(() => {
@@ -666,6 +805,14 @@ setInterval(() => {
 
 }, 10000)
 
+const portInfoToStr = (portInfo)=>{
+  let portInfoStr = portInfo.protocol + " "
+  if(portInfo.nodePort){
+    portInfoStr += portInfo.nodePort + " → "
+  }
+  portInfoStr +=  portInfo.port + " → " + portInfo.targetPort
+  return portInfoStr
+}
 
 onMounted(() => {
   refreshData()

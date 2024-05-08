@@ -28,3 +28,9 @@ export function apiDaemonsetPodList(namespace,daemonset){
         method: 'GET'
     })
 }
+
+export function apiDaemonsetServiceList(namespace,daemonset){
+    return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}/service/list`, {
+        method: 'GET'
+    })
+}

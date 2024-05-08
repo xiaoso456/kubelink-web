@@ -196,7 +196,53 @@
     <div v-if="selectedOption==='Network'">
       <el-row>
 
-        <el-text class="el-descriptions__title">Service</el-text>
+        <el-text class="el-descriptions__title">Container</el-text>
+        <el-table  v-loading="baseInfoLoading" style="margin-top: 10px" :data="containerInfo">
+
+          <el-table-column label="Id" width="60">
+            <template #default="scope">
+              {{ scope.$index+1  }}
+            </template>
+          </el-table-column>
+
+          <el-table-column sortable prop="name" label="Name" width="240">
+          </el-table-column>
+
+
+          <el-table-column sortable prop="image" label="image" width="360">
+          </el-table-column>
+
+          <el-table-column label="protocol" >
+            <template #default="scope">
+              <el-row v-for="(protocol,index) in scope.row.protocols">
+                {{ protocol }}
+              </el-row>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="portName" >
+            <template #default="scope">
+              <el-row v-for="(portName,index) in scope.row.portNames">
+                {{ portName }}
+              </el-row>
+            </template>
+          </el-table-column>
+
+
+
+          <el-table-column label="containerPorts" >
+            <template #default="scope">
+              <el-row v-for="(containerPort,index) in scope.row.containerPorts">
+                {{ containerPort }}
+              </el-row>
+            </template>
+          </el-table-column>
+
+        </el-table>
+
+
+
+        <el-text class="el-descriptions__title" style="margin-top: 10px">Service</el-text>
 
         <el-table  v-loading="tableServiceLoading" style="margin-top: 10px" :data="appServiceInfo">
 
@@ -239,8 +285,8 @@
         </el-table>
 
       </el-row>
-    </div>
 
+    </div>
     <div v-if="selectedOption==='Condition'">
 
       <el-row>
@@ -490,51 +536,138 @@ const item = {
 }
 const tablePodData = ref(Array.from({ length: 1 }).fill(item))
 
-const appInfo =ref({
-  namespace: 'default',
-  name: 'remote-k8s',
-  createdTime: '2024-01-01 00:00:00',
-  restartPolicy: 'Always',
-  availableReplicas: 1,
-  replicas:1,
-  generation: 1,
-  conditions: [
-    {
-      "lastTransitionTime": "2023-11-04T15:03:15Z",
-      "lastUpdateTime": "2024-04-25T07:29:51Z",
-      "message": "ReplicaSet \"mysql-65fb6bb7c7\" has successfully progressed.",
-      "reason": "NewReplicaSetAvailable",
-      "status": "True",
-      "type": "Progressing"
-    },
-    {
-      "lastTransitionTime": "2024-05-02T05:41:50Z",
-      "lastUpdateTime": "2024-05-02T05:41:50Z",
-      "message": "Deployment has minimum availability.",
-      "reason": "MinimumReplicasAvailable",
-      "status": "True",
-      "type": "Available"
-    }
-  ],
+const appServiceInfoRaw = ref([])
+const appServiceInfo = computed(()=>{
+
+  if(!appServiceInfoRaw.value){
+    return []
+  }
+  if(route.params.appType === 'Deployment'){
+    let result = appServiceInfoRaw.value.map(item => {
+      return {
+        name: item.metadata.name,
+        namespace: item.metadata.namespace,
+        createdTime: item.metadata.creationTimestamp,
+        type: item.spec.type,
+        clusterIP: item.spec.clusterIP,
+        ports: item.spec.ports,
+        sessionAffinity: item.spec.sessionAffinity
+      }
+    })
+    console.log(result)
+    return result
+  }else if(route.params.appType === 'Statefulset'){
+
+    return appServiceInfoRaw.value.map(item => {
+      return {
+        name: item.metadata.name,
+        namespace: item.metadata.namespace,
+        createdTime: item.metadata.creationTimestamp,
+        type: item.spec.type,
+        clusterIP: item.spec.clusterIP,
+        ports: item.spec.ports,
+        sessionAffinity: item.spec.sessionAffinity
+      }
+    })
+
+  }else if(route.params.appType === 'Daemonset'){
+    return  appServiceInfoRaw.value.map(item => {
+      return {
+        name: item.metadata.name,
+        namespace: item.metadata.namespace,
+        createdTime: item.metadata.creationTimestamp,
+        type: item.spec.type,
+        clusterIP: item.spec.clusterIP,
+        ports: item.spec.ports,
+        sessionAffinity: item.spec.sessionAffinity
+      }
+    })
+  }
+
+})
+// const appServiceInfo = ref([{
+//   name: 'mysql',
+//   namespace: 'default',
+//   createdTime: '2023-10-07T13:38:06Z',
+//   type: 'ClusterIP',
+//   clusterIP: '10.96.0.1',
+//   ports: [
+//     {
+//       "name": "tcp-5005",
+//       "nodePort": 31118,
+//       "port": 5005,
+//       "protocol": "TCP",
+//       "targetPort": 5006
+//     }
+//   ],
+//   sessionAffinity: 'None',
+// }])
+
+
+const appInfoRaw = ref(null)
+const containerInfo = computed(()=>{
+
+  if(appInfoRaw.value){
+    let result = appInfoRaw.value.spec.template.spec.containers.map((item,index)=>{
+      return {
+        name: item.name,
+        image: item.image,
+        protocols: item.ports===undefined?[]:item.ports.map(port=>{
+          return port.protocol
+        }),
+        portNames: item.ports===undefined?[]:item.ports.map(port=>{
+          return port.name
+        }),
+        containerPorts: item.ports===undefined?[]:item.ports.map(port=>{
+          return port.containerPort
+        }),
+      }
+    })
+    return result
+  }
 })
 
-const appServiceInfo = ref([{
-  name: 'mysql',
-  namespace: 'default',
-  createdTime: '2023-10-07T13:38:06Z',
-  type: 'ClusterIP',
-  clusterIP: '10.96.0.1',
-  ports: [
-    {
-      "name": "tcp-5005",
-      "nodePort": 31118,
-      "port": 5005,
-      "protocol": "TCP",
-      "targetPort": 5006
+const appInfo = computed(()=>{
+  if(!appInfoRaw.value){
+    return {}
+  }
+  if(route.params.appType === 'Deployment'){
+    return {
+      namespace: appInfoRaw.value.metadata.namespace,
+      name: appInfoRaw.value.metadata.name,
+      createdTime: appInfoRaw.value.metadata.creationTimestamp,
+      generation: appInfoRaw.value.metadata.generation,
+      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
+      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0,
+      conditions: appInfoRaw.value.status.conditions
     }
-  ],
-  sessionAffinity: 'None',
-}])
+  }else if(route.params.appType === 'Statefulset'){
+
+    return {
+      namespace: appInfoRaw.value.metadata.namespace,
+      name: appInfoRaw.value.metadata.name,
+      createdTime: appInfoRaw.value.metadata.creationTimestamp,
+      generation: appInfoRaw.value.metadata.generation,
+      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
+      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0
+    }
+  }else if(route.params.appType === 'Daemonset'){
+    return {
+      namespace: appInfoRaw.value.metadata.namespace,
+      name: appInfoRaw.value.metadata.name,
+      createdTime: appInfoRaw.value.metadata.creationTimestamp,
+      generation: appInfoRaw.value.metadata.generation,
+      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoRaw.value.status.numberAvailable? appInfoRaw.value.status.numberAvailable : 0,
+      replicas: (appInfoRaw.value.status.numberAvailable? appInfoRaw.value.status.numberAvailable : 0)
+          + (appInfoRaw.value.status.numberUnavailable? appInfoRaw.value.status.numberUnavailable : 0)
+
+    }
+  }
+
+})
 
 // const tablePodDetailData = ref([
 //   [
@@ -563,16 +696,7 @@ const updateAppInfo = () => {
   if(route.params.appType === 'Deployment'){
     apiDeploymentGet(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
-      appInfo.value = {
-        namespace: resData.metadata.namespace,
-        name: resData.metadata.name,
-        createdTime: resData.metadata.creationTimestamp,
-        generation: resData.metadata.generation,
-        restartPolicy: resData.spec.template.spec.restartPolicy,
-        availableReplicas: resData.status.availableReplicas? resData.status.availableReplicas : 0,
-        replicas: resData.status.replicas? resData.status.replicas : 0,
-        conditions: resData.status.conditions
-      }
+      appInfoRaw.value = resData
 
     }).catch(err => {
       ElMessage({
@@ -584,15 +708,7 @@ const updateAppInfo = () => {
   }else if(route.params.appType === 'Statefulset'){
     apiStatefulsetGet(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
-      appInfo.value = {
-        namespace: resData.metadata.namespace,
-        name: resData.metadata.name,
-        createdTime: resData.metadata.creationTimestamp,
-        generation: resData.metadata.generation,
-        restartPolicy: resData.spec.template.spec.restartPolicy,
-        availableReplicas: resData.status.availableReplicas? resData.status.availableReplicas : 0,
-        replicas: resData.status.replicas? resData.status.replicas : 0
-      }
+      appInfoRaw.value = resData
 
     }).catch(err => {
       ElMessage({
@@ -604,16 +720,7 @@ const updateAppInfo = () => {
   }else if(route.params.appType === 'Daemonset'){
     apiDaemonsetGet(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
-      appInfo.value = {
-        namespace: resData.metadata.namespace,
-        name: resData.metadata.name,
-        createdTime: resData.metadata.creationTimestamp,
-        generation: resData.metadata.generation,
-        restartPolicy: resData.spec.template.spec.restartPolicy,
-        availableReplicas: resData.status.numberAvailable? resData.status.numberAvailable : 0,
-        replicas: (resData.status.numberAvailable? resData.status.numberAvailable : 0)
-          + (resData.status.numberUnavailable? resData.status.numberUnavailable : 0)
-      }
+      appInfoRaw.value = resData
 
     }).catch(err => {
       ElMessage({
@@ -725,17 +832,7 @@ const updateAppNetworkInfo = () => {
   if(route.params.appType === 'Deployment'){
     apiDeploymentServiceList(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
-      appServiceInfo.value = resData.map(item => {
-        return {
-          name: item.metadata.name,
-          namespace: item.metadata.namespace,
-          createdTime: item.metadata.creationTimestamp,
-          type: item.spec.type,
-          clusterIP: item.spec.clusterIP,
-          ports: item.spec.ports,
-          sessionAffinity: item.spec.sessionAffinity
-        }
-      })
+      appServiceInfoRaw.value = resData
 
     }).catch(err => {
       ElMessage({
@@ -747,17 +844,7 @@ const updateAppNetworkInfo = () => {
   }else if(route.params.appType === 'Statefulset'){
     apiStatefulsetServiceList(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
-      appServiceInfo.value = resData.map(item => {
-        return {
-          name: item.metadata.name,
-          namespace: item.metadata.namespace,
-          createdTime: item.metadata.creationTimestamp,
-          type: item.spec.type,
-          clusterIP: item.spec.clusterIP,
-          ports: item.spec.ports,
-          sessionAffinity: item.spec.sessionAffinity
-        }
-      })
+      appServiceInfoRaw.value = resData
 
     }).catch(err => {
       ElMessage({
@@ -769,17 +856,7 @@ const updateAppNetworkInfo = () => {
   }else if(route.params.appType === 'Daemonset'){
     apiDaemonsetServiceList(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
-      appServiceInfo.value = resData.map(item => {
-        return {
-          name: item.metadata.name,
-          namespace: item.metadata.namespace,
-          createdTime: item.metadata.creationTimestamp,
-          type: item.spec.type,
-          clusterIP: item.spec.clusterIP,
-          ports: item.spec.ports,
-          sessionAffinity: item.spec.sessionAffinity
-        }
-      })
+      appServiceInfoRaw.value = resData
 
     }).catch(err => {
       ElMessage({

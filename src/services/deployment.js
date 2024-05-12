@@ -23,6 +23,21 @@ export function apiDeploymentGet(namespace,deployment){
     })
 }
 
+export function apiDeploymentYamlGet(namespace, deployment){
+
+    return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}/yaml`, {
+        method: 'GET'
+    })
+}
+
+export function apiDeploymentYamlUpdate(namespace,deployment,yaml){
+
+    return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}/yaml`, {
+        method: 'PUT',
+        body: yaml
+    })
+}
+
 export function apiDeploymentPodList(namespace,deployment){
     return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}/pod/list`, {
         method: 'GET'

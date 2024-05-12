@@ -112,7 +112,7 @@ import {
   Reading, Search
 } from '@element-plus/icons-vue'
 import {apiNamespaceList} from "@/services/namespace.js";
-import {apiDeploymentContainerSuspend, apiDeploymentList} from "@/services/deployment.js";
+import {apiDeploymentContainerSuspend, apiDeploymentList, apiDeploymentYamlGet} from "@/services/deployment.js";
 import {apiStatefulsetContainerSuspend, apiStatefulsetList} from "@/services/statefulset.js";
 import {apiDaemonsetContainerSuspend, apiDaemonsetList} from "@/services/daemonset.js";
 
@@ -303,8 +303,6 @@ const handleSuspend = (row) => {
       })
     }
   }
-
-
 
 }
 

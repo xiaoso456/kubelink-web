@@ -23,6 +23,21 @@ export function apiStatefulsetGet(namespace,statefulset){
     })
 }
 
+export function apiStatefulsetYamlGet(namespace, statefulset){
+
+    return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}/yaml`, {
+        method: 'GET'
+    })
+}
+
+export function apiStatefulsetYamlUpdate(namespace,statefulset,yaml){
+
+    return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}/yaml`, {
+        method: 'PUT',
+        body: yaml
+    })
+}
+
 export function apiStatefulsetPodList(namespace,statefulset){
     return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}/pod/list`, {
         method: 'GET'

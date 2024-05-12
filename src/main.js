@@ -14,6 +14,8 @@ import { createPinia } from 'pinia'
 import piniaPersist from 'pinia-plugin-persist'
 import AppDetails from "@/components/AppDetails.vue";
 
+
+
 const router = VueRouter.createRouter({
     history: VueRouter.createWebHashHistory(),
     routes: [

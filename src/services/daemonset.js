@@ -23,6 +23,21 @@ export function apiDaemonsetGet(namespace,daemonset){
     })
 }
 
+export function apiDaemonsetYamlGet(namespace, daemonset){
+
+    return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}/yaml`, {
+        method: 'GET'
+    })
+}
+
+export function apiDaemonsetYamlUpdate(namespace,daemonset,yaml){
+
+    return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}/yaml`, {
+        method: 'PUT',
+        body: yaml
+    })
+}
+
 export function apiDaemonsetPodList(namespace,daemonset){
     return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}/pod/list`, {
         method: 'GET'

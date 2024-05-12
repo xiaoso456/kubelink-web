@@ -104,9 +104,9 @@
 
       </el-row>
       <el-row>
-
-        <el-text class="el-descriptions__title">Pods</el-text>
-
+          <el-text class="el-descriptions__title">Pods</el-text>
+      </el-row>
+      <el-row>
         <el-table style="margin-top: 10px" :data="tablePodData"  v-loading="tablePodsLoading">
 
           <el-table-column sortable prop="name" label="Name" width="200">
@@ -188,11 +188,39 @@
 
           </el-table-column>
 
+          <el-table-column  label="Operation">
+            <template #default="scope">
+              <el-button size="small" type="primary" plain @click="()=>{
+                          $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Logs')
+                        } ">logs</el-button>
+            </template>
+          </el-table-column>
         </el-table>
 
       </el-row>
     </div>
+    <div v-if="selectedOption==='Yaml'">
 
+      <el-scrollbar v-loading="yamlLoading" height="65vh"  style="max-width:900px;margin-top: 10px">
+
+        <codemirror
+
+            v-model="yamlCode"
+            placeholder="Code goes here..."
+            :autofocus="true"
+            :indent-with-tab="true"
+            :tab-size="2"
+            :extensions="codeExtensions"
+        />
+      </el-scrollbar>
+      <el-row style="max-width: 900px" class="row-bg" justify="end">
+        <el-button size="default" type="info" plain @click="handleCancelSaveYaml">Cancel</el-button>
+        <el-button size="default" type="success" plain @click="saveAppYaml">Save</el-button>
+      </el-row>
+
+
+
+    </div>
     <div v-if="selectedOption==='Network'">
       <el-row>
 
@@ -332,26 +360,52 @@
 <script  setup>
 import {ref} from 'vue'
 import {useRoute} from 'vue-router'
-import {apiDeploymentGet, apiDeploymentPodList, apiDeploymentServiceList} from "@/services/deployment.js";
-import {apiStatefulsetGet, apiStatefulsetPodList, apiStatefulsetServiceList} from "@/services/statefulset.js";
-import {apiDaemonsetGet, apiDaemonsetPodList, apiDaemonsetServiceList} from "@/services/daemonset.js";
+import {
+  apiDeploymentGet,
+  apiDeploymentPodList,
+  apiDeploymentServiceList,
+  apiDeploymentYamlGet, apiDeploymentYamlUpdate
+} from "@/services/deployment.js";
+import {
+  apiStatefulsetGet,
+  apiStatefulsetPodList,
+  apiStatefulsetServiceList,
+  apiStatefulsetYamlGet, apiStatefulsetYamlUpdate
+} from "@/services/statefulset.js";
+import {
+  apiDaemonsetGet,
+  apiDaemonsetPodList,
+  apiDaemonsetServiceList,
+  apiDaemonsetYamlGet, apiDaemonsetYamlUpdate
+} from "@/services/daemonset.js";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import {
   Refresh
 } from '@element-plus/icons-vue'
+import {Codemirror} from "vue-codemirror";
+import {yaml} from "@codemirror/lang-yaml";
+
+import {oneDark} from "@codemirror/theme-one-dark";
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
-const options = ['Info','Network','Condition' ]
+const options = ['Info','Yaml','Network','Condition' ]
 const tablePodsLoading = ref(true)
 const baseInfoLoading = ref(true)
 const tableServiceLoading = ref(true)
+const yamlLoading = ref(true)
 const isAutoRefresh = ref(false)
 const size = ref('large')
-
+const yamlCode = ref('')
+const yamlCodeRaw = ref('')
 const route = useRoute()
+
+const codeExtensions = [
+  yaml(),
+  oneDark,
+]
 
 const iconStyle = computed(() => {
   const marginMap = {
@@ -869,10 +923,133 @@ const updateAppNetworkInfo = () => {
   tableServiceLoading.value = false
 }
 
+const updateAppYaml = () => {
+  yamlLoading.value = true
+  if(route.params.appType === 'Deployment'){
+    apiDeploymentYamlGet(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.text()
+      yamlCode.value = resData
+      yamlCodeRaw.value = resData
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Statefulset'){
+    apiStatefulsetYamlGet(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.text()
+      yamlCode.value = resData
+      yamlCodeRaw.value = resData
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Daemonset'){
+    apiDaemonsetYamlGet(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.text()
+      yamlCode.value = resData
+      yamlCodeRaw.value = resData
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }
+  yamlLoading.value = false
+}
+
+const saveAppYaml = () => {
+  if(route.params.appType === 'Deployment'){
+    apiDeploymentYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
+
+      if(res.status === 200){
+        ElMessage({
+          message: "update yaml success",
+          type: 'success'
+        })
+      }else{
+        let errorMessage = await res.text()
+        ElMessage({
+          message: errorMessage,
+          type: 'error'
+        })
+      }
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Statefulset'){
+    apiStatefulsetYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
+
+      if(res.status === 200){
+        ElMessage({
+          message: "update yaml success",
+          type: 'success'
+        })
+      }else{
+        let errorMessage = await res.text()
+        ElMessage({
+          message: errorMessage,
+          type: 'error'
+        })
+      }
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Daemonset'){
+    apiDaemonsetYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
+
+      if(res.status === 200){
+        ElMessage({
+          message: "update yaml success",
+          type: 'success'
+        })
+      }else{
+        let errorMessage = await res.text()
+        ElMessage({
+          message: errorMessage,
+          type: 'error'
+        })
+      }
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }
+
+  refreshData()
+
+}
+
+const handleCancelSaveYaml = () => {
+  yamlCode.value = yamlCodeRaw.value
+}
+
+
+
+
 const refreshData = () => {
   updateAppInfo()
   updateTablePodData()
   updateAppNetworkInfo()
+  updateAppYaml()
 }
 
 setInterval(() => {

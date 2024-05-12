@@ -80,7 +80,7 @@
         <template #default="scope">
           <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>
 <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
-<!--          <el-button size="small" type="danger"  plain @click="handleDelete(scope.$index,scope.row)">delete</el-button>-->
+          <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
         </template>
       </el-table-column>
 
@@ -112,9 +112,15 @@ import {
   Reading, Search
 } from '@element-plus/icons-vue'
 import {apiNamespaceList} from "@/services/namespace.js";
-import {apiDeploymentContainerSuspend, apiDeploymentList, apiDeploymentYamlGet} from "@/services/deployment.js";
-import {apiStatefulsetContainerSuspend, apiStatefulsetList} from "@/services/statefulset.js";
-import {apiDaemonsetContainerSuspend, apiDaemonsetList} from "@/services/daemonset.js";
+import {
+  apiDeploymentContainerSuspend,
+  apiDeploymentDelete,
+  apiDeploymentList,
+  apiDeploymentYamlGet
+} from "@/services/deployment.js";
+import {apiStatefulsetContainerSuspend, apiStatefulsetDelete, apiStatefulsetList} from "@/services/statefulset.js";
+import {apiDaemonsetContainerSuspend, apiDaemonsetDelete, apiDaemonsetList} from "@/services/daemonset.js";
+import {apiJobContainerSuspend, apiJobDelete, apiJobList} from "@/services/job.js";
 
 const selectedOptionValue = ref('Deployment')
 const selectedNamespaceOptionValue = ref('')
@@ -140,6 +146,11 @@ const appTypeOptions = [
   {
     label: 'Daemonset',
     value: 'Daemonset',
+    icon: Reading,
+  },
+  {
+    label: 'Job',
+    value: 'Job',
     icon: Reading,
   }
 ]
@@ -241,6 +252,26 @@ const updateTableData = async () => {
       })
       console.log(err)
     })
+  }else if (selectedOptionValue.value === 'Job') {
+    apiJobList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+      const resData = await res.json()
+      tableData.value = resData.map(item => {
+        return {
+          name: item.metadata.name,
+          namespace: item.metadata.namespace,
+          status: {
+            runNum: item.status.succeeded? item.status.succeeded : 0,
+            totalNum: item.spec.completions,
+          }
+        }
+      })
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
   }
   tableLoading.value = false
 
@@ -301,7 +332,95 @@ const handleSuspend = (row) => {
         })
         console.log(err)
       })
+    }else if(selectedOptionValue.value === 'Job'){
+      apiJobContainerSuspend(row.namespace,row.name,"_first").then(async res => {
+        if(res.status === 200){
+          ElMessage({
+            message: "success suspend first container",
+            type:'success'
+          })
+        }
+      }).catch(err => {
+        ElMessage({
+          message: "request error: " + err,
+          type: 'error'
+        })
+        console.log(err)
+      })
     }
+  }
+
+}
+
+const handleDelete = (row) => {
+  dialogVisible.value = true
+  dialogTitle.value = "Tips"
+  dialogMessage.value = `Delete ${selectedOptionValue.value} '${row.name}'`
+  dialogConfirmFuction.value = () => {
+    if(selectedOptionValue.value === 'Deployment'){
+      apiDeploymentDelete(row.namespace,row.name).then(async res => {
+
+        ElMessage({
+          message: await res.json(),
+          type:'success'
+        })
+
+      }).catch(err => {
+        ElMessage({
+          message: "request error: " + err,
+          type: 'error'
+        })
+        console.log(err)
+      })
+    }else if(selectedOptionValue.value === 'Statefulset'){
+      apiStatefulsetDelete(row.namespace,row.name).then(async res => {
+
+        ElMessage({
+          message: await res.json(),
+          type:'success'
+        })
+
+      }).catch(err => {
+        ElMessage({
+          message: "request error: " + err,
+          type: 'error'
+        })
+        console.log(err)
+      })
+    }else if(selectedOptionValue.value === 'Daemonset'){
+      apiDaemonsetDelete(row.namespace,row.name).then(async res => {
+
+        ElMessage({
+          message: await res.json(),
+          type:'success'
+        })
+
+      }).catch(err => {
+        ElMessage({
+          message: "request error: " + err,
+          type: 'error'
+        })
+        console.log(err)
+      })
+    }else if(selectedOptionValue.value === 'Job'){
+      apiJobDelete(row.namespace,row.name).then(async res => {
+
+        ElMessage({
+          message: await res.json(),
+          type:'success'
+        })
+
+      }).catch(err => {
+        ElMessage({
+          message: "request error: " + err,
+          type: 'error'
+        })
+        console.log(err)
+      })
+    }
+    setTimeout(() => {
+      updateTableData(selectedOptionValue.value)
+    }, 2000)
   }
 
 }
@@ -327,20 +446,5 @@ onMounted(async () => {
 
 }
 
-.circle-green {
-  background: rgba(65, 145, 107, 0.99);
-  border: 0.1875em solid rgba(65, 145, 107, 0.99);
-  border-radius: 40%;
-  height: 10px;
-  width: 10px;
-  margin-right: 3px;
-}
-.circle-yellow {
-  background: rgb(218, 162, 11);
-  border: 0.1875em solid rgb(218, 162, 11);
-  border-radius: 40%;
-  height: 10px;
-  width: 10px;
-  margin-right: 3px;
-}
+
 </style>

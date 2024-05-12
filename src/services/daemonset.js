@@ -23,6 +23,13 @@ export function apiDaemonsetGet(namespace,daemonset){
     })
 }
 
+export function apiDaemonsetDelete(namespace,daemonset){
+
+    return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}`, {
+        method: 'DELETE'
+    })
+}
+
 export function apiDaemonsetYamlGet(namespace, daemonset){
 
     return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}/yaml`, {

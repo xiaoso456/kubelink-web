@@ -23,6 +23,13 @@ export function apiStatefulsetGet(namespace,statefulset){
     })
 }
 
+export function apiStatefulsetDelete(namespace,statefulset){
+
+    return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}`, {
+        method: 'DELETE'
+    })
+}
+
 export function apiStatefulsetYamlGet(namespace, statefulset){
 
     return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}/yaml`, {

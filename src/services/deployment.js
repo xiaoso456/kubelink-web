@@ -23,6 +23,13 @@ export function apiDeploymentGet(namespace,deployment){
     })
 }
 
+export function apiDeploymentDelete(namespace,deployment){
+
+    return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}`, {
+        method: 'DELETE'
+    })
+}
+
 export function apiDeploymentYamlGet(namespace, deployment){
 
     return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}/yaml`, {

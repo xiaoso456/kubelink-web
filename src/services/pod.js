@@ -12,3 +12,9 @@ export function apiPodLogs(namespace,pod,container,previous,tailLines){
     })
 }
 
+export function apiPodDelete(namespace,pod){
+
+    return fetch(`${prefix}/namespace/${namespace}/pod/${pod}`, {
+        method: 'DELETE'
+    })
+}

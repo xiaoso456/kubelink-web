@@ -126,12 +126,21 @@
                     </el-table-column>
                     <el-table-column  label="Started" >
                       <template #default="scopeContainer">
-                        {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].started }}
+                        <el-row style="align-items: center">
+                          <div :class="scope.row.podInfo.containerStatuses[scopeContainer.$index].started?'circle-green':'circle-red'"></div>
+                          {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].started }}
+
+                        </el-row>
                       </template>
                     </el-table-column>
                     <el-table-column  label="Ready" >
                       <template #default="scopeContainer">
-                        {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].ready }}
+                        <el-row style="align-items: center">
+                          <div :class="scope.row.podInfo.containerStatuses[scopeContainer.$index].ready?'circle-green':'circle-red'"></div>
+
+                          {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].ready }}
+                        </el-row>
+
                       </template>
                     </el-table-column>
                     <el-table-column  label="RestartCount"  width="120">
@@ -192,7 +201,11 @@
             <template #default="scope">
               <el-button size="small" type="primary" plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Logs')
-                        } ">logs</el-button>
+                        } ">logs
+              </el-button>
+              <el-button size="small" type="danger" plain @click="handleDeletePod(scope.row)">delete
+              </el-button>
+
             </template>
           </el-table-column>
         </el-table>
@@ -356,6 +369,23 @@
     </div>
 
   </div>
+
+  <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      width="500"
+  >
+    <span>{{ dialogMessage }}</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogConfirmFuctionLast">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
 <script  setup>
 import {ref} from 'vue'
@@ -388,6 +418,8 @@ import {Codemirror} from "vue-codemirror";
 import {yaml} from "@codemirror/lang-yaml";
 
 import {oneDark} from "@codemirror/theme-one-dark";
+import {apiJobGet, apiJobPodList, apiJobServiceList, apiJobYamlGet, apiJobYamlUpdate} from "@/services/job.js";
+import {apiPodDelete} from "@/services/pod.js";
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
@@ -401,6 +433,13 @@ const size = ref('large')
 const yamlCode = ref('')
 const yamlCodeRaw = ref('')
 const route = useRoute()
+
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+const dialogMessage = ref('')
+const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
+const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
+
 
 const codeExtensions = [
   yaml(),
@@ -636,6 +675,18 @@ const appServiceInfo = computed(()=>{
         sessionAffinity: item.spec.sessionAffinity
       }
     })
+  }else if(route.params.appType === 'Job'){
+    return  appServiceInfoRaw.value.map(item => {
+      return {
+        name: item.metadata.name,
+        namespace: item.metadata.namespace,
+        createdTime: item.metadata.creationTimestamp,
+        type: item.spec.type,
+        clusterIP: item.spec.clusterIP,
+        ports: item.spec.ports,
+        sessionAffinity: item.spec.sessionAffinity
+      }
+    })
   }
 
 })
@@ -719,6 +770,16 @@ const appInfo = computed(()=>{
           + (appInfoRaw.value.status.numberUnavailable? appInfoRaw.value.status.numberUnavailable : 0)
 
     }
+  }else if(route.params.appType === 'Job'){
+    return {
+      namespace: appInfoRaw.value.metadata.namespace,
+      name: appInfoRaw.value.metadata.name,
+      createdTime: appInfoRaw.value.metadata.creationTimestamp,
+      generation: appInfoRaw.value.metadata.generation,
+      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
+      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0
+    }
   }
 
 })
@@ -773,6 +834,18 @@ const updateAppInfo = () => {
     })
   }else if(route.params.appType === 'Daemonset'){
     apiDaemonsetGet(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.json()
+      appInfoRaw.value = resData
+
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Job'){
+    apiJobGet(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
       appInfoRaw.value = resData
 
@@ -877,6 +950,35 @@ const updateTablePodData = () => {
       })
       console.log(err)
     })
+  }else if(route.params.appType === 'Job'){
+    apiJobPodList(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.json()
+      tablePodData.value = resData.map(item => {
+        return {
+          name: item.metadata.name,
+          nodeName: item.spec.nodeName,
+          hostIP: item.status.hostIP,
+          status: item.status.phase,
+          podInfo:{
+            podName: item.metadata.name,
+            podIP: item.status.podIP,
+            containers: item.spec.containers,
+            containerStatuses: item.status.containerStatuses,
+            conditions: item.status.conditions
+          },
+          createdTime: item.metadata.creationTimestamp,
+          restartTimes: item.status.containerStatuses[0].restartCount
+
+        }
+      })
+
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
   }
   tablePodsLoading.value = false
 }
@@ -909,6 +1011,18 @@ const updateAppNetworkInfo = () => {
     })
   }else if(route.params.appType === 'Daemonset'){
     apiDaemonsetServiceList(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.json()
+      appServiceInfoRaw.value = resData
+
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Job'){
+    apiJobServiceList(route.params.namespace,route.params.appName).then(async res => {
       const resData = await res.json()
       appServiceInfoRaw.value = resData
 
@@ -961,6 +1075,18 @@ const updateAppYaml = () => {
       })
       console.log(err)
     })
+  }else if(route.params.appType === 'Job'){
+    apiJobYamlGet(route.params.namespace,route.params.appName).then(async res => {
+      const resData = await res.text()
+      yamlCode.value = resData
+      yamlCodeRaw.value = resData
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
   }
   yamlLoading.value = false
 }
@@ -974,6 +1100,8 @@ const saveAppYaml = () => {
           message: "update yaml success",
           type: 'success'
         })
+        refreshData()
+
       }else{
         let errorMessage = await res.text()
         ElMessage({
@@ -996,6 +1124,8 @@ const saveAppYaml = () => {
           message: "update yaml success",
           type: 'success'
         })
+        refreshData()
+
       }else{
         let errorMessage = await res.text()
         ElMessage({
@@ -1018,6 +1148,32 @@ const saveAppYaml = () => {
           message: "update yaml success",
           type: 'success'
         })
+        refreshData()
+
+      }else{
+        let errorMessage = await res.text()
+        ElMessage({
+          message: errorMessage,
+          type: 'error'
+        })
+      }
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }else if(route.params.appType === 'Job'){
+    apiJobYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
+
+      if(res.status === 200){
+        ElMessage({
+          message: "update yaml success",
+          type: 'success'
+        })
+        refreshData()
+
       }else{
         let errorMessage = await res.text()
         ElMessage({
@@ -1034,7 +1190,6 @@ const saveAppYaml = () => {
     })
   }
 
-  refreshData()
 
 }
 
@@ -1042,7 +1197,36 @@ const handleCancelSaveYaml = () => {
   yamlCode.value = yamlCodeRaw.value
 }
 
+const handleDeletePod = (row) => {
+  dialogVisible.value = true
+  dialogTitle.value = "Tips"
+  dialogMessage.value = `Delete pod '${row.name}' `
+  dialogConfirmFuction.value = () => {
+    apiPodDelete(route.params.namespace,row.name).then(async res => {
 
+      if(res.status === 200){
+        ElMessage({
+          message: "delete pod success",
+          type: 'success'
+        })
+        refreshData()
+
+      }else{
+        let errorMessage = await res.text()
+        ElMessage({
+          message: errorMessage,
+          type: 'error'
+        })
+      }
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }
+}
 
 
 const refreshData = () => {

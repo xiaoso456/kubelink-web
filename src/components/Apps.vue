@@ -1,16 +1,28 @@
 <template>
   <div>
 
-    <el-segmented @change="updateTableData" class="common-margin" v-model="selectedOptionValue" :options="appTypeOptions"  >
-      <template #default="{ item }">
-        <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
-          <el-icon size="20">
-            <component :is="item.icon" />
+    <el-row align="top">
+      <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue" :options="appTypeOptions"  >
+        <template #default="{ item }">
+          <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
+            <el-icon size="20">
+              <component :is="item.icon" />
+            </el-icon>
+            <div>{{ item.label }}</div>
+          </div>
+        </template>
+      </el-segmented>
+
+      <el-tooltip  placement="top-start" effect="light" content="Refresh data every 10s">
+        <el-button style="margin-left: 10px;" round plain link @click="() => {isAutoRefresh = !isAutoRefresh;updateTableData()}">
+          <el-icon size="18px" :class="{'is-loading':isAutoRefresh}" >
+            <Refresh />
           </el-icon>
-          <div>{{ item.label }}</div>
-        </div>
-      </template>
-    </el-segmented>
+        </el-button >
+      </el-tooltip>
+
+    </el-row>
+
 
 
 
@@ -109,7 +121,7 @@ import { ref } from 'vue'
 import {
   Postcard,
   Coin,
-  Reading, Search
+  Reading, Search, Stopwatch
 } from '@element-plus/icons-vue'
 import {apiNamespaceList} from "@/services/namespace.js";
 import {
@@ -131,29 +143,35 @@ const dialogMessage = ref('')
 const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
 const tableLoading = ref(true)
+const isAutoRefresh = ref(false)
 
-const appTypeOptions = [
+const appTypeOptions = ref([
   {
     label: 'Deployment',
     value: 'Deployment',
     icon: Postcard,
+    disabled: false
   },
   {
     label: 'Statefulset',
     value: 'Statefulset',
     icon: Coin,
+    disabled: false
+
   },
   {
     label: 'Daemonset',
     value: 'Daemonset',
     icon: Reading,
+    disabled: false
   },
   {
     label: 'Job',
     value: 'Job',
-    icon: Reading,
+    icon: Stopwatch,
+    disabled: false
   }
-]
+])
 
 const namespaceOptions = ref([
   {
@@ -190,10 +208,17 @@ const refreshNamespaceOptions = () => {
 
 }
 
+
+
 const updateTableData = async () => {
   tableLoading.value = true
+  // disabled other options
+  appTypeOptions.value.forEach(item => {
+    item.disabled = (item.value !== selectedOptionValue.value)
+  })
+  let wait;
   if (selectedOptionValue.value === 'Deployment') {
-    apiDeploymentList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiDeploymentList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -213,7 +238,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   } else if (selectedOptionValue.value === 'Statefulset') {
-    apiStatefulsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiStatefulsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -233,7 +258,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   } else if (selectedOptionValue.value === 'Daemonset') {
-    apiDaemonsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiDaemonsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -253,7 +278,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   }else if (selectedOptionValue.value === 'Job') {
-    apiJobList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiJobList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -273,13 +298,17 @@ const updateTableData = async () => {
       console.log(err)
     })
   }
+  await wait
+  appTypeOptions.value.forEach(item => {
+    item.disabled = false
+  })
   tableLoading.value = false
 
 }
 
-const handleChangeAppType = (item) => {
+const handleChangeAppType = async (item) => {
   searchInput.value = ''
-  updateTableData(item.value)
+  await updateTableData(item.value)
 }
 
 const handleSuspend = (row) => {

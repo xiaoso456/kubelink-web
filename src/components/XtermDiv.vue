@@ -181,6 +181,7 @@ const highlightKeyword = () => {
 }
 
 const handleSelectOption = ()=>{
+  term.clear()
   router.push(`/pod/namespace/${route.params.namespace}/pod/${route.params.pod}/container/${route.params.container}/${selectedOptionValue.value}`)
   setTimeout(()=>{
     window.location.reload()

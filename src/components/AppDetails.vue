@@ -1,6 +1,6 @@
 <template>
-  <div class="custom-style" style="margin-left: 10px;">
-    <el-row>
+  <div  class="custom-style" style="margin-left: 10px;">
+    <el-row align="top">
       <el-segmented size="large"  v-model="selectedOption" :options="options" >
         <template #default="scope">
           <div style="padding: 0px 20px 0px 20px;">
@@ -8,6 +8,16 @@
           </div>
         </template>
       </el-segmented>
+
+
+        <el-tooltip  placement="top-start" effect="light" content="Refresh data every 10s">
+          <el-button style="margin-left: 10px;" round plain link @click="() => {isAutoRefresh = !isAutoRefresh;refreshData()}">
+            <el-icon size="18px" :class="{'is-loading':isAutoRefresh}" >
+              <Refresh />
+            </el-icon>
+          </el-button >
+        </el-tooltip>
+
     </el-row>
 
     <div v-if="selectedOption==='Info'">
@@ -22,13 +32,7 @@
         >
           <template #extra>
 
-            <el-tooltip  placement="top-start" effect="light" content="Refresh data every 10s">
-              <el-button  round plain link @click="() => {isAutoRefresh = !isAutoRefresh;refreshData()}">
-                <el-icon :class="{'is-loading':isAutoRefresh}" >
-                  <Refresh />
-                </el-icon>
-              </el-button >
-            </el-tooltip>
+
 
           </template>
           <el-descriptions-item>
@@ -118,7 +122,6 @@
               >
                 <template #content>
                   <el-table :data="scope.row.podInfo.containers" >
-
                     <el-table-column prop="name" label="Name" min-width="240">
                       <template #default="scopeContainer">
                         {{ scope.row.podInfo.containers[scopeContainer.$index].name }}
@@ -150,7 +153,11 @@
                     </el-table-column>
                     <el-table-column  label="StartedAt" width="180">
                       <template #default="scopeContainer">
-                        {{ formattedDate(scope.row.podInfo.containerStatuses[scopeContainer.$index].state.running.startedAt) }}
+                        {{ formattedDate(
+                            // todo use func instead
+                            scope.row.podInfo.containerStatuses[scopeContainer.$index].state.running?scope.row.podInfo.containerStatuses[scopeContainer.$index].state.running.startedAt:''
+                          )
+                        }}
                       </template>
                     </el-table-column>
                     <el-table-column  label="Operation" width="180">
@@ -175,8 +182,14 @@
             </template>
           </el-table-column>
 
-          <el-table-column sortable prop="status" label="Status" >
-
+          <el-table-column sortable  label="Status" >
+            <template #default="scope">
+              <el-row  style="align-items: center">
+                <div :class="{'circle-green':   scope.row.status==='Running' , 'circle-yellow':   scope.row.status==='Pending' , 'circle-red':   scope.row.status==='Failed','circle-grey':   scope.row.status==='Succeeded'}">
+                </div>
+                {{ scope.row.status  }}
+              </el-row>
+            </template>
           </el-table-column>
 
           <el-table-column sortable prop="podIP" label="PodIP" >
@@ -197,7 +210,7 @@
 
           </el-table-column>
 
-          <el-table-column  label="Operation">
+          <el-table-column  label="Operation" width="180">
             <template #default="scope">
               <el-button size="small" type="primary" plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Logs')
@@ -806,10 +819,11 @@ const formattedDate = (dateStr) =>{
 }
 
 
-const updateAppInfo = () => {
+const updateAppInfo = async () => {
   baseInfoLoading.value = true
-  if(route.params.appType === 'Deployment'){
-    apiDeploymentGet(route.params.namespace,route.params.appName).then(async res => {
+  let wait
+  if (route.params.appType === 'Deployment') {
+    wait = apiDeploymentGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appInfoRaw.value = resData
 
@@ -820,8 +834,8 @@ const updateAppInfo = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Statefulset'){
-    apiStatefulsetGet(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Statefulset') {
+    wait = apiStatefulsetGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appInfoRaw.value = resData
 
@@ -832,8 +846,8 @@ const updateAppInfo = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Daemonset'){
-    apiDaemonsetGet(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Daemonset') {
+    wait = apiDaemonsetGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appInfoRaw.value = resData
 
@@ -844,8 +858,8 @@ const updateAppInfo = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Job'){
-    apiJobGet(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Job') {
+    wait = apiJobGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appInfoRaw.value = resData
 
@@ -857,14 +871,16 @@ const updateAppInfo = () => {
       console.log(err)
     })
   }
+  await wait
   baseInfoLoading.value = false
 }
 
 
-const updateTablePodData = () => {
+const updateTablePodData = async () => {
   tablePodsLoading.value = true
-  if(route.params.appType === 'Deployment'){
-    apiDeploymentPodList(route.params.namespace,route.params.appName).then(async res => {
+  let wait
+  if (route.params.appType === 'Deployment') {
+    wait = apiDeploymentPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       tablePodData.value = resData.map(item => {
         return {
@@ -872,7 +888,7 @@ const updateTablePodData = () => {
           nodeName: item.spec.nodeName,
           hostIP: item.status.hostIP,
           status: item.status.phase,
-          podInfo:{
+          podInfo: {
             podName: item.metadata.name,
             podIP: item.status.podIP,
             containers: item.spec.containers,
@@ -892,8 +908,8 @@ const updateTablePodData = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Statefulset'){
-    apiStatefulsetPodList(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Statefulset') {
+    wait = apiStatefulsetPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       tablePodData.value = resData.map(item => {
         return {
@@ -901,7 +917,7 @@ const updateTablePodData = () => {
           nodeName: item.spec.nodeName,
           hostIP: item.status.hostIP,
           status: item.status.phase,
-          podInfo:{
+          podInfo: {
             podName: item.metadata.name,
             podIP: item.status.podIP,
             containers: item.spec.containers,
@@ -921,8 +937,8 @@ const updateTablePodData = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Daemonset'){
-    apiDaemonsetPodList(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Daemonset') {
+    wait = apiDaemonsetPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       tablePodData.value = resData.map(item => {
         return {
@@ -930,7 +946,7 @@ const updateTablePodData = () => {
           nodeName: item.spec.nodeName,
           hostIP: item.status.hostIP,
           status: item.status.phase,
-          podInfo:{
+          podInfo: {
             podName: item.metadata.name,
             podIP: item.status.podIP,
             containers: item.spec.containers,
@@ -950,16 +966,18 @@ const updateTablePodData = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Job'){
-    apiJobPodList(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Job') {
+    wait = apiJobPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
+      console.log(resData)
+      console.log("??")
       tablePodData.value = resData.map(item => {
         return {
           name: item.metadata.name,
           nodeName: item.spec.nodeName,
           hostIP: item.status.hostIP,
           status: item.status.phase,
-          podInfo:{
+          podInfo: {
             podName: item.metadata.name,
             podIP: item.status.podIP,
             containers: item.spec.containers,
@@ -980,13 +998,15 @@ const updateTablePodData = () => {
       console.log(err)
     })
   }
+  await wait
   tablePodsLoading.value = false
 }
 
-const updateAppNetworkInfo = () => {
+const updateAppNetworkInfo = async () => {
   tableServiceLoading.value = true
-  if(route.params.appType === 'Deployment'){
-    apiDeploymentServiceList(route.params.namespace,route.params.appName).then(async res => {
+  let wait
+  if (route.params.appType === 'Deployment') {
+    wait = apiDeploymentServiceList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appServiceInfoRaw.value = resData
 
@@ -997,8 +1017,8 @@ const updateAppNetworkInfo = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Statefulset'){
-    apiStatefulsetServiceList(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Statefulset') {
+    wait = apiStatefulsetServiceList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appServiceInfoRaw.value = resData
 
@@ -1009,8 +1029,8 @@ const updateAppNetworkInfo = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Daemonset'){
-    apiDaemonsetServiceList(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Daemonset') {
+    wait = apiDaemonsetServiceList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appServiceInfoRaw.value = resData
 
@@ -1021,8 +1041,8 @@ const updateAppNetworkInfo = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Job'){
-    apiJobServiceList(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Job') {
+    wait = apiJobServiceList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
       appServiceInfoRaw.value = resData
 
@@ -1034,13 +1054,15 @@ const updateAppNetworkInfo = () => {
       console.log(err)
     })
   }
+  await wait
   tableServiceLoading.value = false
 }
 
-const updateAppYaml = () => {
+const updateAppYaml = async () => {
   yamlLoading.value = true
-  if(route.params.appType === 'Deployment'){
-    apiDeploymentYamlGet(route.params.namespace,route.params.appName).then(async res => {
+  let wait
+  if (route.params.appType === 'Deployment') {
+    wait = apiDeploymentYamlGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.text()
       yamlCode.value = resData
       yamlCodeRaw.value = resData
@@ -1051,8 +1073,8 @@ const updateAppYaml = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Statefulset'){
-    apiStatefulsetYamlGet(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Statefulset') {
+    wait = apiStatefulsetYamlGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.text()
       yamlCode.value = resData
       yamlCodeRaw.value = resData
@@ -1063,8 +1085,8 @@ const updateAppYaml = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Daemonset'){
-    apiDaemonsetYamlGet(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Daemonset') {
+    wait = apiDaemonsetYamlGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.text()
       yamlCode.value = resData
       yamlCodeRaw.value = resData
@@ -1075,8 +1097,8 @@ const updateAppYaml = () => {
       })
       console.log(err)
     })
-  }else if(route.params.appType === 'Job'){
-    apiJobYamlGet(route.params.namespace,route.params.appName).then(async res => {
+  } else if (route.params.appType === 'Job') {
+    wait = apiJobYamlGet(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.text()
       yamlCode.value = resData
       yamlCodeRaw.value = resData
@@ -1088,6 +1110,7 @@ const updateAppYaml = () => {
       console.log(err)
     })
   }
+  await wait
   yamlLoading.value = false
 }
 

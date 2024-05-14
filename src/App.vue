@@ -42,7 +42,7 @@
           <el-tag  v-if="clusterInfo.activeId" type="primary">ID :{{ clusterInfo.activeId }}</el-tag>
           <el-tag v-if="clusterInfo.activeName" type="success">Name :{{ clusterInfo.activeName }}</el-tag>
 
-          <el-dropdown >
+          <el-dropdown style="margin-right: 15px" >
             <span class="el-dropdown-link" @click="updateClusterConfig">
               {{clusterInfo.activeName}}
               <el-icon class="el-icon--right">
@@ -96,16 +96,21 @@ const handleClose = (key, keyPath) => {
   console.log(key, keyPath)
 }
 const activeClusterConfig = (id,name) =>{
+
   apiClusterActive(id).then(async res => {
     const status = res.status
     if(status === 200){
+      if(id !== clusterInfo.activeId){
+        ElMessage({
+          message:`active config id [${id}] success`,
+          type:'success'
+        })
+      }
+
       clusterInfo.activeId = id
       clusterInfo.activeName = name
 
-      ElMessage({
-        message:`active config id [${id}] success`,
-        type:'success'
-      })
+
     }
 
   }).catch(err =>{
@@ -156,6 +161,7 @@ onMounted(()=>{
   if(clusterInfo.activeId){
     activeClusterConfig(clusterInfo.activeId,clusterInfo.activeName)
   }
+  updateClusterConfig()
 })
 </script>
 

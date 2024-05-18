@@ -19,6 +19,10 @@
             <el-icon><Menu /></el-icon>
             <template #title>Apps</template>
           </el-menu-item>
+          <el-menu-item index="/template" @click="()=>{$router.push('/template')}" >
+            <el-icon><ChatLineSquare /></el-icon>
+            <template #title>Template</template>
+          </el-menu-item>
 <!--          <el-sub-menu index="1" >-->
 <!--            <template #title >-->
 <!--              <el-icon><setting /></el-icon>       <h4 @click="()=>{this.$router.push('/cluster')}" class="mb-2">Config</h4>-->

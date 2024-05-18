@@ -7,6 +7,7 @@ import SyncConfigTable from "./components/SyncConfigTable.vue";
 import ClusterConfig from "./components/ClusterConfig.vue";
 import Apps from "./components/Apps.vue";
 import XtermDiv from "./components/XtermDiv.vue";
+import TextTemplate from "./components/TextTemplate.vue";
 
 import * as VueRouter from 'vue-router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
@@ -23,6 +24,7 @@ const router = VueRouter.createRouter({
         {path: '/sync', component: SyncConfigTable},
         {path: '/cluster', component: ClusterConfig},
         {path: '/apps', component: Apps},
+        {path: '/template',component: TextTemplate},
         {path: '/app/namespace/:namespace/:appType/:appName', component: AppDetails},
         {path: '/pod/namespace/:namespace/pod/:pod/container/:container/:action',component: XtermDiv},
         {path: '/:pathMatch(.*)*', redirect: '/'},

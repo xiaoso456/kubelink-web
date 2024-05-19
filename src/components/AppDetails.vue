@@ -391,8 +391,8 @@
     <span>{{ dialogMessage }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogConfirmFuctionLast">
+        <el-button plain @click="dialogVisible = false">Cancel</el-button>
+        <el-button plain type="success" @click="dialogConfirmFuctionLast">
           Confirm
         </el-button>
       </div>

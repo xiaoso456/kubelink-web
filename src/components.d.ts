@@ -10,7 +10,6 @@ declare module 'vue' {
     AppDetails: typeof import('./components/AppDetails.vue')['default']
     Apps: typeof import('./components/Apps.vue')['default']
     ClusterConfig: typeof import('./components/ClusterConfig.vue')['default']
-    ElAffix: typeof import('element-plus/es')['ElAffix']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']

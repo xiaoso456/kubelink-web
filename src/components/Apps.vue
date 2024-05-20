@@ -2,7 +2,7 @@
   <div>
 
     <el-row align="top">
-      <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue" :options="appTypeOptions"  >
+      <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue.selectedOption" :options="appTypeOptions"  >
         <template #default="{ item }">
           <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
             <el-icon size="20">
@@ -63,7 +63,7 @@
 
 
 
-    <el-table  v-loading="tableLoading" height="65vh" :data="tableData" class="common-margin common-width">
+    <el-table  v-loading="tableLoading" height="75vh" :data="tableData" class="common-margin common-width">
       <el-table-column label="Id" width="80"   >
         <template #default="scope">
           {{ scope.$index + 1  }}
@@ -74,7 +74,7 @@
 
       <el-table-column sortable prop="name" label="name" width="240" >
         <template #default="scope">
-          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
+          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
         </template>
       </el-table-column>
 
@@ -132,8 +132,10 @@ import {
 import {apiStatefulsetContainerSuspend, apiStatefulsetDelete, apiStatefulsetList} from "@/services/statefulset.js";
 import {apiDaemonsetContainerSuspend, apiDaemonsetDelete, apiDaemonsetList} from "@/services/daemonset.js";
 import {apiJobContainerSuspend, apiJobDelete, apiJobList} from "@/services/job.js";
+import {useSelectedOptionValue} from "@/store/appsStore.js";
 
-const selectedOptionValue = ref('Deployment')
+// const selectedOptionValue = ref('Deployment')
+const selectedOptionValue = useSelectedOptionValue()
 const selectedNamespaceOptionValue = ref('')
 const searchInput = ref('')
 const dialogVisible = ref(false)
@@ -213,10 +215,10 @@ const updateTableData = async () => {
   tableLoading.value = true
   // disabled other options
   appTypeOptions.value.forEach(item => {
-    item.disabled = (item.value !== selectedOptionValue.value)
+    item.disabled = (item.value !== selectedOptionValue.selectedOption)
   })
   let wait;
-  if (selectedOptionValue.value === 'Deployment') {
+  if (selectedOptionValue.selectedOption === 'Deployment') {
     wait = apiDeploymentList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
@@ -236,7 +238,7 @@ const updateTableData = async () => {
       })
       console.log(err)
     })
-  } else if (selectedOptionValue.value === 'Statefulset') {
+  } else if (selectedOptionValue.selectedOption === 'Statefulset') {
     wait = apiStatefulsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
@@ -256,7 +258,7 @@ const updateTableData = async () => {
       })
       console.log(err)
     })
-  } else if (selectedOptionValue.value === 'Daemonset') {
+  } else if (selectedOptionValue.selectedOption === 'Daemonset') {
     wait = apiDaemonsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
@@ -276,7 +278,7 @@ const updateTableData = async () => {
       })
       console.log(err)
     })
-  }else if (selectedOptionValue.value === 'Job') {
+  }else if (selectedOptionValue.selectedOption === 'Job') {
     wait = apiJobList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
@@ -313,9 +315,9 @@ const handleChangeAppType = async (item) => {
 const handleSuspend = (row) => {
   dialogVisible.value = true
   dialogTitle.value = "Tips"
-  dialogMessage.value = `Suspend ${selectedOptionValue.value} '${row.name}' first container`
+  dialogMessage.value = `Suspend ${selectedOptionValue.selectedOption} '${row.name}' first container`
   dialogConfirmFuction.value = () => {
-    if(selectedOptionValue.value === 'Deployment'){
+    if(selectedOptionValue.selectedOption === 'Deployment'){
       apiDeploymentContainerSuspend(row.namespace,row.name,"_first").then(async res => {
         if(res.status === 200){
           ElMessage({
@@ -330,7 +332,7 @@ const handleSuspend = (row) => {
         })
         console.log(err)
       })
-    }else if(selectedOptionValue.value === 'Statefulset'){
+    }else if(selectedOptionValue.selectedOption === 'Statefulset'){
       apiStatefulsetContainerSuspend(row.namespace,row.name,"_first").then(async res => {
         if(res.status === 200){
           ElMessage({
@@ -345,7 +347,7 @@ const handleSuspend = (row) => {
         })
         console.log(err)
       })
-    }else if(selectedOptionValue.value === 'Daemonset'){
+    }else if(selectedOptionValue.selectedOption === 'Daemonset'){
       apiDaemonsetContainerSuspend(row.namespace,row.name,"_first").then(async res => {
         if(res.status === 200){
           ElMessage({
@@ -360,7 +362,7 @@ const handleSuspend = (row) => {
         })
         console.log(err)
       })
-    }else if(selectedOptionValue.value === 'Job'){
+    }else if(selectedOptionValue.selectedOption === 'Job'){
       apiJobContainerSuspend(row.namespace,row.name,"_first").then(async res => {
         if(res.status === 200){
           ElMessage({
@@ -383,9 +385,9 @@ const handleSuspend = (row) => {
 const handleDelete = (row) => {
   dialogVisible.value = true
   dialogTitle.value = "Tips"
-  dialogMessage.value = `Delete ${selectedOptionValue.value} '${row.name}'`
+  dialogMessage.value = `Delete ${selectedOptionValue.selectedOption} '${row.name}'`
   dialogConfirmFuction.value = () => {
-    if(selectedOptionValue.value === 'Deployment'){
+    if(selectedOptionValue.selectedOption === 'Deployment'){
       apiDeploymentDelete(row.namespace,row.name).then(async res => {
 
         ElMessage({
@@ -400,7 +402,7 @@ const handleDelete = (row) => {
         })
         console.log(err)
       })
-    }else if(selectedOptionValue.value === 'Statefulset'){
+    }else if(selectedOptionValue.selectedOption === 'Statefulset'){
       apiStatefulsetDelete(row.namespace,row.name).then(async res => {
 
         ElMessage({
@@ -415,7 +417,7 @@ const handleDelete = (row) => {
         })
         console.log(err)
       })
-    }else if(selectedOptionValue.value === 'Daemonset'){
+    }else if(selectedOptionValue.selectedOption === 'Daemonset'){
       apiDaemonsetDelete(row.namespace,row.name).then(async res => {
 
         ElMessage({
@@ -430,7 +432,7 @@ const handleDelete = (row) => {
         })
         console.log(err)
       })
-    }else if(selectedOptionValue.value === 'Job'){
+    }else if(selectedOptionValue.selectedOption === 'Job'){
       apiJobDelete(row.namespace,row.name).then(async res => {
 
         ElMessage({
@@ -447,7 +449,7 @@ const handleDelete = (row) => {
       })
     }
     setTimeout(() => {
-      updateTableData(selectedOptionValue.value)
+      updateTableData(selectedOptionValue.selectedOption)
     }, 2000)
   }
 

@@ -25,6 +25,13 @@ export default ({mode})=>{
                     target: 'http://localhost:15151',
                     changeOrigin: true,
                     rewrite: (path) => path.replace(/^\/api/, '')
+                },
+                '/api-ws':{
+                    target: 'ws://localhost:15151',
+                    ws: true,
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/api-ws/, '')
+
                 }
             }
         },

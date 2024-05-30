@@ -87,7 +87,7 @@
 <script  setup>
 import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
 import {useClusterInfo} from "@/store/clusterStore.js";
-import {apiClusterActive, apiClusterList} from "@/services/clusterConfig.js";
+import {apiClusterActive, apiClusterConnect, apiClusterList} from "@/services/clusterConfig.js";
 const clusterInfo = useClusterInfo()
 
 const isCollapse = ref(false)
@@ -114,7 +114,6 @@ const activeClusterConfig = (id,name) =>{
       clusterInfo.activeId = id
       clusterInfo.activeName = name
 
-
     }
 
   }).catch(err =>{
@@ -124,6 +123,9 @@ const activeClusterConfig = (id,name) =>{
     })
     console.log(err)
   })
+
+
+
 }
 
 const updateClusterConfig = () => {
@@ -137,18 +139,42 @@ const updateClusterConfig = () => {
     console.log(err)
   })
 
+
 }
 
-const handleSelectNamespace = (item) => {
+const handleSelectNamespace =  (item) => {
   apiClusterActive(item.id).then(async res => {
     const status = res.status
-    if(status === 200){
+    if (status === 200) {
       clusterInfo.activeId = item.id
       clusterInfo.activeName = item.name
 
       ElMessage({
-        message:`active config id [${item.id}] success`,
+        message: `active config id [${item.id}] success`,
+        type: 'success'
+      })
+    }
+
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+  apiClusterConnect(item.id).then(async res => {
+
+    const text = await res.json()
+    const textB = JSON.stringify(text, null, 2);
+    if(res.status === 200){
+      ElMessage({
+        message: textB,
         type:'success'
+      })
+    }else{
+      ElMessage({
+        message: textB,
+        type:'error'
       })
     }
 
@@ -159,6 +185,8 @@ const handleSelectNamespace = (item) => {
     })
     console.log(err)
   })
+
+
 }
 
 onMounted(()=>{

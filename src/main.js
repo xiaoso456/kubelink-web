@@ -27,6 +27,7 @@ const router = VueRouter.createRouter({
         {path: '/template',component: TextTemplate},
         {path: '/app/namespace/:namespace/:appType/:appName', component: AppDetails},
         {path: '/pod/namespace/:namespace/pod/:pod/container/:container/:action',component: XtermDiv},
+
         {path: '/:pathMatch(.*)*', redirect: '/'},
 
     ],

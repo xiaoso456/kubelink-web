@@ -42,16 +42,16 @@
             </template>
           </el-input>
         </el-col>
-        <el-col :span="3">
-          <el-tooltip effect="light" content="tail lines">
-            <el-input-number style="width: 100%" v-model="tailLines" :min="1" :step="1000" />
+        <el-col :span="3" v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)">
+          <el-tooltip  effect="light" content="tail lines">
+            <el-input-number  style="width: 100%" v-model="tailLines" :min="1" :step="5000" />
           </el-tooltip>
 
         </el-col>
 
         <el-col :span="6">
 
-          <el-button @click="updateTermLog()"  plain type="primary" >Refresh</el-button>
+          <el-button v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)"  @click="updateTermLog()"  plain type="primary" >Refresh</el-button>
           <el-button @click="downloadTermLog()"  plain type="success" >Download</el-button>
 
         </el-col>
@@ -59,9 +59,11 @@
       </el-row>
 
       <el-scrollbar height="60%">
-        <div id="terminal" class="terminal">
+        <div v-show="selectedOptionValue==='Logs'" id="terminalLog" class="terminal"/>
+        <div v-show="selectedOptionValue==='PreviousLogs'" id="terminalPreLog" class="terminal"/>
+        <div v-show="selectedOptionValue==='Console'" id="terminalConsole" class="terminal"/>
 
-        </div>
+
       </el-scrollbar>
 
     </div>
@@ -73,12 +75,14 @@
 <script setup>
 import {Terminal} from "xterm";
 import { FitAddon } from '@xterm/addon-fit';
-import {Coin, Postcard, Reading, Search, Memo} from "@element-plus/icons-vue";
+import {Coin,Monitor, Postcard, Reading, Search, Memo} from "@element-plus/icons-vue";
 import {useRoute} from "vue-router";
 import {useRouter} from "vue-router";
 import {apiDeploymentGet} from "@/services/deployment.js";
 import {apiPodLogs} from "@/services/pod.js";
 import {SearchAddon} from "@xterm/addon-search";
+import {createWS} from "@/services/ws.js";
+import {AttachAddon} from "@xterm/addon-attach";
 
 const selectedOptionValue = ref('Logs')
 const operationTypeOptions = [
@@ -91,6 +95,11 @@ const operationTypeOptions = [
     label: 'PreviousLogs',
     value: 'PreviousLogs',
     icon: Memo,
+  },
+  {
+    label: 'Console',
+    value: 'Console',
+    icon: Monitor,
   },
   // {
   //   label: 'Attach',
@@ -111,7 +120,48 @@ const tailLines = ref(1000)
 const route = useRoute()
 const router = useRouter()
 
-const term = new Terminal({
+const selectState = ref({
+  Logs:{
+    searchAddon: null,
+    fitAddon: null,
+  },
+  PreviousLogs:{
+    searchAddon: null,
+    fitAddon: null,
+
+  },
+  Console:{
+    searchAddon: null,
+    fitAddon: null,
+
+  }
+})
+window.onresize = () => {
+  allFit()
+}
+const allFit = () => {
+  for (const key in selectState.value) {
+    if (selectState.value.hasOwnProperty(key)) {
+      if(selectState.value[key].fitAddon != null){
+        selectState.value[key].fitAddon.fit()
+      }
+    }
+  }
+}
+const addAddonToTerm = (term,stateName) => {
+  const fitAddon = new FitAddon();
+  const searchAddon = new SearchAddon();
+  searchAddon.onDidChangeResults((item)=>{
+    searchIndex.value = item.resultIndex
+    searchCount.value = item.resultCount
+  })
+  term.loadAddon(fitAddon);
+  term.loadAddon(searchAddon);
+  selectState.value[stateName].searchAddon = searchAddon
+  selectState.value[stateName].fitAddon = fitAddon
+}
+
+const termLog = new Terminal({
   theme: {
     background: '#000000',
     foreground: '#ffffff',
@@ -119,58 +169,133 @@ const term = new Terminal({
   screenReaderMode: false,
   disableStdin: true,
   convertEol: true,
-  allowProposedApi: true
+  allowProposedApi: true,
+  scrollback: Number.MAX_SAFE_INTEGER
+
 
 });
-const fitAddon = new FitAddon();
-const searchAddon = new SearchAddon();
+addAddonToTerm(termLog,'Logs')
+
+const terminalPreLog = new Terminal({
+  theme: {
+    background: '#000000',
+    foreground: '#ffffff',
+  },
+  screenReaderMode: false,
+  disableStdin: true,
+  convertEol: true,
+  allowProposedApi: true,
+  scrollback: Number.MAX_SAFE_INTEGER
+
+});
+addAddonToTerm(terminalPreLog,'PreviousLogs')
+
+const terminalConsole = new Terminal({
+  theme: {
+    background: '#000000',
+    foreground: '#ffffff',
+  },
+  screenReaderMode: false,
+  disableStdin: false,
+  convertEol: true,
+  allowProposedApi: true,
+  scrollback: Number.MAX_SAFE_INTEGER
+});
+addAddonToTerm(terminalConsole,'Console')
+
+
+
+
+
+
+
 const updateTermLog = ()=>{
-  term.clear()
-  const previous = (route.params.action === 'PreviousLogs')
-  apiPodLogs(route.params.namespace,route.params.pod,route.params.container,previous,tailLines.value).then(async res => {
-    const resData = await res.text()
-    updateTermText(resData)
+  if(route.params.action === 'Logs'){
+    termLog.clear()
+    apiPodLogs(route.params.namespace,route.params.pod,route.params.container,false,tailLines.value).then(async res => {
+      const resData = await res.text()
+      updateTermText(termLog,resData)
 
-  }).catch(err => {
-    ElMessage({
-      message: "request error: " + err,
-      type: 'error'
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
     })
-    console.log(err)
-  })
+  }else if(route.params.action === 'PreviousLogs'){
+    terminalPreLog.clear()
+    apiPodLogs(route.params.namespace,route.params.pod,route.params.container,true,tailLines.value).then(async res => {
+      const resData = await res.text()
+      updateTermText(terminalPreLog,resData)
+
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  }
+
 }
 
-const downloadTermLog = () => {
-
-  const previous = (route.params.action === 'PreviousLogs')
-  apiPodLogs(route.params.namespace,route.params.pod,route.params.container,previous,tailLines.value).then(async res => {
-    const resData = await res.text()
-    const blob = new Blob([resData], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${route.params.namespace}-${route.params.pod}-${route.params.container}.log`; // 设置下载的文件名
-    document.body.appendChild(link);
-    link.click();
-    URL.revokeObjectURL(url);
-    document.body.removeChild(link);
+const downloadTermLog = async () => {
 
 
-  }).catch(err => {
-    ElMessage({
-      message: "request error: " + err,
-      type: 'error'
+  let downloadText = ""
+  let wait;
+  if (route.params.action === 'Logs') {
+    // use api
+    wait = apiPodLogs(route.params.namespace, route.params.pod, route.params.container, false, tailLines.value).then(async res => {
+      downloadText = await res.text()
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
     })
-    console.log(err)
-  })
+  } else if (route.params.action === 'PreviousLogs') {
+    wait = apiPodLogs(route.params.namespace, route.params.pod, route.params.container, true, tailLines.value).then(async res => {
+      downloadText = await res.text()
+    }).catch(err => {
+      ElMessage({
+        message: "request error: " + err,
+        type: 'error'
+      })
+      console.log(err)
+    })
+  } else if (route.params.action === 'Console') {
+    for (let i = 0; i < terminalConsole.buffer.active.length; i++) {
+      downloadText += terminalConsole.buffer.active.getLine(i).translateToString() + '\n'
+    }
+  }
+  if (wait) {
+    await wait
+  }
+
+
+  const blob = new Blob([downloadText], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${route.params.namespace}-${route.params.pod}-${route.params.container}-${route.params.action}.log`; // 设置下载的文件名
+  document.body.appendChild(link);
+  link.click();
+  URL.revokeObjectURL(url);
+  document.body.removeChild(link);
+
+
 }
 
-const updateTermText = (text) => {
-  fitAddon.fit();
-  term.write(text)
+const updateTermText = async (terminal, text) => {
+  await terminal.write(text)
+  await allFit()
 }
 
 const highlightKeyword = () => {
+  const searchAddon = selectState.value[route.params.action].searchAddon
 
   searchAddon.findPrevious(searchInput.value,{
     matchCase: true,
@@ -179,25 +304,44 @@ const highlightKeyword = () => {
     }
   })
 }
+const socket = ref(null);
+const handleSelectOption = async () => {
 
-const handleSelectOption = ()=>{
-  term.clear()
-  router.push(`/pod/namespace/${route.params.namespace}/pod/${route.params.pod}/container/${route.params.container}/${selectedOptionValue.value}`)
-  setTimeout(()=>{
-    window.location.reload()
-  },50)
+  route.params.action = selectedOptionValue.value
+  if (selectedOptionValue.value === 'Logs') {
+    termLog.clear()
+
+  } else if (selectedOptionValue.value === 'PreviousLogs') {
+    terminalPreLog.clear()
+    // router.push(`/pod/namespace/${route.params.namespace}/pod/${route.params.pod}/container/${route.params.container}/PreviousLogs`)
+  } else if (selectedOptionValue.value === 'Console') {
+    if (!socket.value) {
+      socket.value = createWS(`/ws/namespace/${route.params.namespace}/pod/${route.params.pod}/container/${route.params.container}/exec`);
+      const attachAddon = new AttachAddon(socket.value);
+      terminalConsole.loadAddon(attachAddon);
+
+    }
+  }
+  await updateTermLog()
+  await highlightKeyword()
+
+  // router.push(`/pod/namespace/${route.params.namespace}/pod/${route.params.pod}/container/${route.params.container}/${selectedOptionValue.value}`)
+  // setTimeout(()=>{
+  //   window.location.reload()
+  // },50)
 }
 
 onMounted(() => {
   selectedOptionValue.value = route.params.action
-  term.loadAddon(fitAddon);
-  searchAddon.onDidChangeResults((item)=>{
-    searchIndex.value = item.resultIndex
-    searchCount.value = item.resultCount
-  })
-  term.loadAddon(searchAddon);
-  term.open(document.getElementById('terminal'));
-  updateTermLog()
+
+  termLog.open(document.getElementById('terminalLog'));
+
+  terminalPreLog.open(document.getElementById('terminalPreLog'));
+
+  terminalConsole.open(document.getElementById('terminalConsole'));
+
+  handleSelectOption()
+
 
 
 

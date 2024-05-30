@@ -162,9 +162,15 @@
                     </el-table-column>
                     <el-table-column  label="Operation" width="180">
                       <template #default="scopeContainer">
+                        <el-button size="small" type="success" plain @click="()=>{
+                          $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/'+scope.row.podInfo.containers[scopeContainer.$index].name + '/Console')
+                        } ">Console</el-button>
+
                         <el-button size="small" type="primary" plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/'+scope.row.podInfo.containers[scopeContainer.$index].name + '/Logs')
                         } ">logs</el-button>
+
+
                       </template>
                     </el-table-column>
                   </el-table>
@@ -210,8 +216,13 @@
 
           </el-table-column>
 
-          <el-table-column  label="Operation" width="180">
+          <el-table-column  label="Operation" width="280">
             <template #default="scope">
+              <el-button size="small" type="success" plain @click="()=>{
+                          $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Console')
+                        } ">Console
+              </el-button>
+
               <el-button size="small" type="primary" plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Logs')
                         } ">logs

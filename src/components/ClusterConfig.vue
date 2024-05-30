@@ -81,7 +81,6 @@ onMounted(() => {
 })
 
 const handleConnect = (index, row) => {
-  console.log(row.id)
   apiClusterConnect(row.id).then(async res => {
     const text = await res.json()
     const textB = JSON.stringify(text, null, 2);
@@ -105,7 +104,6 @@ const handleConnect = (index, row) => {
     console.log(err)
   })
 
-  console.log(index, row)
 }
 
 

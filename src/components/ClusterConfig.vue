@@ -1,9 +1,9 @@
 <template>
   
-    <el-table :data="tableData" class="common-margin">
-      <el-table-column prop="id" label="Id" width="80" />
+    <el-table @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin">
+      <el-table-column sortable="custom" prop="id" label="Id" width="80" />s
 
-      <el-table-column prop="name" label="Name" width="200">
+      <el-table-column sortable="custom" prop="name" label="Name" width="200">
         <template #default="scope" >
             <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
             <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'name')"  >{{ scope.row.name?scope.row.name:'-' }}</p>
@@ -18,22 +18,68 @@
         </template>
       </el-table-column>
 
-      <!-- <el-table-column prop="status" label="Status" >
-        <template #default="scope" >
-            <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'status'===tableEditFieldName" v-model="tableRowInput" @blur="handleExitEditMode"></el-input>
-            <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'status')"  >clickToEdit</p>
-        </template>
-      </el-table-column> -->
 
-      <el-table-column label="Operation">
+
+      <el-table-column >
+        <template #header>
+          <el-input v-model="search" size="small" placeholder="Search name or config" />
+        </template>
         <template #default="scope">
-            <el-button size="small" type="primary" plain @click="handleConnect(scope.$index,scope.row)">connect</el-button>
-            <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">active</el-button>
-            <el-button size="small" type="danger"  plain @click="handleDelete(scope.$index,scope.row)">delete</el-button>
+            <el-button size="small" type="default" plain @click="handleConnect(scope.row)">connect</el-button>
+            <el-button size="small" type="primary"  plain @click="handleEdit(scope.row)">edit</el-button>
+          <el-button size="small" type="success" plain @click="handleActive(scope.row)">active</el-button>
+
         </template>
       </el-table-column>
     </el-table>
+
     <el-button class="mt-4 common-margin"  @click="handleAddItem">Add Item</el-button>
+    <el-row justify="end">
+      <el-pagination
+          v-model:current-page="pageCurrent"
+          v-model:page-size="pageSize"
+          :page-sizes="[5, 10, 20, 50]"
+          layout="total,sizes, prev, pager, next"
+          :total="filterTableData.length"
+
+      />
+    </el-row>
+
+
+  <el-dialog
+      v-model="editMode"
+      title="Cluster Config"
+      width="80vw"
+  >
+    <el-form :model="editRowInfo" label-width="auto" style="max-width: 78vw">
+      <el-form-item label="id">
+        <el-input readonly v-model="editRowInfo.id" />
+      </el-form-item>
+      <el-form-item label="Name">
+        <el-input v-model="editRowInfo.name" />
+      </el-form-item>
+      <el-form-item label="content"  >
+        <el-input v-model="editRowInfo.config" autosize type="textarea" />
+      </el-form-item>
+
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+          <el-button  text @click="editMode = false">Cancel</el-button>
+
+          <el-button-group style="margin-left: 20px">
+            <el-button  text @click="handleSave(editRowInfo)" type="success">Save</el-button>
+            <el-button  text @click="handleConnect(editRowInfo)"  type="success" >Connect</el-button>
+            <el-button  text @Click="handleActive(editRowInfo)" type="success">Active</el-button>
+          </el-button-group>
+
+          <el-button style="margin-left: 20px" text @click="handleDelete(editRowInfo);editMode=false" type="danger" >Delete</el-button>
+
+      </div>
+    </template>
+  </el-dialog>
+
+
   </template>
   
 <script setup>
@@ -55,12 +101,40 @@ const item = {
     config: 'config...\naaa\nbbb\nccc'
 }
 const tableData = ref(Array.from({ length: 0 }).fill(item))
+const filterTableData = computed(() => {
+  const filterData = tableData.value.filter(item =>{
+    if(search.value === ''){
+      return true
+    }
+    if(item.name && item.name.includes(search.value)){
+      return true
+    }
+    if(item.config && item.config.includes(search.value)){
+      return true
+    }
+
+  })
+  return filterData
+})
+
 const tableEditIndex = ref(undefined);
 const tableEditFieldName = ref(undefined);
 const tableRowInput = ref(undefined);
 const focusRef = ref(null);
 
 const clusterInfo = useClusterInfo()
+
+const pageSize = ref(10)
+const pageCurrent = ref(1)
+const search = ref('')
+
+const editMode = ref(false)
+const editRowInfo = ref({
+  id: 0,
+  name: '',
+  config: ''
+})
+
 
 const updateClusterConfig = () => {
   apiClusterList().then(async res => {
@@ -75,13 +149,35 @@ const updateClusterConfig = () => {
 
 }
 
+const tableSort = (sortInfo) => {
+  let sortField = sortInfo.prop
+  tableData.value.sort((a, b) => {
+
+    if (sortInfo.order === "ascending" || sortInfo.order === null) {
+      if(typeof a[sortField] === 'string'){
+        return a[sortField].localeCompare(b[sortField]);
+      }else if(typeof a[sortField] === 'number'){
+        return a[sortField] - b[sortField];
+      }
+    } else {
+      if(typeof a[sortField] === 'string'){
+        return b[sortField].localeCompare(a[sortField]);
+      }else if(typeof a[sortField] === 'number'){
+        return b[sortField] - a[sortField];
+      }
+    }
+
+  });
+
+};
+
 onMounted(() => {
 
   updateClusterConfig()
 })
 
-const handleConnect = (index, row) => {
-  apiClusterConnect(row.id).then(async res => {
+const handleConnect = (config) => {
+  apiClusterConnect(config.id).then(async res => {
     const text = await res.json()
     const textB = JSON.stringify(text, null, 2);
     if(res.status === 200){
@@ -107,15 +203,15 @@ const handleConnect = (index, row) => {
 }
 
 
-const handleActive = (index, row) => {
-  apiClusterActive(row.id).then(async res => {
+const handleActive = (config) => {
+  apiClusterActive(config.id).then(async res => {
     const status = res.status
     if(status === 200){
-      clusterInfo.activeId = row.id
-      clusterInfo.activeName = row.name
+      clusterInfo.activeId = config.id
+      clusterInfo.activeName = config.name
 
       ElMessage({
-        message:`active config id [${row.id}] success`,
+        message:`active config id [${config.id}] success`,
         type:'success'
       })
     }
@@ -129,12 +225,17 @@ const handleActive = (index, row) => {
   })
 }
 
-const handleDelete = async (index, row) => {
-  await apiClusterDelete(row.id).then(async res => {
+const handleEdit = (row) => {
+  editRowInfo.value = row
+  editMode.value = true
+}
+
+const handleDelete = async (config) => {
+  await apiClusterDelete(config.id).then(async res => {
     const status = res.status
     if (status === 200) {
       ElMessage({
-        message: `delete config id [${row.id}] success`,
+        message: `delete config id [${config.id}] success`,
         type: 'success'
       })
     }
@@ -173,7 +274,6 @@ const handleAddItem = async () => {
 }
 
 const handleIntoEditMode = (index, row, propName) => {
-  console.log(index, row)
   tableEditIndex.value = index
   tableEditFieldName.value=propName
   setTimeout(() => {
@@ -184,7 +284,6 @@ const handleIntoEditMode = (index, row, propName) => {
 }
 
 const handleExitEditMode = async (index,row) => {
-  console.log("lost focus")
   tableEditIndex.value = -1
   row[tableEditFieldName.value] = tableRowInput.value
 
@@ -205,6 +304,24 @@ const handleExitEditMode = async (index,row) => {
   })
 
   updateClusterConfig()
+}
+
+const handleSave = async (config) => {
+  await apiClusterUpdate(config.id,config).then(async res => {
+    const status = res.status
+    if (status === 200) {
+      ElMessage({
+        message: `update config success`,
+        type: 'success'
+      })
+    }
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
 }
 
 

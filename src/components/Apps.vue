@@ -63,22 +63,22 @@
 
 
 
-    <el-table  v-loading="tableLoading" height="75vh" :data="tableData" class="common-margin common-width">
+    <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin common-width">
       <el-table-column label="Id" width="80"   >
         <template #default="scope">
           {{ scope.$index + 1  }}
         </template>
       </el-table-column>
 
-      <el-table-column sortable prop="namespace" label="Namespace" width="180" />
+      <el-table-column sortable="custom" prop="namespace" label="Namespace"  />
 
-      <el-table-column sortable prop="name" label="name" width="240" >
+      <el-table-column sortable="custom" prop="name" label="Name">
         <template #default="scope">
           <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
         </template>
       </el-table-column>
 
-      <el-table-column sortable prop="status" label="Status" width="100" >
+      <el-table-column sortable="custom" prop="status" label="Status" width="120" >
         <template #default="scope" >
           <div style="display: flex;align-items: center">
             <div :class="scope.row.status.runNum===scope.row.status.totalNum?'circle-green':'circle-yellow'"></div>
@@ -87,7 +87,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Operation">
+      <el-table-column label="Operation" width="200">
         <template #default="scope">
           <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>
 <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
@@ -96,7 +96,16 @@
       </el-table-column>
 
     </el-table>
+    <el-row justify="end">
+      <el-pagination
+          v-model:current-page="pageCurrent"
+          v-model:page-size="pageSize"
+          :page-sizes="[5, 10, 20, 50]"
+          layout="total,sizes, prev, pager, next"
+          :total="filterTableData.length"
 
+      />
+    </el-row>
   </div>
   <el-dialog
       v-model="dialogVisible"
@@ -120,14 +129,13 @@ import { ref } from 'vue'
 import {
   Postcard,
   Coin,
-  Reading, Search, Stopwatch
+  Reading, Search, Stopwatch, Refresh
 } from '@element-plus/icons-vue'
 import {apiNamespaceList} from "@/services/namespace.js";
 import {
   apiDeploymentContainerSuspend,
   apiDeploymentDelete,
-  apiDeploymentList,
-  apiDeploymentYamlGet
+  apiDeploymentList
 } from "@/services/deployment.js";
 import {apiStatefulsetContainerSuspend, apiStatefulsetDelete, apiStatefulsetList} from "@/services/statefulset.js";
 import {apiDaemonsetContainerSuspend, apiDaemonsetDelete, apiDaemonsetList} from "@/services/daemonset.js";
@@ -145,6 +153,9 @@ const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
 const tableLoading = ref(true)
 const isAutoRefresh = ref(false)
+
+const pageSize = ref(10)
+const pageCurrent = ref(1)
 
 const appTypeOptions = ref([
   {
@@ -189,6 +200,48 @@ const item = {
   }
 }
 const tableData = ref(Array.from({length: 0}).fill(item))
+const filterTableData = computed(() => {
+  const filterData = tableData.value.filter(item =>{
+    if(searchInput.value === ''){
+      return true
+    }
+    if(item.name && item.name.includes(searchInput.value)){
+      return true
+    }
+  })
+  return filterData
+})
+
+const tableSort = (sortInfo) => {
+  let sortField = sortInfo.prop
+  tableData.value.sort((a, b) => {
+    if (sortInfo.order === "ascending" || sortInfo.order === null) {
+
+      if (sortField === 'status'){
+        return a[sortField].runNum - b[sortField].runNum
+      }
+
+      if(typeof a[sortField] === 'string'){
+        return a[sortField].localeCompare(b[sortField]);
+      }else if(typeof a[sortField] === 'number'){
+        return a[sortField] - b[sortField];
+      }
+
+
+    } else {
+      if (sortField === 'status'){
+        return b[sortField].runNum - a[sortField].runNum
+      }
+      if(typeof a[sortField] === 'string'){
+        return b[sortField].localeCompare(a[sortField]);
+      }else if(typeof a[sortField] === 'number'){
+        return b[sortField] - a[sortField];
+      }
+    }
+
+  });
+
+};
 
 const refreshNamespaceOptions = () => {
   apiNamespaceList().then(async res => {
@@ -219,7 +272,7 @@ const updateTableData = async () => {
   })
   let wait;
   if (selectedOptionValue.selectedOption === 'Deployment') {
-    wait = apiDeploymentList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiDeploymentList(selectedNamespaceOptionValue.value, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -239,7 +292,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   } else if (selectedOptionValue.selectedOption === 'Statefulset') {
-    wait = apiStatefulsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiStatefulsetList(selectedNamespaceOptionValue.value, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -259,7 +312,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   } else if (selectedOptionValue.selectedOption === 'Daemonset') {
-    wait = apiDaemonsetList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiDaemonsetList(selectedNamespaceOptionValue.value, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -279,7 +332,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   }else if (selectedOptionValue.selectedOption === 'Job') {
-    wait = apiJobList(selectedNamespaceOptionValue.value, searchInput.value).then(async res => {
+    wait = apiJobList(selectedNamespaceOptionValue.value, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {

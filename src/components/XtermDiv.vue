@@ -72,7 +72,7 @@
 
       </el-row>
 
-      <el-scrollbar height="60%">
+      <el-scrollbar height="67vh">
         <div v-show="selectedOptionValue==='Logs'" id="terminalLog" class="terminal"/>
         <div v-show="selectedOptionValue==='PreviousLogs'" id="terminalPreLog" class="terminal"/>
         <div v-show="selectedOptionValue==='Console'" id="terminalConsole" class="terminal"/>
@@ -220,6 +220,8 @@ const termLog = new Terminal({
     background: '#000000',
     foreground: '#ffffff',
   },
+  rows: 100,
+
   screenReaderMode: false,
   disableStdin: true,
   convertEol: true,
@@ -235,6 +237,7 @@ const terminalPreLog = new Terminal({
     background: '#000000',
     foreground: '#ffffff',
   },
+  rows: 100,
   screenReaderMode: false,
   disableStdin: true,
   convertEol: true,
@@ -249,6 +252,7 @@ const terminalConsole = new Terminal({
     background: '#000000',
     foreground: '#ffffff',
   },
+  rows: 100,
   screenReaderMode: false,
   disableStdin: false,
   convertEol: true,
@@ -409,9 +413,8 @@ onMounted(() => {
 <style lang="scss" scoped>
 .terminal {
   margin-top:10px;
-  /*border-style: solid;*/
-  /*border-width: 1px;*/
-  border-radius: 5px;
+  max-height: 65vh;
+
 }
 
 ::v-deep(.el-input-group__append){

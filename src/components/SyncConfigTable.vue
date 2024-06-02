@@ -1,7 +1,7 @@
 <template>
-  <el-table @sort-change="tableSort"  class="common-margin" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
+  <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="common-margin" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
     <el-table-column  sortable="custom" prop="id" label="Id" width="80"/>
-    <el-table-column  sortable="custom" show-overflow-tooltip="true" prop="name" label="Name"  width="180" >
+    <el-table-column  sortable="custom" :show-overflow-tooltip="true" prop="name" label="Name"  width="180" >
       <template #default="scope">
           <el-input  sortable="custom" ref="focusRef" v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName"
                     v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"
@@ -31,7 +31,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column sortable="custom" show-overflow-tooltip="true"  prop="namespace" label="Namespace" >
+    <el-table-column sortable="custom" :show-overflow-tooltip="true"  prop="namespace" label="Namespace" >
       <template #default="scope">
         <el-select
             @change="updateSyncConfigAndRefresh(scope.row)"
@@ -54,7 +54,7 @@
     </el-table-column>
 
 
-    <el-table-column show-overflow-tooltip="true" prop="Pod" label="pod" >
+    <el-table-column :show-overflow-tooltip="true" prop="Pod" label="pod" >
       <template #default="scope">
         <el-select
             @click="updateNamespacePod(scope.row)"
@@ -77,7 +77,7 @@
 
     </el-table-column>
 
-    <el-table-column show-overflow-tooltip="true" prop="container" label="Container" >
+    <el-table-column :show-overflow-tooltip="true" prop="container" label="Container" >
       <template #default="scope">
         <el-select
             @click="updateNamespacePodContainer(scope.row)"
@@ -643,6 +643,26 @@ const handleDeleteResource = (index, row, type) => {
   })
 }
 
+const handleArrow = (event) =>{
+  const allPage = Math.ceil(filterTableData.value.length / pageSize.value)
+  switch (event.srcKey) {
+    case "right":
+      let nextPage = pageCurrent.value + 1
+      if(nextPage > allPage){
+        nextPage = 1
+      }
+      pageCurrent.value = nextPage
+
+      break;
+    case "left":
+      let prevPage = pageCurrent.value - 1
+      if(prevPage < 1){
+        prevPage = allPage
+      }
+      pageCurrent.value = prevPage
+      break;
+  }
+}
 
 </script>
 

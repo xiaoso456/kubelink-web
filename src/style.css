@@ -32,3 +32,17 @@
     width: 10px;
     margin-right: 3px;
 }
+
+.dark{
+    /*background: rgb(0, 0, 0);*/
+}
+.light{
+    /*background: rgb(255, 255, 255);*/
+}
+
+.el-menu-item{
+    font-size: 30px;!important;
+}
+body{
+    --el-border-radius-base: 6px;
+}

@@ -1,6 +1,5 @@
-<template>
-  
-    <el-table @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin">
+<template >
+    <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin">
       <el-table-column sortable="custom" prop="id" label="Id" width="80" />s
 
       <el-table-column sortable="custom" prop="name" label="Name" width="200">
@@ -324,7 +323,26 @@ const handleSave = async (config) => {
   })
 }
 
+const handleArrow = (event) =>{
+  const allPage = Math.ceil(filterTableData.value.length / pageSize.value)
+  switch (event.srcKey) {
+    case "right":
+      let nextPage = pageCurrent.value + 1
+      if(nextPage > allPage){
+        nextPage = 1
+      }
+      pageCurrent.value = nextPage
 
+      break;
+    case "left":
+      let prevPage = pageCurrent.value - 1
+      if(prevPage < 1){
+        prevPage = allPage
+      }
+      pageCurrent.value = prevPage
+      break;
+  }
+}
 
 </script>
 

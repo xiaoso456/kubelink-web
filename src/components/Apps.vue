@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
 
     <el-row align="top">
       <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue.selectedOption" :options="appTypeOptions"  >
         <template #default="{ item }">
           <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
             <el-icon size="20">
-              <component :is="item.icon" />
+              <component :is="{...item.icon}" />
             </el-icon>
             <div>{{ item.label }}</div>
           </div>
@@ -517,6 +517,27 @@ onMounted(async () => {
     icon: Postcard,
   })
 })
+
+const handleArrow = (event) =>{
+  const allPage = Math.ceil(filterTableData.value.length / pageSize.value)
+  switch (event.srcKey) {
+    case "right":
+      let nextPage = pageCurrent.value + 1
+      if(nextPage > allPage){
+        nextPage = 1
+      }
+      pageCurrent.value = nextPage
+
+      break;
+    case "left":
+      let prevPage = pageCurrent.value - 1
+      if(prevPage < 1){
+        prevPage = allPage
+      }
+      pageCurrent.value = prevPage
+      break;
+  }
+}
 
 </script>
 

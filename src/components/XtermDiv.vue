@@ -1,6 +1,6 @@
 <template>
 <!--    <div   style="width: 600px;height: 600px;border-style: solid;border-width: 1px;">-->
-    <div  style="margin-left: 10px;margin-right: 10px;">
+    <div  style="margin-left: 10px;margin-right: 10px;" >
 
       <el-segmented @change="handleSelectOption"  v-model="selectedOptionValue" :options="operationTypeOptions"  >
         <template #default="{ item }">
@@ -14,7 +14,7 @@
       </el-segmented>
       <el-row align="middle">
 
-          <el-descriptions  style="margin-top: 10px;width: 70%"  border size="default" column="4">
+          <el-descriptions  style="margin-top: 10px;width: 70%"  border size="default" :column="4">
 
             <el-descriptions-item  label="Namespace">{{ route.params.namespace }}</el-descriptions-item>
             <el-descriptions-item  label="Pod">{{ route.params.pod }}</el-descriptions-item>

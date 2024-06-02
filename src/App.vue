@@ -1,5 +1,5 @@
 <template>
-  <el-container class="layout-container-demo" style="margin: -8px;height: calc(100vh - 8px)">
+  <el-container v-shortkey="['tab']" @shortkey="handleShortKeyTable" class="layout-container-demo" style="margin: -8px;height: calc(100vh - 8px)">
 
 
     <el-aside width="collapse" >
@@ -24,7 +24,7 @@
             <template #title>Template</template>
           </el-menu-item>
 
-          <el-menu-item  @click="isCollapse = !isCollapse" >
+          <el-menu-item index="collapse"  @click="isCollapse = !isCollapse" >
             <el-icon v-if="isCollapse"><Expand /></el-icon>
             <el-icon v-else><Fold /></el-icon>
             <template #title>
@@ -81,8 +81,8 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-
-
+          <el-switch  inline-prompt v-model="isDark" :active-action-icon="Moon" :inactive-action-icon="Sunny" @change="toggleDark">
+          </el-switch>
         </div>
 
       </el-header>
@@ -101,9 +101,20 @@
 </template>
 
 <script  setup>
-import {ArrowRight, Expand, Menu as IconMenu, Message, Setting} from '@element-plus/icons-vue'
+import {ArrowRight, Expand, Menu as IconMenu, Message, Moon, Setting, Sunny} from '@element-plus/icons-vue'
 import {useClusterInfo} from "@/store/clusterStore.js";
 import {apiClusterActive, apiClusterConnect, apiClusterList} from "@/services/clusterConfig.js";
+import { useDark, useToggle } from '@vueuse/core'
+
+
+const isDark = useDark({
+  storageKey: 'vue-theme-mode',
+  valueDark: 'dark',
+  valueLight: 'light',
+})
+
+const toggleDark = useToggle(isDark)
+
 const clusterInfo = useClusterInfo()
 
 const isCollapse = ref(false)
@@ -142,6 +153,10 @@ const activeClusterConfig = (id,name) =>{
 
 
 
+}
+
+const handleShortKeyTable = (event) => {
+  isCollapse.value = !isCollapse.value
 }
 
 const updateClusterConfig = () => {
@@ -213,15 +228,15 @@ onMounted(()=>{
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .layout-container-demo .el-header {
   position: relative;
-  background-color: #121212;
-  color: var(--el-text-color-primary);
+  /*background-color: #121212;*/
+  /*color: var(--el-text-color-primary);*/
 }
 .layout-container-demo .el-aside {
   color: var(--el-text-color-primary);
-  background: #161616;
+  /*background: #161616;*/
 }
 .layout-container-demo .el-menu {
   border-right: none;
@@ -253,6 +268,20 @@ onMounted(()=>{
   align-items: center;
   outline: none;
 }
+
+.el-switch {
+  --el-switch-off-color: #67C23A;
+}
+
+/* menu text and icon size*/
+.el-menu-item{
+  font-size: 16px;
+}
+.el-menu-item [class^=el-icon]{
+  font-size: 20px;
+}
+
+
 
 
 </style>

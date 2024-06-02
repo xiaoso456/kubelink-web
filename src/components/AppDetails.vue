@@ -218,7 +218,8 @@
 
           <el-table-column  label="Operation" width="280">
             <template #default="scope">
-              <el-button size="small" type="success" plain @click="()=>{
+              <el-button size="small" type="success"
+                         plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Console')
                         } ">Console
               </el-button>
@@ -444,6 +445,7 @@ import {yaml} from "@codemirror/lang-yaml";
 import {oneDark} from "@codemirror/theme-one-dark";
 import {apiJobGet, apiJobPodList, apiJobServiceList, apiJobYamlGet, apiJobYamlUpdate} from "@/services/job.js";
 import {apiPodDelete} from "@/services/pod.js";
+import {useDark} from "@vueuse/core";
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
@@ -464,11 +466,28 @@ const dialogMessage = ref('')
 const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
 
+const isDark = useDark({
+  storageKey: 'vue-theme-mode',
+  valueDark: 'dark',
+  valueLight: 'light',
+})
 
-const codeExtensions = [
+const codeExtensions = ref([
   yaml(),
   oneDark,
-]
+])
+watch(isDark, (isDarkValue) => {
+  if(isDarkValue){
+    codeExtensions.value = [
+      yaml(),
+      oneDark,
+    ]
+  }else{
+    codeExtensions.value = [
+      yaml(),
+    ]
+  }
+})
 
 const iconStyle = computed(() => {
   const marginMap = {
@@ -1293,9 +1312,9 @@ onMounted(() => {
 
 <style scoped>
 .custom-style .el-segmented {
-  --el-segmented-item-selected-color: var(--el-text-color-primary);
+  /*--el-segmented-item-selected-color: var(--el-text-color-primary);*/
   --el-segmented-item-selected-bg-color: #3987e0;
-  --el-border-radius-base: 3px;
+
 
 }
 .custom-style .el-row{

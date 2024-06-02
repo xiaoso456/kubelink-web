@@ -4,7 +4,7 @@
       <template #default="{ item }">
         <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
           <el-icon size="20">
-            <component :is="item.icon" />
+            <component :is="{...item.icon}" />
           </el-icon>
           <div>{{ item.label }}</div>
         </div>

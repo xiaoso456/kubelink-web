@@ -1,6 +1,6 @@
 <template>
 <!--    <div   style="width: 600px;height: 600px;border-style: solid;border-width: 1px;">-->
-    <div  style="margin-left: 10px;margin-right: 10px;" >
+    <div  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" style="margin-left: 10px;margin-right: 10px;" >
 
       <el-segmented @change="handleSelectOption"  v-model="selectedOptionValue" :options="operationTypeOptions"  >
         <template #default="{ item }">
@@ -23,33 +23,47 @@
           </el-descriptions>
 
       </el-row>
-      <el-row style="margin-top: 10px" :gutter="10">
-        <el-col :span="8">
+      <el-row style="margin-top: 10px" :gutter="8">
+        <el-col :span="10" style="min-width: 480px">
           <el-input
               v-model="searchInput"
-              style="max-width: 100%"
               placeholder="Please input"
-              class="input-with-select"
-              @input="highlightKeyword"
+              @keyup.enter="highlightKeyword"
               clearable
           >
             <template #prepend>
               <el-button @click="highlightKeyword" :icon="Search" ></el-button>
             </template>
-            <template #append>
-              <el-text>Total:{{ searchCount }}</el-text>
+            <template #append >
+
+              <el-tooltip
+                  class="box-item"
+                  :content="highlightContent"
+                  placement="top-start"
+              >
+                <el-text  :type="searchCount===highlightLimit?'danger':'info'">{{searchIndex + 1}}/{{searchCount }}</el-text>
+              </el-tooltip>
+
+              <el-divider direction="vertical" />
+              <el-button-group class="ml-4">
+                <el-button size="small" @click="searchPrev" style="margin: 0;padding: 4px" :bg="true" plain text><el-icon><ArrowUpBold /></el-icon></el-button>
+                <el-button size="small"  @click="searchNext"  style="margin: 0;padding: 4px" :bg="true" plain text><el-icon><ArrowDownBold /></el-icon></el-button>
+
+              </el-button-group>
 
             </template>
           </el-input>
         </el-col>
-        <el-col :span="3" v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)">
+
+
+        <el-col :span="3"  style="min-width: 160px" v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)">
           <el-tooltip  effect="light" content="tail lines">
             <el-input-number  style="width: 100%" v-model="tailLines" :min="1" :step="5000" />
           </el-tooltip>
 
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="6"  style="min-width: 200px">
 
           <el-button v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)"  @click="updateTermLog()"  plain type="primary" >Refresh</el-button>
           <el-button @click="downloadTermLog()"  plain type="success" >Download</el-button>
@@ -116,31 +130,47 @@ const operationTypeOptions = [
 const searchInput = ref('')
 const searchIndex = ref(0)
 const searchCount = ref(0)
-const tailLines = ref(1000)
+const tailLines = ref(5000)
 const route = useRoute()
 const router = useRouter()
+const highlightLimit = ref(1000)
+const highlightContent = computed(()=>{
+  return "highlight limit: " + highlightLimit.value
+})
 
 const selectState = ref({
   Logs:{
+    terminal: null,
     searchAddon: null,
     fitAddon: null,
   },
   PreviousLogs:{
+    terminal: null,
     searchAddon: null,
     fitAddon: null,
 
   },
   Console:{
+    terminal: null,
     searchAddon: null,
     fitAddon: null,
 
   }
 })
-window.onresize = () => {
-  allFit()
+// const isFitting = ref(false)
+window.onresize = async () => {
+  // if(!isFitting.value) {
+  //   isFitting.value = true
+  //   await allFit()
+  //   isFitting.value = false
+  // }
+
 }
 const allFit = () => {
   for (const key in selectState.value) {
+    if(key !== route.params.action){
+      continue
+    }
     if (selectState.value.hasOwnProperty(key)) {
       if(selectState.value[key].fitAddon != null){
         selectState.value[key].fitAddon.fit()
@@ -148,9 +178,32 @@ const allFit = () => {
     }
   }
 }
+const searchPrev = ()=>{
+  const searchAddon = selectState.value[route.params.action].searchAddon
+  searchAddon.findPrevious(searchInput.value,findOption)
+}
+const searchNext = ()=>{
+  const searchAddon = selectState.value[route.params.action].searchAddon
+  searchAddon.findNext(searchInput.value,findOption)
+}
+
+const handleArrow = (event) =>{
+  switch (event.srcKey) {
+    case "right":
+      searchNext()
+      break;
+    case "left":
+      searchPrev()
+      break;
+  }
+}
+
+
 const addAddonToTerm = (term,stateName) => {
   const fitAddon = new FitAddon();
-  const searchAddon = new SearchAddon();
+  const searchAddon = new SearchAddon({
+    highlightLimit: highlightLimit.value,
+  });
   searchAddon.onDidChangeResults((item)=>{
     searchIndex.value = item.resultIndex
     searchCount.value = item.resultCount
@@ -159,6 +212,7 @@ const addAddonToTerm = (term,stateName) => {
   term.loadAddon(searchAddon);
   selectState.value[stateName].searchAddon = searchAddon
   selectState.value[stateName].fitAddon = fitAddon
+  selectState.value[stateName].terminal = term
 }
 
 const termLog = new Terminal({
@@ -293,16 +347,20 @@ const updateTermText = async (terminal, text) => {
   await terminal.write(text)
   await allFit()
 }
-
+const findOption = {
+  caseSensitive: false,
+  decorations:{
+    // activeMatchBackground: '#1cb263',
+    // activeMatchBorder: '#1cb263',
+    // matchBackground: '#3987e0',
+    matchBorder: '#3987e0',
+    incremental: true
+  }
+}
 const highlightKeyword = () => {
   const searchAddon = selectState.value[route.params.action].searchAddon
 
-  searchAddon.findPrevious(searchInput.value,{
-    matchCase: true,
-    decorations:{
-      matchBackground: '#1e7949'
-    }
-  })
+  searchAddon.findNext(searchInput.value,findOption)
 }
 const socket = ref(null);
 const handleSelectOption = async () => {
@@ -348,11 +406,21 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .terminal {
   margin-top:10px;
   /*border-style: solid;*/
   /*border-width: 1px;*/
   border-radius: 5px;
+}
+
+::v-deep(.el-input-group__append){
+  padding: 0 10px 0 15px;
+}
+
+::v-deep(.xterm-find-active-result-decoration){
+  //outline: #1cb263 solid 2px !important;
+  background: #3987e0;
+  z-index: 1!important;
 }
 </style>

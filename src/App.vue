@@ -2,11 +2,11 @@
   <el-container class="layout-container-demo" style="margin: -8px;height: calc(100vh - 8px)">
 
 
-    <el-aside width="auto">
-      <el-scrollbar width="100%" style="height: 100vh">
-
-        <el-menu     class="el-menu-vertical-demo"
-                     :default-active="$route.path" collapse="false"  @open="handleOpen"  @close="handleClose">
+    <el-aside width="collapse" >
+<!--      <el-scrollbar width="100%" style="height: 100vh">-->
+<!--      <el-row>-->
+        <el-menu :collapse-transition="false"    class="el-menu-vertical-demo"
+                     :default-active="$route.path" :collapse="isCollapse"  @open="handleOpen"  @close="handleClose">
           <el-menu-item index="/cluster" @click="()=>{$router.push('/cluster')}" >
             <el-icon><SetUp /></el-icon>
             <template #title>Cluster</template>
@@ -23,21 +23,37 @@
             <el-icon><ChatLineSquare /></el-icon>
             <template #title>Template</template>
           </el-menu-item>
-<!--          <el-sub-menu index="1" >-->
-<!--            <template #title >-->
-<!--              <el-icon><setting /></el-icon>       <h4 @click="()=>{this.$router.push('/cluster')}" class="mb-2">Config</h4>-->
 
-<!--            </template>-->
+          <el-menu-item  @click="isCollapse = !isCollapse" >
+            <el-icon v-if="isCollapse"><Expand /></el-icon>
+            <el-icon v-else><Fold /></el-icon>
+            <template #title>
+              <p v-if="isCollapse">Extend</p>
+              <p v-else>Fold</p>
+            </template>
+          </el-menu-item>
+          <!--          <el-sub-menu index="1" >-->
+          <!--            <template #title >-->
+          <!--              <el-icon><setting /></el-icon>       <h4 @click="()=>{this.$router.push('/cluster')}" class="mb-2">Config</h4>-->
 
-<!--              <el-menu-item index="1-1" @click="()=>{this.$router.push('/cluster')}" ><el-icon><SetUp /></el-icon>cluster config</el-menu-item>-->
-<!--              <el-menu-item index="1-2" @click="()=>{this.$router.push('/sync')}"  ><el-icon><Refresh /></el-icon>sync config</el-menu-item>-->
+          <!--            </template>-->
 
-<!--          </el-sub-menu>-->
+          <!--              <el-menu-item index="1-1" @click="()=>{this.$router.push('/cluster')}" ><el-icon><SetUp /></el-icon>cluster config</el-menu-item>-->
+          <!--              <el-menu-item index="1-2" @click="()=>{this.$router.push('/sync')}"  ><el-icon><Refresh /></el-icon>sync config</el-menu-item>-->
+
+          <!--          </el-sub-menu>-->
 
         </el-menu>
+<!--      </el-row>-->
+<!--      <el-row justify="center">-->
+<!--        <el-button type="text" @click="isCollapse = !isCollapse" class="collapse-btn">-->
+<!--          <el-icon><arrow-right /></el-icon>Extend-->
+<!--        </el-button>-->
+<!--      </el-row>-->
 
 
-      </el-scrollbar>
+
+<!--      </el-scrollbar>-->
     </el-aside>
 
     <el-container>
@@ -85,7 +101,7 @@
 </template>
 
 <script  setup>
-import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
+import {ArrowRight, Expand, Menu as IconMenu, Message, Setting} from '@element-plus/icons-vue'
 import {useClusterInfo} from "@/store/clusterStore.js";
 import {apiClusterActive, apiClusterConnect, apiClusterList} from "@/services/clusterConfig.js";
 const clusterInfo = useClusterInfo()
@@ -224,7 +240,7 @@ onMounted(()=>{
 .el-aside {
   position: relative;
   height: 100vh;
-  background-color: #161616 !important;
+  /*background-color: #161616 !important;*/
 }
 .el-tag{
   margin: 5px 10px;
@@ -237,4 +253,6 @@ onMounted(()=>{
   align-items: center;
   outline: none;
 }
+
+
 </style>

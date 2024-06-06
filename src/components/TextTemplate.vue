@@ -52,7 +52,7 @@
 
   </el-row>
 
-  <el-row class="common-margin">
+  <el-row class="common-margin ">
     <el-col v-for="item in templateListRaw" :xs="24" :sm="12" :md="6" :xl="4" >
         <el-card   style="max-width: 300px;margin-top: 20px" shadow="never">
           <template #header >
@@ -92,6 +92,7 @@
       title="Template"
       width="80%"
       :before-close="handleClose"
+      class="none-box"
   >
     <el-form :model="templateForm" label-width="auto" style="max-width: 1000px">
       <el-form-item label="Name">
@@ -116,7 +117,7 @@
         <el-table-column prop="key" label="Key" width="160" >
           <template #default="scope" >
             <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'key'===tableEditFieldName" v-model="scope.row.key" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,'key')"></el-input>
-            <p v-else  @click="handleIntoEditMode(scope.$index,'key')"  >{{ scope.row.value?scope.row.key:'-' }}</p>
+            <p v-else  @click="handleIntoEditMode(scope.$index,'key')"  >{{ scope.row.key?scope.row.key:'-' }}</p>
           </template>
 
         </el-table-column>

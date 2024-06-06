@@ -3,7 +3,9 @@ import { defineStore } from 'pinia'
 export const useSelectedOptionValue = defineStore('selectedOptionValue', {
     state: () => {
         return {
-            selectedOption: 'Deployment'
+            selectedOption: 'Deployment',
+            selectedNetworkOption: 'Service',
+            selectedNamespaceOption: '',
         }
         // return ref('Deployment')
     },

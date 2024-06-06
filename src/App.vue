@@ -19,10 +19,18 @@
             <el-icon><Menu /></el-icon>
             <template #title>Apps</template>
           </el-menu-item>
+
+          <el-menu-item index="/network" @click="()=>{$router.push('/network')}" >
+            <el-icon><Connection /></el-icon>
+            <template #title>Network</template>
+          </el-menu-item>
+
           <el-menu-item index="/template" @click="()=>{$router.push('/template')}" >
             <el-icon><ChatLineSquare /></el-icon>
             <template #title>Template</template>
           </el-menu-item>
+
+
 
           <el-menu-item index="collapse"  @click="isCollapse = !isCollapse" >
             <el-icon v-if="isCollapse"><Expand /></el-icon>
@@ -281,6 +289,35 @@ onMounted(()=>{
   font-size: 20px;
 }
 
+::v-deep(.none-box .el-select__wrapper){
+  box-shadow: none;
+}
+::v-deep(.none-box .el-input__wrapper) {
+  box-shadow: none;
+}
+:deep(.none-box .el-select__wrapper.is-hovering:not(.is-focused)) {
+  box-shadow: none;
+}
+:deep(.none-box .el-textarea__inner) {
+  box-shadow: none;
+}
+
+//:deep(.el-select__wrapper) {
+//  box-shadow: none;
+//}
+//:deep(.el-select__wrapper.is-focused) {
+//  box-shadow: none;
+//}
+//:deep(.el-select__wrapper.is-hovering:not(.is-focused)) {
+//  box-shadow: none;
+//}
+//
+//:deep(.el-input__wrapper) {
+//  box-shadow: none;
+//}
+//:deep(.el-textarea__inner) {
+//  box-shadow: none;
+//}
 
 
 

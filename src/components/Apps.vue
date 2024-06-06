@@ -38,7 +38,7 @@
           <el-select
               @click="refreshNamespaceOptions"
               @change="updateTableData"
-              v-model="selectedNamespaceOptionValue"
+              v-model="selectedOptionValue.selectedNamespaceOption"
               placeholder="All"
               style="width: 200px"
               default-first-option
@@ -144,7 +144,6 @@ import {useSelectedOptionValue} from "@/store/appsStore.js";
 
 // const selectedOptionValue = ref('Deployment')
 const selectedOptionValue = useSelectedOptionValue()
-const selectedNamespaceOptionValue = ref('')
 const searchInput = ref('')
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -272,7 +271,7 @@ const updateTableData = async () => {
   })
   let wait;
   if (selectedOptionValue.selectedOption === 'Deployment') {
-    wait = apiDeploymentList(selectedNamespaceOptionValue.value, '').then(async res => {
+    wait = apiDeploymentList(selectedOptionValue.selectedNamespaceOption, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -292,7 +291,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   } else if (selectedOptionValue.selectedOption === 'Statefulset') {
-    wait = apiStatefulsetList(selectedNamespaceOptionValue.value, '').then(async res => {
+    wait = apiStatefulsetList(selectedOptionValue.selectedNamespaceOption, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -312,7 +311,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   } else if (selectedOptionValue.selectedOption === 'Daemonset') {
-    wait = apiDaemonsetList(selectedNamespaceOptionValue.value, '').then(async res => {
+    wait = apiDaemonsetList(selectedOptionValue.selectedNamespaceOption, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {
@@ -332,7 +331,7 @@ const updateTableData = async () => {
       console.log(err)
     })
   }else if (selectedOptionValue.selectedOption === 'Job') {
-    wait = apiJobList(selectedNamespaceOptionValue.value, '').then(async res => {
+    wait = apiJobList(selectedOptionValue.selectedNamespaceOption, '').then(async res => {
       const resData = await res.json()
       tableData.value = resData.map(item => {
         return {

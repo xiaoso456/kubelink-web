@@ -1,6 +1,6 @@
-<template>
-  <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="common-margin" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
-    <el-table-column  sortable="custom" prop="id" label="Id" width="80"/>
+<template >
+  <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="common-margin none-box" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
+    <el-table-column   sortable="custom" prop="id" label="Id" width="80"/>
     <el-table-column  sortable="custom" :show-overflow-tooltip="true" prop="name" label="Name"  width="180" >
       <template #default="scope">
           <el-input  sortable="custom" ref="focusRef" v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName"
@@ -177,10 +177,10 @@
       width="80vw"
       style="max-width: 1000px"
   >
-    <el-form :model="editRowInfo" label-width="auto" style="max-width: 1000px"  >
+    <el-form class="none-box" :model="editRowInfo" label-width="auto" style="max-width: 1000px"  >
       <el-row>
         <el-col :span="8">
-          <el-form-item label="id">
+          <el-form-item  label="id">
             <el-input readonly v-model="editRowInfo.id" />
           </el-form-item>
         </el-col>

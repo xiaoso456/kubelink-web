@@ -926,7 +926,7 @@ const updateTablePodData = async () => {
             conditions: item.status.conditions
           },
           createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses[0].restartCount
+          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
 
         }
       })
@@ -955,7 +955,7 @@ const updateTablePodData = async () => {
             conditions: item.status.conditions
           },
           createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses[0].restartCount
+          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
 
         }
       })
@@ -984,7 +984,7 @@ const updateTablePodData = async () => {
             conditions: item.status.conditions
           },
           createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses[0].restartCount
+          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
 
         }
       })
@@ -1015,7 +1015,7 @@ const updateTablePodData = async () => {
             conditions: item.status.conditions
           },
           createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses[0].restartCount
+          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
 
         }
       })

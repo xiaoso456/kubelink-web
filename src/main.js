@@ -15,6 +15,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { createPinia } from 'pinia'
 import piniaPersist from 'pinia-plugin-persist'
 import AppDetails from "@/components/AppDetails.vue";
+import NetworkInfo from "@/components/NetworkInfo.vue";
 
 
 
@@ -26,6 +27,7 @@ const router = VueRouter.createRouter({
         {path: '/cluster', component: ClusterConfig},
         {path: '/apps', component: Apps},
         {path: '/template',component: TextTemplate},
+        {path: '/network',component: NetworkInfo},
         {path: '/app/namespace/:namespace/:appType/:appName', component: AppDetails},
         {path: '/pod/namespace/:namespace/pod/:pod/container/:container/:action',component: XtermDiv},
 

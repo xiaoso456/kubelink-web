@@ -1,5 +1,5 @@
 <template >
-    <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin">
+    <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin none-box">
       <el-table-column sortable="custom" prop="id" label="Id" width="80" />s
 
       <el-table-column sortable="custom" prop="name" label="Name" width="200">
@@ -21,7 +21,12 @@
 
       <el-table-column >
         <template #header>
-          <el-input v-model="search" size="small" placeholder="Search name or config" />
+          <el-row>
+            <el-input v-model="search" size="small" :prefix-icon="Search" placeholder="Search name or config" />
+
+
+          </el-row>
+
         </template>
         <template #default="scope">
             <el-button size="small" type="default" plain @click="handleConnect(scope.row)">connect</el-button>
@@ -46,6 +51,7 @@
 
 
   <el-dialog
+      class="none-box"
       v-model="editMode"
       title="Cluster Config"
       width="80vw"
@@ -92,6 +98,7 @@ import {
   apiClusterUpdate
 } from "@/services/clusterConfig.js";
 import {useClusterInfo} from "@/store/clusterStore.js";
+import {Search} from "@element-plus/icons-vue";
 
   
 const item = {
@@ -150,6 +157,7 @@ const updateClusterConfig = () => {
 
 const tableSort = (sortInfo) => {
   let sortField = sortInfo.prop
+  console.log(tableData.value)
   tableData.value.sort((a, b) => {
 
     if (sortInfo.order === "ascending" || sortInfo.order === null) {

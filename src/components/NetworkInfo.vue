@@ -71,11 +71,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column sortable="custom" prop="namespace" label="Namespace"  />
+      <el-table-column sortable="custom" prop="namespace" label="Namespace"  width="180"></el-table-column>
 
       <el-table-column sortable="custom" prop="name" label="Name">
         <template #default="scope">
-          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedNetworkOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
+<!--          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedNetworkOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>-->
         </template>
       </el-table-column>
 
@@ -193,8 +193,16 @@ const networkOptions = ref([
     label: 'Service',
     value: 'Service',
     icon: Postcard,
-    disabled: false
+    disabled: false,
+    supported: true
   },
+  {
+    label: 'Ingress',
+    value: 'Ingress',
+    icon: Coin,
+    disabled: false,
+    supported: false
+  }
 
 ])
 
@@ -281,7 +289,6 @@ const updateServiceType = async (row) => {
   let wait;
   wait = apiServiceUpdate(row.namespace, row.name, row.raw).then(async res => {
 
-    const resData = await res.json()
 
     if (res.status === 200) {
       ElMessage({
@@ -290,6 +297,8 @@ const updateServiceType = async (row) => {
       })
 
     } else {
+      const resData = await res.text()
+
       ElMessage({
         message: "request error: " + JSON.stringify(resData),
         type: 'error'
@@ -305,6 +314,7 @@ const updateServiceType = async (row) => {
   })
   await wait;
   updateTableData()
+
 }
 
 
@@ -333,7 +343,7 @@ const updateTableData = async () => {
   tableLoading.value = true
   // disabled other options
   networkOptions.value.forEach(item => {
-    item.disabled = (item.value !== selectedOptionValue.selectedNetworkOption)
+    item.disabled = (item.value !== selectedOptionValue.selectedNetworkOption || !item.supported)
   })
   let wait;
   if (selectedOptionValue.selectedNetworkOption === 'Service') {
@@ -352,7 +362,7 @@ const updateTableData = async () => {
   }
   await wait
   networkOptions.value.forEach(item => {
-    item.disabled = false
+    item.disabled = !item.supported
   })
   tableLoading.value = false
 

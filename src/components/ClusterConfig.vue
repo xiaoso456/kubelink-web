@@ -356,11 +356,7 @@ const handleArrow = (event) =>{
 
 <style scoped>
 
-.text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+
 
 .common-margin{
   margin: 0 10px 10px 10px;

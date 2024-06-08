@@ -129,7 +129,7 @@ import { ref } from 'vue'
 import {
   Postcard,
   Coin,
-  Reading, Search, Stopwatch, Refresh
+  Reading, Search, Stopwatch, Refresh, Clock
 } from '@element-plus/icons-vue'
 import {apiNamespaceList} from "@/services/namespace.js";
 import {
@@ -161,26 +161,39 @@ const appTypeOptions = ref([
     label: 'Deployment',
     value: 'Deployment',
     icon: Postcard,
-    disabled: false
+    disabled: false,
+    supported: true
   },
   {
     label: 'Statefulset',
     value: 'Statefulset',
     icon: Coin,
-    disabled: false
+    disabled: false,
+    supported: true
+
 
   },
   {
     label: 'Daemonset',
     value: 'Daemonset',
     icon: Reading,
-    disabled: false
+    disabled: false,
+    supported: true
+
   },
   {
     label: 'Job',
     value: 'Job',
     icon: Stopwatch,
-    disabled: false
+    disabled: false,
+    supported: true
+  },
+  {
+    label: 'Cronjob',
+    value: 'Cronjob',
+    icon: Clock,
+    disabled: true,
+    supported: false
   }
 ])
 
@@ -267,7 +280,7 @@ const updateTableData = async () => {
   tableLoading.value = true
   // disabled other options
   appTypeOptions.value.forEach(item => {
-    item.disabled = (item.value !== selectedOptionValue.selectedOption)
+    item.disabled = (item.value !== selectedOptionValue.selectedOption  || !item.supported)
   })
   let wait;
   if (selectedOptionValue.selectedOption === 'Deployment') {
@@ -353,7 +366,7 @@ const updateTableData = async () => {
   }
   await wait
   appTypeOptions.value.forEach(item => {
-    item.disabled = false
+    item.disabled = !item.supported
   })
   tableLoading.value = false
 

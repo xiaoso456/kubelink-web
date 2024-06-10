@@ -1,9 +1,9 @@
 <template>
 
-  <div v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
+  <div class="ml-10 mr-10" v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
 
     <el-row align="top">
-      <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue.selectedNetworkOption" :options="networkOptions"  >
+      <el-segmented  @change="updateTableData"  v-model="selectedOptionValue.selectedNetworkOption" :options="networkOptions"  >
         <template #default="{ item }">
           <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
             <el-icon size="20">
@@ -26,109 +26,112 @@
 
 
 
-
-    <div class="mt-4 common-margin" >
-      <el-input
-          v-model="searchInput"
-          style="max-width: 100%"
-          placeholder="Please input"
-          @change="updateTableData"
-          clearable
-      >
-        <template #prepend>
-          <el-select
-              @click="refreshNamespaceOptions"
-              @change="updateTableData"
-              v-model="selectedOptionValue.selectedNamespaceOption"
-              placeholder="All"
-              style="width: 200px"
-              default-first-option
-              filterable
-              allow-create
-              clearable
-          >
-            <el-option
-                v-for="item in namespaceOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-            />
-
-          </el-select>
-        </template>
-        <template #append>
-          <el-button @click="updateTableData" :icon="Search" />
-        </template>
-      </el-input>
-    </div>
-
-
-
-    <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin common-width">
-      <el-table-column label="Id" width="80">
-        <template #default="scope">
-          {{ scope.$index + 1  }}
-        </template>
-      </el-table-column>
-
-      <el-table-column sortable="custom" prop="namespace" label="Namespace"  width="180"></el-table-column>
-
-      <el-table-column sortable="custom" prop="name" label="Name">
-        <template #default="scope">
-<!--          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedNetworkOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>-->
-        </template>
-      </el-table-column>
-
-      <el-table-column sortable="custom" prop="type" label="Type" width="140" >
-        <template #default="scope" >
-          <div class="flex flex-wrap gap-4 items-center" >
+    <el-row class="mt-10" :gutter="20">
+      <el-col :span="20"  >
+        <el-input
+            class="mt-4"
+            v-model="searchInput"
+            placeholder="Please input"
+            @change="updateTableData"
+            clearable
+        >
+          <template #prepend>
             <el-select
-                class="none-box"
-                v-model="scope.row.raw.spec.type"
-                placeholder="Select"
-                @change="updateServiceType(scope.row)"
-                size="small"
+                @click="refreshNamespaceOptions"
+                @change="updateTableData"
+                v-model="selectedOptionValue.selectedNamespaceOption"
+                placeholder="All"
+                style="width: 200px"
                 default-first-option
                 filterable
                 allow-create
+                clearable
             >
               <el-option
-                  v-for="item in ['NodePort','ClusterIP','LoadBalancer']"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+                  v-for="item in namespaceOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
               />
+
             </el-select>
-          </div>
+          </template>
+          <template #append>
+            <el-button @click="updateTableData" :icon="Search" />
+          </template>
+        </el-input>
+      </el-col>
+      <el-col :span="4">
+      </el-col>
+    </el-row>
+    <el-row >
+      <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="mt-10">
+        <el-table-column label="Id" width="80">
+          <template #default="scope">
+            {{ scope.$index + 1  }}
+          </template>
+        </el-table-column>
 
-<!--          <el-input ref="focusRef"   v-model="scope.row.type" @keyup.enter.native="$event.target.blur()"></el-input>-->
-<!--          <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'type')"  >{{ scope.row.type?scope.row.type:'-' }}</p>-->
-        </template>
-      </el-table-column>
+        <el-table-column sortable="custom" prop="namespace" label="Namespace"  width="180"></el-table-column>
 
-      <el-table-column sortable="custom" prop="clusterIP" label="ClusterIP"  >
-      </el-table-column>
+        <el-table-column sortable="custom" prop="name" label="Name">
+          <template #default="scope">
+            <!--          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedNetworkOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>-->
+          </template>
+        </el-table-column>
 
-      <el-table-column label="mapping" width="280">
-        <template #default="scope">
-          <el-row v-for="(item,index) in scope.row.ports">
-            {{ portInfoToStr(item) }}
-          </el-row>
+        <el-table-column sortable="custom" prop="type" label="Type" width="140" >
+          <template #default="scope" >
+            <div class="flex flex-wrap gap-4 items-center" >
+              <el-select
+                  class="none-box"
+                  v-model="scope.row.raw.spec.type"
+                  placeholder="Select"
+                  @change="updateServiceType(scope.row)"
+                  size="small"
+                  default-first-option
+                  filterable
+                  allow-create
+              >
+                <el-option
+                    v-for="item in ['NodePort','ClusterIP','LoadBalancer']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                />
+              </el-select>
+            </div>
+
+            <!--          <el-input ref="focusRef"   v-model="scope.row.type" @keyup.enter.native="$event.target.blur()"></el-input>-->
+            <!--          <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'type')"  >{{ scope.row.type?scope.row.type:'-' }}</p>-->
+          </template>
+        </el-table-column>
+
+        <el-table-column sortable="custom" prop="clusterIP" label="ClusterIP"  >
+        </el-table-column>
+
+        <el-table-column label="mapping" width="280">
+          <template #default="scope">
+            <el-row v-for="(item,index) in scope.row.ports">
+              {{ portInfoToStr(item) }}
+            </el-row>
 
 
-        </template>
-      </el-table-column>
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Operation" width="140">
-        <template #default="scope">
-<!--          <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>-->
-          <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
-          <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
-        </template>
-      </el-table-column>
+        <el-table-column label="Operation" width="140">
+          <template #default="scope">
+            <!--          <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>-->
+            <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
+            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
+          </template>
+        </el-table-column>
 
-    </el-table>
-    <el-row justify="end">
+      </el-table>
+
+    </el-row>
+    <el-row class="mt-10" justify="end">
       <el-pagination
           v-model:current-page="pageCurrent"
           v-model:page-size="pageSize"
@@ -159,15 +162,10 @@
 
 <script setup>
 import {ref} from "vue";
-import {Coin, Postcard, Reading, Stopwatch,Search} from "@element-plus/icons-vue";
+import {Coin, Postcard, Search} from "@element-plus/icons-vue";
 import {apiNamespaceList} from "@/services/namespace.js";
 import {useSelectedOptionValue} from "@/store/appsStore.js";
 import {apiServiceDelete, apiServiceList, apiServiceUpdate} from "@/services/service.js";
-import {apiDeploymentDelete} from "@/services/deployment.js";
-import {apiStatefulsetDelete} from "@/services/statefulset.js";
-import {apiDaemonsetDelete} from "@/services/daemonset.js";
-import {apiJobDelete} from "@/services/job.js";
-import {apiClusterUpdate} from "@/services/clusterConfig.js";
 
 const selectedOptionValue = useSelectedOptionValue()
 
@@ -445,13 +443,8 @@ const handleArrow = (event) =>{
 </script>
 
 <style scoped>
-.common-margin{
-  margin: 0 10px 10px 10px;
-}
-.common-width{
-  width: calc(100% - 20px);
 
-}
+
 
 
 </style>

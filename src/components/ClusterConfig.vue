@@ -1,53 +1,60 @@
 <template >
-    <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin none-box">
-      <el-table-column sortable="custom" prop="id" label="Id" width="80" />s
+   <div  class="ml-10 mr-10" v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  >
+     <el-row>
+       <el-table  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="none-box">
+         <el-table-column sortable="custom" prop="id" label="Id" width="80" />s
 
-      <el-table-column sortable="custom" prop="name" label="Name" width="200">
-        <template #default="scope" >
-            <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
-            <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'name')"  >{{ scope.row.name?scope.row.name:'-' }}</p>
-        </template>
-      </el-table-column>
-
-        
-      <el-table-column prop="config" label="Config" >
-        <template #default="scope" >
-            <el-input :autosize="{minRows:1,maxRows:3}" resize="none" type="textarea" ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
-            <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'config')"  >{{ scope.row.config?scope.row.config:'-' }}</p>
-        </template>
-      </el-table-column>
+         <el-table-column sortable="custom" prop="name" label="Name" width="200">
+           <template #default="scope" >
+             <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
+             <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'name')"  >{{ scope.row.name?scope.row.name:'-' }}</p>
+           </template>
+         </el-table-column>
 
 
+         <el-table-column prop="config" label="Config" >
+           <template #default="scope" >
+             <el-input :autosize="{minRows:1,maxRows:3}" resize="none" type="textarea" ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
+             <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'config')"  >{{ scope.row.config?scope.row.config:'-' }}</p>
+           </template>
+         </el-table-column>
 
-      <el-table-column >
-        <template #header>
-          <el-row>
-            <el-input v-model="search" size="small" :prefix-icon="Search" placeholder="Search name or config" />
 
 
-          </el-row>
+         <el-table-column >
+           <template #header>
+             <el-row>
+               <el-input v-model="search" size="small" :prefix-icon="Search" placeholder="Search name or config" />
 
-        </template>
-        <template #default="scope">
-            <el-button size="small" type="default" plain @click="handleConnect(scope.row)">connect</el-button>
-            <el-button size="small" type="primary"  plain @click="handleEdit(scope.row)">edit</el-button>
-          <el-button size="small" type="success" plain @click="handleActive(scope.row)">active</el-button>
 
-        </template>
-      </el-table-column>
-    </el-table>
+             </el-row>
 
-    <el-button class="mt-4 common-margin"  @click="handleAddItem">Add Item</el-button>
-    <el-row justify="end">
-      <el-pagination
-          v-model:current-page="pageCurrent"
-          v-model:page-size="pageSize"
-          :page-sizes="[5, 10, 20, 50]"
-          layout="total,sizes, prev, pager, next"
-          :total="filterTableData.length"
+           </template>
+           <template #default="scope">
+             <el-button size="small" type="default" plain @click="handleConnect(scope.row)">connect</el-button>
+             <el-button size="small" type="primary"  plain @click="handleEdit(scope.row)">edit</el-button>
+             <el-button size="small" type="success" plain @click="handleActive(scope.row)">active</el-button>
 
-      />
-    </el-row>
+           </template>
+         </el-table-column>
+       </el-table>
+
+     </el-row>
+     <el-row class="mt-10">
+       <el-button class="mt-10" style="width: 100%;"  @click="handleAddItem">Add Item</el-button>
+     </el-row>
+     <el-row class="mt-10" justify="end">
+       <el-pagination
+           v-model:current-page="pageCurrent"
+           v-model:page-size="pageSize"
+           :page-sizes="[5, 10, 20, 50]"
+           layout="total,sizes, prev, pager, next"
+           :total="filterTableData.length"
+
+       />
+     </el-row>
+
+   </div>
 
 
   <el-dialog
@@ -100,7 +107,7 @@ import {
 import {useClusterInfo} from "@/store/clusterStore.js";
 import {Search} from "@element-plus/icons-vue";
 
-  
+
 const item = {
     id: 1,
     name: 'remote-k8s',
@@ -357,9 +364,4 @@ const handleArrow = (event) =>{
 <style scoped>
 
 
-
-.common-margin{
-  margin: 0 10px 10px 10px;
-  width: calc(100% - 20px);
-}
 </style>

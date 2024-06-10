@@ -204,31 +204,22 @@
 <script  setup>
 import {ref} from 'vue'
 import {useRoute} from 'vue-router'
-import {
-  apiDeploymentGet,
-  apiDeploymentPodList,
-  apiDeploymentServiceList,
-  apiDeploymentYamlGet, apiDeploymentYamlUpdate
-} from "@/services/deployment.js";
 
-import {
-  Refresh
-} from '@element-plus/icons-vue'
+import {Refresh} from '@element-plus/icons-vue'
 import {Codemirror} from "vue-codemirror";
 import {yaml} from "@codemirror/lang-yaml";
 
 import {oneDark} from "@codemirror/theme-one-dark";
-import {apiPodDelete} from "@/services/pod.js";
 import {useDark} from "@vueuse/core";
 import {formattedDate} from "../services/common.js";
 import {
-  apiConfigmapDelete,
   apiConfigmapGet,
   apiConfigmapUpdate,
   apiConfigmapYamlGet,
   apiConfigmapYamlUpdate
 } from "@/services/configmap.js";
 import {apiSecretGet, apiSecretUpdate, apiSecretYamlGet, apiSecretYamlUpdate} from "@/services/secret.js";
+
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]

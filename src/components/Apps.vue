@@ -1,5 +1,5 @@
 <template>
-  <div v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
+  <div class="ml-10 mr-10" v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
 
     <el-row align="top">
       <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue.selectedOption" :options="appTypeOptions"  >
@@ -26,7 +26,7 @@
 
 
 
-    <div class="mt-4 common-margin" >
+    <el-row class="mt-10" >
       <el-input
           v-model="searchInput"
           style="max-width: 100%"
@@ -59,44 +59,45 @@
           <el-button @click="updateTableData" :icon="Search" />
         </template>
       </el-input>
-    </div>
+    </el-row>
 
 
+    <el-row  class="mt-10">
+      <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
+        <el-table-column label="Id" width="80"   >
+          <template #default="scope">
+            {{ scope.$index + 1  }}
+          </template>
+        </el-table-column>
 
-    <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin common-width">
-      <el-table-column label="Id" width="80"   >
-        <template #default="scope">
-          {{ scope.$index + 1  }}
-        </template>
-      </el-table-column>
+        <el-table-column sortable="custom" prop="namespace" label="Namespace"  />
 
-      <el-table-column sortable="custom" prop="namespace" label="Namespace"  />
+        <el-table-column sortable="custom" prop="name" label="Name">
+          <template #default="scope">
+            <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
+          </template>
+        </el-table-column>
 
-      <el-table-column sortable="custom" prop="name" label="Name">
-        <template #default="scope">
-          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
-        </template>
-      </el-table-column>
+        <el-table-column sortable="custom" prop="status" label="Status" width="120" >
+          <template #default="scope" >
+            <div style="display: flex;align-items: center">
+              <div :class="scope.row.status.runNum===scope.row.status.totalNum?'circle-green':'circle-yellow'"></div>
+              <el-text>{{ scope.row.status.runNum }}/{{ scope.row.status.totalNum }}</el-text>
+            </div>
+          </template>
+        </el-table-column>
 
-      <el-table-column sortable="custom" prop="status" label="Status" width="120" >
-        <template #default="scope" >
-          <div style="display: flex;align-items: center">
-            <div :class="scope.row.status.runNum===scope.row.status.totalNum?'circle-green':'circle-yellow'"></div>
-            <el-text>{{ scope.row.status.runNum }}/{{ scope.row.status.totalNum }}</el-text>
-          </div>
-        </template>
-      </el-table-column>
+        <el-table-column label="Operation" width="200">
+          <template #default="scope">
+            <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>
+            <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
+            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Operation" width="200">
-        <template #default="scope">
-          <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>
-<!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
-          <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
-        </template>
-      </el-table-column>
-
-    </el-table>
-    <el-row justify="end">
+      </el-table>
+    </el-row>
+    <el-row class="mt-10" justify="end">
       <el-pagination
           v-model:current-page="pageCurrent"
           v-model:page-size="pageSize"
@@ -125,18 +126,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import {
-  Postcard,
-  Coin,
-  Reading, Search, Stopwatch, Refresh, Clock
-} from '@element-plus/icons-vue'
+import {ref} from 'vue'
+import {Clock, Coin, Postcard, Reading, Refresh, Search, Stopwatch} from '@element-plus/icons-vue'
 import {apiNamespaceList} from "@/services/namespace.js";
-import {
-  apiDeploymentContainerSuspend,
-  apiDeploymentDelete,
-  apiDeploymentList
-} from "@/services/deployment.js";
+import {apiDeploymentContainerSuspend, apiDeploymentDelete, apiDeploymentList} from "@/services/deployment.js";
 import {apiStatefulsetContainerSuspend, apiStatefulsetDelete, apiStatefulsetList} from "@/services/statefulset.js";
 import {apiDaemonsetContainerSuspend, apiDaemonsetDelete, apiDaemonsetList} from "@/services/daemonset.js";
 import {apiJobContainerSuspend, apiJobDelete, apiJobList} from "@/services/job.js";
@@ -554,13 +547,7 @@ const handleArrow = (event) =>{
 </script>
 
 <style scoped>
-.common-margin{
-  margin: 0 10px 10px 10px;
-}
-.common-width{
-  width: calc(100% - 20px);
 
-}
 
 
 </style>

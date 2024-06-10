@@ -181,20 +181,15 @@
 
 <script setup>
 import {onMounted, ref} from "vue";
-import {Coin, Postcard,CirclePlusFilled,CirclePlus, Reading, Search, Stopwatch} from "@element-plus/icons-vue";
+import {CirclePlusFilled, Postcard, Search} from "@element-plus/icons-vue";
 import {
   apiTextTemplateCreate,
   apiTextTemplateDelete,
-  apiTextTemplateList, apiTextTemplateTypeList,
+  apiTextTemplateList,
+  apiTextTemplateTypeList,
   apiTextTemplateUpdate
 } from "@/services/textTemplate.js";
 import Handlebars from "handlebars";
-import {apiClusterUpdate} from "@/services/clusterConfig.js";
-import {ElMessageBox} from "element-plus";
-import {apiDeploymentContainerSuspend} from "@/services/deployment.js";
-import {apiStatefulsetContainerSuspend} from "@/services/statefulset.js";
-import {apiDaemonsetContainerSuspend} from "@/services/daemonset.js";
-import {apiJobContainerSuspend} from "@/services/job.js";
 
 const searchInput = ref('')
 

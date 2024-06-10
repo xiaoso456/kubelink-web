@@ -35,7 +35,15 @@ export function apiSecretUpdate(namespace,secretName,secret){
     })
 }
 
-
+export function apiSecretCreate(namespace,secret){
+    return fetch(`${prefix}/namespace/${namespace}/secret`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(secret)
+    })
+}
 
 export function apiSecretYamlGet(namespace, secret){
 

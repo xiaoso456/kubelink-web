@@ -419,26 +419,24 @@ import {
   apiDeploymentGet,
   apiDeploymentPodList,
   apiDeploymentServiceList,
-  apiDeploymentYamlGet, apiDeploymentYamlUpdate
+  apiDeploymentYamlGet,
+  apiDeploymentYamlUpdate
 } from "@/services/deployment.js";
 import {
   apiStatefulsetGet,
   apiStatefulsetPodList,
   apiStatefulsetServiceList,
-  apiStatefulsetYamlGet, apiStatefulsetYamlUpdate
+  apiStatefulsetYamlGet,
+  apiStatefulsetYamlUpdate
 } from "@/services/statefulset.js";
 import {
   apiDaemonsetGet,
   apiDaemonsetPodList,
   apiDaemonsetServiceList,
-  apiDaemonsetYamlGet, apiDaemonsetYamlUpdate
+  apiDaemonsetYamlGet,
+  apiDaemonsetYamlUpdate
 } from "@/services/daemonset.js";
-import dayjs from "dayjs";
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import {
-  Refresh
-} from '@element-plus/icons-vue'
+import {Refresh} from '@element-plus/icons-vue'
 import {Codemirror} from "vue-codemirror";
 import {yaml} from "@codemirror/lang-yaml";
 
@@ -447,6 +445,7 @@ import {apiJobGet, apiJobPodList, apiJobServiceList, apiJobYamlGet, apiJobYamlUp
 import {apiPodDelete} from "@/services/pod.js";
 import {useDark} from "@vueuse/core";
 import {formattedDate} from "../services/common.js";
+
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]

@@ -1,176 +1,186 @@
-<template >
-  <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="common-margin none-box" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
-    <el-table-column   sortable="custom" prop="id" label="Id" width="80"/>
-    <el-table-column  sortable="custom" :show-overflow-tooltip="true" prop="name" label="Name"  width="180" >
-      <template #default="scope">
-          <el-input  sortable="custom" ref="focusRef" v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName"
-                    v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"
-                    @blur="handleExitEditMode(scope.$index,scope.row)">
+<template>
 
-          </el-input>
+  <div class="ml-10 mr-10">
+    <el-row>
+      <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="none-box" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
+        <el-table-column   sortable="custom" prop="id" label="Id" width="80"/>
+        <el-table-column  sortable="custom" :show-overflow-tooltip="true" prop="name" label="Name"  width="180" >
+          <template #default="scope">
+            <el-input  sortable="custom" ref="focusRef" v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName"
+                       v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"
+                       @blur="handleExitEditMode(scope.$index,scope.row)">
 
-          <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'name')">{{ scope.row.name===null? '-':scope.row.name }}</p>
-      </template>
-    </el-table-column>
+            </el-input>
 
-    <el-table-column  sortable="custom" prop="syncType" label="SyncType" width="180">
-      <template #default="scope">
-        <el-select
-            @change="updateSyncConfigAndRefresh(scope.row)"
-            v-model="scope.row.syncType"
-            placeholder="Select"
-            size="small"
-        >
-          <el-option
-              v-for="item in syncTypeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          />
-        </el-select>
-      </template>
-    </el-table-column>
+            <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'name')">{{ scope.row.name===null? '-':scope.row.name }}</p>
+          </template>
+        </el-table-column>
 
-    <el-table-column sortable="custom" :show-overflow-tooltip="true"  prop="namespace" label="Namespace" >
-      <template #default="scope">
-        <el-select
-            @change="updateSyncConfigAndRefresh(scope.row)"
-            default-first-option
-            filterable
-            allow-create
-            v-model="scope.row.namespace"
-            placeholder="Select"
-            size="small"
-        >
-          <el-option
-              v-for="item in namespaceOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          />
-        </el-select>
-      </template>
+        <el-table-column  sortable="custom" prop="syncType" label="SyncType" width="180">
+          <template #default="scope">
+            <el-select
+                @change="updateSyncConfigAndRefresh(scope.row)"
+                v-model="scope.row.syncType"
+                placeholder="Select"
+                size="small"
+            >
+              <el-option
+                  v-for="item in syncTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
+          </template>
+        </el-table-column>
 
-    </el-table-column>
+        <el-table-column sortable="custom" :show-overflow-tooltip="true"  prop="namespace" label="Namespace" >
+          <template #default="scope">
+            <el-select
+                @change="updateSyncConfigAndRefresh(scope.row)"
+                default-first-option
+                filterable
+                allow-create
+                v-model="scope.row.namespace"
+                placeholder="Select"
+                size="small"
+            >
+              <el-option
+                  v-for="item in namespaceOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
+          </template>
+
+        </el-table-column>
 
 
-    <el-table-column :show-overflow-tooltip="true" prop="Pod" label="pod" >
-      <template #default="scope">
-        <el-select
-            @click="updateNamespacePod(scope.row)"
-            @change="updateSyncConfigAndRefresh(scope.row)"
-            default-first-option
-            filterable
-            allow-create
-            v-model="scope.row.pod"
-            placeholder="Select"
-            size="small"
-        >
-          <el-option
-              v-for="item in namespacePodMap[scope.row.namespace]"
-              :key="item"
-              :label="item"
-              :value="item"
-          />
-        </el-select>
-      </template>
+        <el-table-column :show-overflow-tooltip="true" prop="Pod" label="pod" >
+          <template #default="scope">
+            <el-select
+                @click="updateNamespacePod(scope.row)"
+                @change="updateSyncConfigAndRefresh(scope.row)"
+                default-first-option
+                filterable
+                allow-create
+                v-model="scope.row.pod"
+                placeholder="Select"
+                size="small"
+            >
+              <el-option
+                  v-for="item in namespacePodMap[scope.row.namespace]"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+              />
+            </el-select>
+          </template>
 
-    </el-table-column>
+        </el-table-column>
 
-    <el-table-column :show-overflow-tooltip="true" prop="container" label="Container" >
-      <template #default="scope">
-        <el-select
-            @click="updateNamespacePodContainer(scope.row)"
-            @change="updateSyncConfigAndRefresh(scope.row)"
-            default-first-option
-            filterable
-            allow-create
-            v-model="scope.row.container"
-            placeholder="Select"
-            size="small"
-        >
-          <el-option
-              v-for="item in namespacePodContainerMap[scope.row.namespace+'-'+scope.row.pod]"
-              :key="item"
-              :label="item"
-              :value="item"
-          />
-        </el-select>
-      </template>
+        <el-table-column :show-overflow-tooltip="true" prop="container" label="Container" >
+          <template #default="scope">
+            <el-select
+                @click="updateNamespacePodContainer(scope.row)"
+                @change="updateSyncConfigAndRefresh(scope.row)"
+                default-first-option
+                filterable
+                allow-create
+                v-model="scope.row.container"
+                placeholder="Select"
+                size="small"
+            >
+              <el-option
+                  v-for="item in namespacePodContainerMap[scope.row.namespace+'-'+scope.row.pod]"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+              />
+            </el-select>
+          </template>
 
-    </el-table-column>
+        </el-table-column>
 
-<!--    <el-table-column prop="source" label="Source" >-->
-<!--      <template #default="scope">-->
-<!--        <el-input ref="focusRef" v-if="scope.$index === tableEditIndex && 'source'===tableEditFieldName"-->
-<!--                  v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"-->
-<!--                  @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>-->
-<!--        <el-tooltip-->
-<!--            v-else-->
-<!--            effect="light"-->
-<!--            placement="top-start"-->
-<!--        >-->
-<!--          <template #content>{{scope.row.source}}<el-button style="margin-left: 5px" size="small" type="danger" plain @click="handleDeleteResource(scope.$index,scope.row,'source')">delete</el-button>-->
-<!--          </template>-->
-<!--          <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'source')">{{ scope.row.source }}</p>-->
-<!--        </el-tooltip>-->
-<!--      </template>-->
-<!--    </el-table-column>-->
+        <!--    <el-table-column prop="source" label="Source" >-->
+        <!--      <template #default="scope">-->
+        <!--        <el-input ref="focusRef" v-if="scope.$index === tableEditIndex && 'source'===tableEditFieldName"-->
+        <!--                  v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"-->
+        <!--                  @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>-->
+        <!--        <el-tooltip-->
+        <!--            v-else-->
+        <!--            effect="light"-->
+        <!--            placement="top-start"-->
+        <!--        >-->
+        <!--          <template #content>{{scope.row.source}}<el-button style="margin-left: 5px" size="small" type="danger" plain @click="handleDeleteResource(scope.$index,scope.row,'source')">delete</el-button>-->
+        <!--          </template>-->
+        <!--          <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'source')">{{ scope.row.source }}</p>-->
+        <!--        </el-tooltip>-->
+        <!--      </template>-->
+        <!--    </el-table-column>-->
 
-<!--    <el-table-column prop="target" label="Target" width="140">-->
-<!--      <template #default="scope">-->
-<!--        <el-input ref="focusRef" v-if="scope.$index === tableEditIndex && 'target'===tableEditFieldName"-->
-<!--                  v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"-->
-<!--                  @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>-->
-<!--        <el-tooltip-->
-<!--            v-else-->
-<!--            effect="light"-->
-<!--            placement="top-start"-->
-<!--        >-->
-<!--          <template #content>{{scope.row.target}}<el-button style="margin-left: 5px" size="small" type="danger" plain @click="handleDeleteResource(scope.$index,scope.row,'target')">delete</el-button>-->
-<!--          </template>-->
-<!--          <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'target')">{{ scope.row.target }}</p>-->
-<!--        </el-tooltip>-->
+        <!--    <el-table-column prop="target" label="Target" width="140">-->
+        <!--      <template #default="scope">-->
+        <!--        <el-input ref="focusRef" v-if="scope.$index === tableEditIndex && 'target'===tableEditFieldName"-->
+        <!--                  v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"-->
+        <!--                  @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>-->
+        <!--        <el-tooltip-->
+        <!--            v-else-->
+        <!--            effect="light"-->
+        <!--            placement="top-start"-->
+        <!--        >-->
+        <!--          <template #content>{{scope.row.target}}<el-button style="margin-left: 5px" size="small" type="danger" plain @click="handleDeleteResource(scope.$index,scope.row,'target')">delete</el-button>-->
+        <!--          </template>-->
+        <!--          <p class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'target')">{{ scope.row.target }}</p>-->
+        <!--        </el-tooltip>-->
 
-<!--      </template>-->
-<!--    </el-table-column>-->
-<!--    TODO support auto sync-->
-<!--    <el-table-column prop="autoSync" label="AutoSync" width="100">-->
-<!--      <template #default="scope">-->
-<!--        <el-switch @change="updateSyncConfigAndRefresh(scope.row.id,scope.row)" v-model="scope.row.autoSync"/>-->
-<!--      </template>-->
-<!--    </el-table-column>-->
+        <!--      </template>-->
+        <!--    </el-table-column>-->
+        <!--    TODO support auto sync-->
+        <!--    <el-table-column prop="autoSync" label="AutoSync" width="100">-->
+        <!--      <template #default="scope">-->
+        <!--        <el-switch @change="updateSyncConfigAndRefresh(scope.row.id,scope.row)" v-model="scope.row.autoSync"/>-->
+        <!--      </template>-->
+        <!--    </el-table-column>-->
 
-    <el-table-column prop="enable" label="Enable" width="100">
-      <template #default="scope">
-        <el-switch @change="updateSyncConfigAndRefresh(scope.row)" v-model="scope.row.enable"/>
-      </template>
-    </el-table-column>
+        <el-table-column prop="enable" label="Enable" width="100">
+          <template #default="scope">
+            <el-switch @change="updateSyncConfigAndRefresh(scope.row)" v-model="scope.row.enable"/>
+          </template>
+        </el-table-column>
 
-    <el-table-column  width="220" >
-      <template #header>
-        <el-input v-model="search" size="small" placeholder="Search name, source or target" />
-      </template>
-      <template #default="scope">
-        <el-button size="small" type="success" plain @click="handleSync(scope.row)">sync</el-button>
-        <el-button size="small" type="primary" plain @click="handleEdit(scope.row)">edit</el-button>
-        <el-button size="small" type="danger" plain @click="handleDelete(scope.row)">delete</el-button>
+        <el-table-column  width="220" >
+          <template #header>
+            <el-input v-model="search" size="small" placeholder="Search name, source or target" />
+          </template>
+          <template #default="scope">
+            <el-button size="small" type="success" plain @click="handleSync(scope.row)">sync</el-button>
+            <el-button size="small" type="primary" plain @click="handleEdit(scope.row)">edit</el-button>
+            <el-button size="small" type="danger" plain @click="handleDelete(scope.row)">delete</el-button>
 
-      </template>
-    </el-table-column>
-  </el-table>
-  <el-button class="mt-4 common-margin" @click="handleAddItem">Add Item</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-row>
 
-  <el-row justify="end">
-    <el-pagination
-        v-model:current-page="pageCurrent"
-        v-model:page-size="pageSize"
-        :page-sizes="[5, 10, 20, 50]"
-        layout="total,sizes, prev, pager, next"
-        :total="filterTableData.length"
+    <el-row class="mt-10">
+      <el-button style="width: 100%" @click="handleAddItem">Add Item</el-button>
+    </el-row>
 
-    />
-  </el-row>
+    <el-row  class="mt-10" justify="end">
+      <el-pagination
+          v-model:current-page="pageCurrent"
+          v-model:page-size="pageSize"
+          :page-sizes="[5, 10, 20, 50]"
+          layout="total,sizes, prev, pager, next"
+          :total="filterTableData.length"
+
+      />
+    </el-row>
+  </div>
+
+
   <el-dialog
       v-model="editMode"
       title="Sync Config"
@@ -294,12 +304,13 @@
 <script setup>
 import {onMounted, ref} from "vue"
 import {
-  apiSyncTypeList,
-  apiSyncConfigList,
+  apiDeleteResource,
   apiSyncConfigAdd,
   apiSyncConfigDelete,
+  apiSyncConfigList,
   apiSyncConfigUpdate,
-  apiSyncOnly, apiDeleteResource
+  apiSyncOnly,
+  apiSyncTypeList
 } from "@/services/syncConfig.js"
 import {apiNamespaceList, apiPodContainerList, apiPodList} from "@/services/namespace.js";
 
@@ -673,8 +684,6 @@ const handleArrow = (event) =>{
   white-space: nowrap;
 }
 
-.common-margin{
-  margin: 0 10px 10px 10px;
-  width: calc(100% - 20px);
-}
+
+
 </style>

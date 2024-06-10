@@ -1,9 +1,9 @@
 <template>
 
-  <div v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
+  <div class="mr-10 ml-10"  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
 
     <el-row align="top">
-      <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue.selectedConfigOption" :options="configOptions"  >
+      <el-segmented  @change="updateTableData"  v-model="selectedOptionValue.selectedConfigOption" :options="configOptions"  >
         <template #default="{ item }">
           <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
             <el-icon size="20">
@@ -27,93 +27,100 @@
 
 
 
-    <div class="mt-4 common-margin" >
-      <el-input
-          v-model="searchInput"
-          style="max-width: 100%"
-          placeholder="Please input"
-          @change="updateTableData"
-          clearable
-      >
-        <template #prepend>
-          <el-select
-              @click="refreshNamespaceOptions"
-              @change="updateTableData"
-              v-model="selectedOptionValue.selectedNamespaceOption"
-              placeholder="All"
-              style="width: 200px"
-              default-first-option
-              filterable
-              allow-create
-              clearable
-          >
-            <el-option
-                v-for="item in namespaceOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-            />
+    <el-row class="mt-10" :gutter="20">
+      <el-col :span="20">
+        <el-input
+            v-model="searchInput"
+            style="max-width: 100%"
+            placeholder="Please input"
+            @change="updateTableData"
+            clearable
+        >
+          <template #prepend>
+            <el-select
+                @click="refreshNamespaceOptions"
+                @change="updateTableData"
+                v-model="selectedOptionValue.selectedNamespaceOption"
+                placeholder="All"
+                style="width: 200px"
+                default-first-option
+                filterable
+                allow-create
+                clearable
+            >
+              <el-option
+                  v-for="item in namespaceOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
 
-          </el-select>
-        </template>
-        <template #append>
-          <el-button @click="updateTableData" :icon="Search" />
-        </template>
-      </el-input>
-    </div>
-
-
-
-    <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="common-margin common-width">
-      <el-table-column label="Id" width="80">
-        <template #default="scope">
-          {{ scope.$index + 1  }}
-        </template>
-      </el-table-column>
-
-      <el-table-column sortable="custom" prop="namespace" label="Namespace"  width="180"></el-table-column>
-
-      <el-table-column sortable="custom" prop="name" label="Name">
-        <template #default="scope">
-          <el-link :href="`/#/config/namespace/${scope.row.namespace}/${selectedOptionValue.selectedConfigOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
-        </template>
-      </el-table-column>
-
-      <el-table-column  key="DataCount"  label="DataCount" >
-        <template #default="scope">
-          {{ scope.row.data? Object.keys( scope.row.data).length :0 }}
-        </template>
-      </el-table-column>
-
-      <el-table-column  v-if="selectedOptionValue.selectedConfigOption === 'ConfigMap'" key="BinaryDataCount" label="BinaryDataCount"  >
-        <template #default="scope">
-          {{ scope.row.binaryData? Object.keys( scope.row.binaryData).length:0 }}
-        </template>
-      </el-table-column>
+            </el-select>
+          </template>
+          <template #append>
+            <el-button @click="updateTableData" :icon="Search" />
+          </template>
+        </el-input>
+      </el-col>
+      <el-col :span="4">
+        <el-button @click="handleAddConfig">New</el-button>
+      </el-col>
+    </el-row>
 
 
+    <el-row class="mt-10">
+      <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" >
+        <el-table-column label="Id" width="80">
+          <template #default="scope">
+            {{ scope.$index + 1  }}
+          </template>
+        </el-table-column>
 
-      <el-table-column   v-if="selectedOptionValue.selectedConfigOption === 'Secret'"  key="StringDataCount"  label="StringDataCount"  >
-        <template #default="scope">
-          {{ scope.row.stringData? Object.keys( scope.row.stringData).length : 0 }}
-        </template>
-      </el-table-column>
+        <el-table-column sortable="custom" prop="namespace" label="Namespace"  width="180"></el-table-column>
 
-      <el-table-column sortable="custom" prop="creationTimestamp" label="createTime" >
-        <template #default="scope">
-          {{ formattedDate(scope.row.creationTimestamp) }}
-        </template>
+        <el-table-column sortable="custom" prop="name" label="Name">
+          <template #default="scope">
+            <el-link :href="`/#/config/namespace/${scope.row.namespace}/${selectedOptionValue.selectedConfigOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
+          </template>
+        </el-table-column>
 
-      </el-table-column>
+        <el-table-column  key="DataCount"  label="DataCount" >
+          <template #default="scope">
+            {{ scope.row.data? Object.keys( scope.row.data).length :0 }}
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Operation" width="140">
-        <template #default="scope">
-          <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
-        </template>
-      </el-table-column>
+        <el-table-column  v-if="selectedOptionValue.selectedConfigOption === 'ConfigMap'" key="BinaryDataCount" label="BinaryDataCount"  >
+          <template #default="scope">
+            {{ scope.row.binaryData? Object.keys( scope.row.binaryData).length:0 }}
+          </template>
+        </el-table-column>
 
-    </el-table>
-    <el-row justify="end">
+
+
+        <el-table-column   v-if="selectedOptionValue.selectedConfigOption === 'Secret'"  key="StringDataCount"  label="StringDataCount"  >
+          <template #default="scope">
+            {{ scope.row.stringData? Object.keys( scope.row.stringData).length : 0 }}
+          </template>
+        </el-table-column>
+
+        <el-table-column sortable="custom" prop="creationTimestamp" label="createTime" >
+          <template #default="scope">
+            {{ formattedDate(scope.row.creationTimestamp) }}
+          </template>
+
+        </el-table-column>
+
+        <el-table-column label="Operation" width="140">
+          <template #default="scope">
+            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
+          </template>
+        </el-table-column>
+
+      </el-table>
+    </el-row>
+
+    <el-row class="mt-10" justify="end">
       <el-pagination
           v-model:current-page="pageCurrent"
           v-model:page-size="pageSize"
@@ -140,24 +147,66 @@
     </template>
   </el-dialog>
 
+  <el-dialog
+      v-model="newConfig.dialogVisible"
+      :title="newConfig.dialogTitle"
+      width="500"
+
+  >
+    <el-form class="none-box" :model="newConfig.config" label-width="auto" style="max-width: 78vw">
+
+      <el-form-item label="Name">
+        <el-input v-model="newConfig.config.metadata.name" />
+      </el-form-item>
+      <el-form-item label="Namespace"  >
+
+        <el-select
+            @click="refreshNamespaceOptions"
+            @change="updateTableData"
+            v-model="newConfig.config.metadata.namespace"
+            placeholder="All"
+            default-first-option
+            filterable
+            allow-create
+            clearable
+        >
+          <el-option
+              v-for="item in namespaceOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+          />
+
+        </el-select>
+
+      </el-form-item>
+
+    </el-form>
+
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button plain @click="newConfig.dialogVisible = false">Cancel</el-button>
+        <el-button plain type="success" @click="newConfig.dialogConfirmFuctionLast">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 
 
 </template>
 
 <script setup>
 import {ref} from "vue";
-import {Coin, Postcard, Reading, Stopwatch,Search} from "@element-plus/icons-vue";
+import {Coin, Postcard, Search} from "@element-plus/icons-vue";
 import {apiNamespaceList} from "@/services/namespace.js";
 import {useSelectedOptionValue} from "@/store/appsStore.js";
-import {apiServiceDelete, apiServiceList, apiServiceUpdate} from "@/services/service.js";
-import {apiDeploymentDelete} from "@/services/deployment.js";
-import {apiStatefulsetDelete} from "@/services/statefulset.js";
-import {apiDaemonsetDelete} from "@/services/daemonset.js";
-import {apiJobDelete} from "@/services/job.js";
-import {apiClusterUpdate} from "@/services/clusterConfig.js";
-import {apiConfigmapDelete, apiConfigmapList} from "@/services/configmap.js";
+import {apiServiceUpdate} from "@/services/service.js";
+import {apiConfigmapCreate, apiConfigmapDelete, apiConfigmapList} from "@/services/configmap.js";
 import {formattedDate} from "@/services/common.js";
-import {apiSecretDelete, apiSecretList} from "@/services/secret.js";
+import {apiSecretCreate, apiSecretDelete, apiSecretList} from "@/services/secret.js";
+import {configMapTemplateReader, secretTemplateReader} from "@/template/resourceTemplate.js";
 
 const selectedOptionValue = useSelectedOptionValue()
 
@@ -168,6 +217,16 @@ const dialogTitle = ref('')
 const dialogMessage = ref('')
 const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
+
+const newConfig = ref({
+  dialogVisible: false,
+  dialogTitle: '',
+  dialogMessage: '',
+  dialogConfirmFuction: () => {newConfig.value.dialogVisible = false},
+  dialogConfirmFuctionLast: () => {newConfig.value.dialogVisible = false;newConfig.value.dialogConfirmFuction()},
+  config:{}
+})
+
 const tableLoading = ref(true)
 const isAutoRefresh = ref(false)
 
@@ -266,7 +325,6 @@ const filterTableData = computed(() => {
 
 const tableSort = (sortInfo) => {
   let sortField = sortInfo.prop
-  console.log(tableData.value)
   tableData.value.sort((a, b) => {
     if (sortInfo.order === "ascending" || sortInfo.order === null) {
 
@@ -286,48 +344,6 @@ const tableSort = (sortInfo) => {
   });
 
 };
-
-const handleIntoEditMode = (index, row, propName) => {
-  tableEditIndex.value = index
-  tableEditFieldName.value = propName
-  setTimeout(() => {
-    focusRef.value.focus()
-  }, 10)
-
-}
-
-const updateServiceType = async (row) => {
-  let wait;
-  wait = apiServiceUpdate(row.namespace, row.name, row.raw).then(async res => {
-
-
-    if (res.status === 200) {
-      ElMessage({
-        message: "update success",
-        type: 'success'
-      })
-
-    } else {
-      const resData = await res.text()
-
-      ElMessage({
-        message: "request error: " + JSON.stringify(resData),
-        type: 'error'
-      })
-    }
-
-  }).catch(err => {
-    ElMessage({
-      message: "request error: " + err,
-      type: 'error'
-    })
-    console.log(err)
-  })
-  await wait;
-  updateTableData()
-
-}
-
 
 
 const refreshNamespaceOptions = () => {
@@ -443,6 +459,79 @@ const handleDelete = (row) => {
 
 }
 
+const handleAddConfig = ()=> {
+
+
+  if (selectedOptionValue.selectedConfigOption === 'ConfigMap') {
+    newConfig.value.config = configMapTemplateReader({
+      namespace: 'default',
+      data: {},
+      stringData: {},
+    })
+    newConfig.value.dialogTitle = 'Create configmap'
+    newConfig.value.dialogConfirmFuction = ()=>{
+      apiConfigmapCreate(newConfig.value.config.metadata.namespace, newConfig.value.config).then(async res => {
+        if (res.status === 200 || res.status === 201) {
+          ElMessage({
+            message: "create success",
+            type: 'success'
+          })
+          updateTableData()
+        } else {
+          const resData = await res.text()
+
+          ElMessage({
+            message: "request error: " + resData,
+            type: 'error'
+          })
+        }
+
+      }).catch(err => {
+        ElMessage({
+          message: "request error: " + err,
+          type: 'error'
+        })
+        console.log(err)
+      })
+    }
+
+  }else if (selectedOptionValue.selectedConfigOption === 'Secret') {
+    newConfig.value.config = secretTemplateReader({
+      namespace: 'default',
+      data: {},
+    })
+    newConfig.value.dialogTitle = 'Create secret'
+    newConfig.value.dialogConfirmFuction = ()=>{
+      apiSecretCreate(newConfig.value.config.metadata.namespace, newConfig.value.config).then(async res => {
+        if (res.status === 200 || res.status === 201) {
+          ElMessage({
+            message: "create success",
+            type: 'success'
+          })
+          updateTableData()
+        } else {
+          const resData = await res.text()
+
+          ElMessage({
+            message: "request error: " + resData,
+            type: 'error'
+          })
+        }
+
+      }).catch(err => {
+        ElMessage({
+          message: "request error: " + err,
+          type: 'error'
+        })
+        console.log(err)
+      })
+    }
+
+  }
+
+  newConfig.value.dialogVisible = true
+}
+
 
 onMounted(async () => {
   refreshNamespaceOptions()
@@ -476,13 +565,6 @@ const handleArrow = (event) =>{
 </script>
 
 <style scoped>
-.common-margin{
-  margin: 0 10px 10px 10px;
-}
-.common-width{
-  width: calc(100% - 20px);
-
-}
 
 
 </style>

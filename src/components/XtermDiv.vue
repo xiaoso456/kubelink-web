@@ -88,11 +88,9 @@
 
 <script setup>
 import {Terminal} from "xterm";
-import { FitAddon } from '@xterm/addon-fit';
-import {Coin,Monitor, Postcard, Reading, Search, Memo} from "@element-plus/icons-vue";
-import {useRoute} from "vue-router";
-import {useRouter} from "vue-router";
-import {apiDeploymentGet} from "@/services/deployment.js";
+import {FitAddon} from '@xterm/addon-fit';
+import {Memo, Monitor, Postcard, Search} from "@element-plus/icons-vue";
+import {useRoute, useRouter} from "vue-router";
 import {apiPodLogs} from "@/services/pod.js";
 import {SearchAddon} from "@xterm/addon-search";
 import {createWS} from "@/services/ws.js";

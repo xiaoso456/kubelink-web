@@ -42,6 +42,16 @@ export function apiConfigmapUpdate(namespace,configmapName,configmap){
     })
 }
 
+export function apiConfigmapCreate(namespace,configmap){
+    return fetch(`${prefix}/namespace/${namespace}/configmap`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(configmap)
+    })
+}
+
 export function apiConfigmapYamlGet(namespace, configmap){
 
     return fetch(`${prefix}/namespace/${namespace}/configmap/${configmap}/yaml`, {

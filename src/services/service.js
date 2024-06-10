@@ -33,7 +33,6 @@ export function apiServiceDelete(namespace,service){
 // }
 
 export function apiServiceUpdate(namespace,serviceName,service){
-    console.log("!",serviceName)
     return fetch(`${prefix}/namespace/${namespace}/service/${serviceName}`, {
         method: 'PUT',
         headers: {

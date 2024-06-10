@@ -446,6 +446,7 @@ import {oneDark} from "@codemirror/theme-one-dark";
 import {apiJobGet, apiJobPodList, apiJobServiceList, apiJobYamlGet, apiJobYamlUpdate} from "@/services/job.js";
 import {apiPodDelete} from "@/services/pod.js";
 import {useDark} from "@vueuse/core";
+import {formattedDate} from "../services/common.js";
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
@@ -838,15 +839,9 @@ const appInfo = computed(()=>{
 //     }
 //   ]
 // ])
-dayjs.extend(utc)
-dayjs.extend(timezone);
 
-const formattedDate = (dateStr) =>{
-  if(!dateStr){
-    return '-'
-  }
-  return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
-}
+
+
 
 
 const updateAppInfo = async () => {

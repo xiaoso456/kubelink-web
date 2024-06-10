@@ -10,6 +10,8 @@ declare module 'vue' {
     AppDetails: typeof import('./components/AppDetails.vue')['default']
     Apps: typeof import('./components/Apps.vue')['default']
     ClusterConfig: typeof import('./components/ClusterConfig.vue')['default']
+    ConfigDetails: typeof import('./components/ConfigDetails.vue')['default']
+    ConfigInfo: typeof import('./components/ConfigInfo.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']

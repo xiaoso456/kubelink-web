@@ -16,6 +16,8 @@ import { createPinia } from 'pinia'
 import piniaPersist from 'pinia-plugin-persist'
 import AppDetails from "@/components/AppDetails.vue";
 import NetworkInfo from "@/components/NetworkInfo.vue";
+import ConfigInfo from "@/components/ConfigInfo.vue";
+import ConfigDetails from "@/components/ConfigDetails.vue";
 
 
 
@@ -26,11 +28,12 @@ const router = VueRouter.createRouter({
         {path: '/sync', component: SyncConfigTable},
         {path: '/cluster', component: ClusterConfig},
         {path: '/apps', component: Apps},
-        {path: '/template',component: TextTemplate},
         {path: '/network',component: NetworkInfo},
+        {path: '/config',component: ConfigInfo},
+        {path: '/template',component: TextTemplate},
         {path: '/app/namespace/:namespace/:appType/:appName', component: AppDetails},
+        {path: '/config/namespace/:namespace/:configType/:configName', component: ConfigDetails},
         {path: '/pod/namespace/:namespace/pod/:pod/container/:container/:action',component: XtermDiv},
-
         {path: '/:pathMatch(.*)*', redirect: '/'},
 
     ],

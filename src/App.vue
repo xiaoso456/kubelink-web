@@ -25,6 +25,11 @@
             <template #title>Network</template>
           </el-menu-item>
 
+          <el-menu-item index="/config" @click="()=>{$router.push('/config')}" >
+            <el-icon><Tools /></el-icon>
+            <template #title>Config</template>
+          </el-menu-item>
+
           <el-menu-item index="/template" @click="()=>{$router.push('/template')}" >
             <el-icon><ChatLineSquare /></el-icon>
             <template #title>Template</template>

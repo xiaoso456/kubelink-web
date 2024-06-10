@@ -5,6 +5,7 @@ export const useSelectedOptionValue = defineStore('selectedOptionValue', {
         return {
             selectedOption: 'Deployment',
             selectedNetworkOption: 'Service',
+            selectedConfigOption: 'ConfigMap',
             selectedNamespaceOption: '',
         }
         // return ref('Deployment')

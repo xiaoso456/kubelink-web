@@ -54,7 +54,7 @@
 
   <el-row class="common-margin ">
     <el-col v-for="item in templateListRaw" :xs="24" :sm="12" :md="6" :xl="4" >
-        <el-card   style="max-width: 300px;margin-top: 20px" shadow="never">
+        <el-card  class="none-box"  style="max-width: 300px;margin-top: 20px" shadow="never">
           <template #header >
             <div >
               <el-text type="primary"  line-clamp="1" size="large" >
@@ -94,6 +94,21 @@
       :before-close="handleClose"
       class="none-box"
   >
+    <template #header="{ close, titleId, titleClass }">
+      <div>
+        <span>Template</span>
+        <el-tooltip
+            class="box-item"
+            effect="light"
+            content="Base on Handlebars.js,  {{ key1 }} or {{{ key1 }}} represents var key1"
+            placement="top-start"
+        >
+          <el-icon style="margin-left: 4px" size="14"><QuestionFilled /></el-icon>
+
+        </el-tooltip>
+      </div>
+    </template>
+
     <el-form :model="templateForm" label-width="auto" style="max-width: 1000px">
       <el-form-item label="Name">
         <el-input v-model="templateForm.name" />
@@ -499,5 +514,12 @@ onMounted(() => {
   position: fixed;
   bottom: 60px;
   right: 60px;
+}
+
+.my-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 16px;
 }
 </style>

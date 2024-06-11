@@ -211,6 +211,11 @@ const addAddonToTerm = (term,stateName) => {
   selectState.value[stateName].searchAddon = searchAddon
   selectState.value[stateName].fitAddon = fitAddon
   selectState.value[stateName].terminal = term
+  setTimeout(()=>{
+    fitAddon.fit()
+  },1000)
+
+
 }
 
 const termLog = new Terminal({
@@ -258,7 +263,6 @@ const terminalConsole = new Terminal({
   scrollback: Number.MAX_SAFE_INTEGER
 });
 addAddonToTerm(terminalConsole,'Console')
-
 
 
 
@@ -379,7 +383,6 @@ const handleSelectOption = async () => {
       socket.value = createWS(`/ws/namespace/${route.params.namespace}/pod/${route.params.pod}/container/${route.params.container}/exec`);
       const attachAddon = new AttachAddon(socket.value);
       terminalConsole.loadAddon(attachAddon);
-
     }
   }
   await updateTermLog()

@@ -5,6 +5,17 @@ export const useClusterInfo = defineStore('clusterInfo', {
         return {
             activeId: 0,
             activeName: '',
+            raw: {
+                "buildDate": "",
+                "compiler": "",
+                "gitCommit": "",
+                "gitTreeState": "",
+                "gitVersion": "",
+                "goVersion": "",
+                "major": "",
+                "minor": "",
+                "platform": ""
+            }
         }
     },
     persist: {

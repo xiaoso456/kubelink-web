@@ -129,7 +129,7 @@
     </div>
     <div v-if="selectedOption==='Yaml'">
 
-      <el-scrollbar v-loading="yamlLoading" height="65vh"  style="max-width:900px;margin-top: 10px">
+      <el-scrollbar v-loading="yamlLoading" max-height="65vh"  style="max-width:70vw;margin-top: 10px">
 
         <codemirror
 
@@ -141,7 +141,7 @@
             :extensions="codeExtensions"
         />
       </el-scrollbar>
-      <el-row style="max-width: 900px" class="row-bg" justify="end">
+      <el-row style="max-width: 70vw" class="row-bg" justify="end">
         <el-button size="default" type="info" plain @click="handleCancelSaveYaml">Cancel</el-button>
         <el-button size="default" type="success" plain @click="saveAppYaml">Save</el-button>
       </el-row>

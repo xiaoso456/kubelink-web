@@ -21,8 +21,10 @@
         </el-col>
 
         <el-col :span="18" class="toolbar flex gap-2" style="text-align: right">
-          <el-tag  v-if="clusterInfo.activeId" type="primary">ID :{{ clusterInfo.activeId }}</el-tag>
-          <el-tag v-if="clusterInfo.activeName" type="success">Name :{{ clusterInfo.activeName }}</el-tag>
+<!--          <el-text class="mx-1 " style="margin-right: 10px" ><el-icon><Opportunity /></el-icon>V1.2.6</el-text>-->
+
+          <el-tag v-if="clusterInfo.activeId" type="primary">K8S Version: V{{ clusterInfo.raw.major }}.{{ clusterInfo.raw.minor }}</el-tag>
+          <el-tag v-if="clusterInfo.activeName" type="primary">Platform: {{ clusterInfo.raw.platform }}</el-tag>
 
           <el-dropdown style="margin-right: 15px" >
             <span class="el-dropdown-link" @click="updateClusterConfig">
@@ -43,6 +45,7 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
+
           <el-switch  inline-prompt v-model="isDark" :active-action-icon="Moon" :inactive-action-icon="Sunny" @change="toggleDark">
           </el-switch>
           <el-link :underline="false" :href="'https://github.com/xiaoso456/kubelink'">
@@ -157,10 +160,10 @@ const isCollapse = ref(false)
 const namespaceList = ref([])
 
 const handleOpen = (key, keyPath) => {
-  console.log(key, keyPath)
+  // console.log(key, keyPath)
 }
 const handleClose = (key, keyPath) => {
-  console.log(key, keyPath)
+  // console.log(key, keyPath)
 }
 const activeClusterConfig = (id,name) =>{
 
@@ -176,8 +179,19 @@ const activeClusterConfig = (id,name) =>{
 
       clusterInfo.activeId = id
       clusterInfo.activeName = name
-
     }
+
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+
+  apiClusterConnect(id).then(async res => {
+    clusterInfo.raw = await res.json()
+
 
   }).catch(err =>{
     ElMessage({

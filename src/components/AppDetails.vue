@@ -799,7 +799,9 @@ const appInfo = computed(()=>{
       generation: appInfoRaw.value.metadata.generation,
       restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
       availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
-      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0
+      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0,
+      conditions: appInfoRaw.value.status.conditions
+
     }
   }else if(route.params.appType === 'Daemonset'){
     return {
@@ -810,7 +812,8 @@ const appInfo = computed(()=>{
       restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
       availableReplicas: appInfoRaw.value.status.numberAvailable? appInfoRaw.value.status.numberAvailable : 0,
       replicas: (appInfoRaw.value.status.numberAvailable? appInfoRaw.value.status.numberAvailable : 0)
-          + (appInfoRaw.value.status.numberUnavailable? appInfoRaw.value.status.numberUnavailable : 0)
+          + (appInfoRaw.value.status.numberUnavailable? appInfoRaw.value.status.numberUnavailable : 0),
+      conditions: appInfoRaw.value.status.conditions
 
     }
   }else if(route.params.appType === 'Job'){
@@ -821,7 +824,8 @@ const appInfo = computed(()=>{
       generation: appInfoRaw.value.metadata.generation,
       restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
       availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
-      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0
+      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0,
+      conditions: appInfoRaw.value.status.conditions
     }
   }
 
@@ -993,8 +997,6 @@ const updateTablePodData = async () => {
   } else if (route.params.appType === 'Job') {
     wait = apiJobPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
-      console.log(resData)
-      console.log("??")
       tablePodData.value = resData.map(item => {
         return {
           name: item.metadata.name,

@@ -8,6 +8,7 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import path from 'path'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import {createSvgIconsPlugin} from "vite-plugin-svg-icons";
 
 
 const pathSrc = path.resolve(__dirname, 'src')
@@ -67,6 +68,10 @@ export default ({mode})=>{
                 autoInstall: true,
             }),
             Inspect(),
+            createSvgIconsPlugin({
+                iconDirs: [path.resolve(process.cwd(), 'src/icons')],
+                symbolId: 'icon-[dir]-[name]',
+            }),
 
         ],
     })

@@ -11,3 +11,7 @@ export const formattedDate = (dateStr) =>{
     }
     return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
 }
+
+export const currentDate = () =>{
+    return dayjs().format('YYYY-MM-DD.HH-mm-ss');
+}

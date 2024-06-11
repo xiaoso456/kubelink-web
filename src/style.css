@@ -33,11 +33,25 @@
     margin-right: 3px;
 }
 
-.dark{
+.dark .text-color{
     /*background: rgb(0, 0, 0);*/
+    color: #FFFFFF;
+
 }
-.light{
-    /*background: rgb(255, 255, 255);*/
+
+.light .text-color{
+    color: #212121;
+
+}
+
+.dark .logo-color{
+    /*background: rgb(0, 0, 0);*/
+    fill: #FFFFFF;
+
+}
+
+.light .logo-color{
+    fill: #212121
 }
 
 .el-menu-item{
@@ -64,4 +78,9 @@ body{
 }
 .mb-10{
     margin-bottom: 10px;
+}
+
+a{
+    color: inherit; /* 使用父元素的颜色 */
+    text-decoration: none; /* 去除下划线 */
 }

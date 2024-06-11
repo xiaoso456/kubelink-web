@@ -1,77 +1,26 @@
 <template>
   <el-container v-shortkey="['tab']" @shortkey="handleShortKeyTable" class="layout-container-demo" style="margin: -8px;height: calc(100vh - 8px)">
+    <el-header>
+      <el-row style="height: 100%">
+        <el-col :span="6" class="software-title">
 
+<!--          <el-text>-->
+<!--              <el-image-->
+<!--                  style="width: 18px; height: 18px;display: block;vertical-align: center;transform: rotate(5deg);"-->
+<!--                  class="logo-color-svg"-->
+<!--                  src="/link.svg"-->
+<!--                  fit="contain"-->
+<!--              />-->
 
-    <el-aside width="collapse" >
-<!--      <el-scrollbar width="100%" style="height: 100vh">-->
-<!--      <el-row>-->
-        <el-menu :collapse-transition="false"    class="el-menu-vertical-demo"
-                     :default-active="$route.path" :collapse="isCollapse"  @open="handleOpen"  @close="handleClose">
-          <el-menu-item index="/cluster" @click="()=>{$router.push('/cluster')}" >
-            <el-icon><SetUp /></el-icon>
-            <template #title>Cluster</template>
-          </el-menu-item>
-          <el-menu-item index="/sync" @click="()=>{$router.push('/sync')}" >
-            <el-icon><Switch /></el-icon>
-            <template #title>Sync</template>
-          </el-menu-item>
-          <el-menu-item index="/apps" @click="()=>{$router.push('/apps')}" >
-            <el-icon><Menu /></el-icon>
-            <template #title>Apps</template>
-          </el-menu-item>
+<!--          </el-text>-->
+          <el-text>
+            <SvgIcon name="link" class="logo-color" color="#66ccff"></SvgIcon>
+          </el-text>
 
-          <el-menu-item index="/network" @click="()=>{$router.push('/network')}" >
-            <el-icon><Connection /></el-icon>
-            <template #title>Network</template>
-          </el-menu-item>
+          <el-text style="font-size: 22px;font-weight: bold;" class="text-color">&nbsp;KubeLink</el-text>
+        </el-col>
 
-          <el-menu-item index="/config" @click="()=>{$router.push('/config')}" >
-            <el-icon><Tools /></el-icon>
-            <template #title>Config</template>
-          </el-menu-item>
-
-          <el-menu-item index="/template" @click="()=>{$router.push('/template')}" >
-            <el-icon><ChatLineSquare /></el-icon>
-            <template #title>Template</template>
-          </el-menu-item>
-
-
-
-          <el-menu-item index="collapse"  @click="isCollapse = !isCollapse" >
-            <el-icon v-if="isCollapse"><Expand /></el-icon>
-            <el-icon v-else><Fold /></el-icon>
-            <template #title>
-              <p v-if="isCollapse">Extend</p>
-              <p v-else>Fold</p>
-            </template>
-          </el-menu-item>
-          <!--          <el-sub-menu index="1" >-->
-          <!--            <template #title >-->
-          <!--              <el-icon><setting /></el-icon>       <h4 @click="()=>{this.$router.push('/cluster')}" class="mb-2">Config</h4>-->
-
-          <!--            </template>-->
-
-          <!--              <el-menu-item index="1-1" @click="()=>{this.$router.push('/cluster')}" ><el-icon><SetUp /></el-icon>cluster config</el-menu-item>-->
-          <!--              <el-menu-item index="1-2" @click="()=>{this.$router.push('/sync')}"  ><el-icon><Refresh /></el-icon>sync config</el-menu-item>-->
-
-          <!--          </el-sub-menu>-->
-
-        </el-menu>
-<!--      </el-row>-->
-<!--      <el-row justify="center">-->
-<!--        <el-button type="text" @click="isCollapse = !isCollapse" class="collapse-btn">-->
-<!--          <el-icon><arrow-right /></el-icon>Extend-->
-<!--        </el-button>-->
-<!--      </el-row>-->
-
-
-
-<!--      </el-scrollbar>-->
-    </el-aside>
-
-    <el-container>
-      <el-header style="text-align: right; font-size: 12px">
-        <div class="toolbar flex gap-2">
+        <el-col :span="18" class="toolbar flex gap-2" style="text-align: right">
           <el-tag  v-if="clusterInfo.activeId" type="primary">ID :{{ clusterInfo.activeId }}</el-tag>
           <el-tag v-if="clusterInfo.activeName" type="success">Name :{{ clusterInfo.activeName }}</el-tag>
 
@@ -96,9 +45,82 @@
           </el-dropdown>
           <el-switch  inline-prompt v-model="isDark" :active-action-icon="Moon" :inactive-action-icon="Sunny" @change="toggleDark">
           </el-switch>
-        </div>
+        </el-col>
+      </el-row>
 
-      </el-header>
+
+    </el-header>
+
+
+
+    <el-container>
+      <el-aside width="collapse">
+        <!--      <el-scrollbar width="100%" style="height: 100vh">-->
+        <!--      <el-row>-->
+        <el-menu :collapse-transition="false"    class="el-menu-vertical-demo sidebar-el-menu" router
+                 :default-active="$route.path" :collapse="isCollapse"  @open="handleOpen"  @close="handleClose">
+          <el-menu-item index="/cluster" >
+            <el-icon><SetUp /></el-icon>
+            <template #title><a href="#/cluster" >Cluster</a></template>
+
+          </el-menu-item>
+          <el-menu-item index="/sync">
+            <el-icon><Switch /></el-icon>
+            <template #title><a href="#/sync" >Sync</a></template>
+          </el-menu-item>
+          <el-menu-item index="/apps" >
+            <el-icon><Menu /></el-icon>
+            <template #title><a href="#/apps" >Apps</a></template>
+          </el-menu-item>
+
+          <el-menu-item index="/network" >
+            <el-icon><Connection /></el-icon>
+            <template #title><a href="#/network" >Network</a></template>
+          </el-menu-item>
+
+          <el-menu-item index="/config" >
+            <el-icon><Tools /></el-icon>
+            <template #title><a href="#/config" >Config</a></template>
+          </el-menu-item>
+
+          <el-menu-item index="/template" >
+            <el-icon><ChatLineSquare /></el-icon>
+            <template #title><a href="#/template" >Template</a></template>
+          </el-menu-item>
+
+          <li style="flex:1;"></li>
+          <el-menu-item index="collapse"  @click="isCollapse = !isCollapse" >
+            <el-icon v-if="isCollapse"><Expand /></el-icon>
+            <el-icon v-else><Fold /></el-icon>
+            <template #title>
+              <p v-if="isCollapse">Extend</p>
+              <p v-else>Fold</p>
+            </template>
+          </el-menu-item>
+          <!--          <el-sub-menu index="1" >-->
+          <!--            <template #title >-->
+          <!--              <el-icon><setting /></el-icon>       <h4 @click="()=>{this.$router.push('/cluster')}" class="mb-2">Config</h4>-->
+
+          <!--            </template>-->
+
+          <!--              <el-menu-item index="1-1" @click="()=>{this.$router.push('/cluster')}" ><el-icon><SetUp /></el-icon>cluster config</el-menu-item>-->
+          <!--              <el-menu-item index="1-2" @click="()=>{this.$router.push('/sync')}"  ><el-icon><Refresh /></el-icon>sync config</el-menu-item>-->
+
+          <!--          </el-sub-menu>-->
+
+        </el-menu>
+        <!--      </el-row>-->
+        <!--      <el-row justify="center">-->
+        <!--        <el-button type="text" @click="isCollapse = !isCollapse" class="collapse-btn">-->
+        <!--          <el-icon><arrow-right /></el-icon>Extend-->
+        <!--        </el-button>-->
+        <!--      </el-row>-->
+
+
+
+        <!--      </el-scrollbar>-->
+      </el-aside>
+
 
       <el-main>
         <el-scrollbar>
@@ -106,9 +128,7 @@
         </el-scrollbar>
       </el-main>
 
-<!--      <el-footer>-->
-<!--        footer-->
-<!--      </el-footer>-->
+
     </el-container>
   </el-container>
 </template>
@@ -257,10 +277,15 @@ onMounted(()=>{
 .layout-container-demo .el-main {
   padding: 0;
 }
+
+
+.software-title{
+  display: inline-flex;
+}
 .layout-container-demo .toolbar {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: right;
   height: 100%;
   right: 20px;
 }
@@ -323,7 +348,5 @@ onMounted(()=>{
 //:deep(.el-textarea__inner) {
 //  box-shadow: none;
 //}
-
-
 
 </style>

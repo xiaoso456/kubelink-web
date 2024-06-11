@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
+import {currentDate} from "@/services/common.js";
 
-export const configMapTemplateReader = ({ name = 'config-'+uuidv4(),labels={}, namespace='default', data={}, binaryData={}}) => {
+export const configMapTemplateReader = ({ name = 'config-' + currentDate(),labels={}, namespace='default', data={}, binaryData={}}) => {
     return {
         "apiVersion": "v1",
         "binaryData": binaryData,
@@ -15,7 +16,7 @@ export const configMapTemplateReader = ({ name = 'config-'+uuidv4(),labels={}, n
 
 }
 
-export const secretTemplateReader = ({ name = 'secret-'+uuidv4(),labels={}, namespace='default', data={}, stringData={}}) => {
+export const secretTemplateReader = ({ name = 'secret-' + currentDate(),labels={}, namespace='default', data={}, stringData={}}) => {
     return {
         "apiVersion": "v1",
         "data": data,

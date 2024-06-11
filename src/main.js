@@ -9,6 +9,7 @@ import Apps from "./components/Apps.vue";
 import XtermDiv from "./components/XtermDiv.vue";
 import TextTemplate from "./components/TextTemplate.vue";
 import VueShortKey from 'vue3-shortkey';
+import 'virtual:svg-icons-register'
 
 import * as VueRouter from 'vue-router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'

@@ -49,6 +49,7 @@ declare module 'vue' {
     ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     Network: typeof import('./components/Network.vue')['default']
+    NetworkDetails: typeof import('./components/NetworkDetails.vue')['default']
     NetworkInfo: typeof import('./components/NetworkInfo.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

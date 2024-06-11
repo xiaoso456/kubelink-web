@@ -45,6 +45,9 @@
           </el-dropdown>
           <el-switch  inline-prompt v-model="isDark" :active-action-icon="Moon" :inactive-action-icon="Sunny" @change="toggleDark">
           </el-switch>
+          <el-link :underline="false" :href="'https://github.com/xiaoso456/kubelink'">
+            <SvgIcon class="logo-github-color" style="margin-left: 10px" name="github-mark"   />
+          </el-link>
         </el-col>
       </el-row>
 

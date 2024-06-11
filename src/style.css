@@ -54,6 +54,12 @@
     fill: #212121
 }
 
+.light .logo-github-color{
+    fill: #24292f
+}
+.dark .logo-github-color{
+    fill: #fff
+}
 .el-menu-item{
     font-size: 30px;!important;
 }

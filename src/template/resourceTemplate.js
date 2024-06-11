@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import {currentDate} from "@/services/common.js";
 
 export const configMapTemplateReader = ({ name = 'config-' + currentDate(),labels={}, namespace='default', data={}, binaryData={}}) => {

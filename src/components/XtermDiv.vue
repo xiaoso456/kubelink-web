@@ -72,13 +72,87 @@
 
       </el-row>
 
-      <el-scrollbar height="67vh">
-        <div v-show="selectedOptionValue==='Logs'" id="terminalLog" class="terminal"/>
-        <div v-show="selectedOptionValue==='PreviousLogs'" id="terminalPreLog" class="terminal"/>
-        <div v-show="selectedOptionValue==='Console'" id="terminalConsole" class="terminal"/>
-
+      <el-scrollbar v-show="selectedOptionValue==='Logs'" height="67vh" >
+        <div  id="terminalLog" class="terminal"/>
 
       </el-scrollbar>
+      <el-scrollbar v-show="selectedOptionValue==='PreviousLogs'" height="67vh" >
+        <div v-show="selectedOptionValue==='PreviousLogs'" id="terminalPreLog" class="terminal"/>
+
+      </el-scrollbar>
+      <div v-show="selectedOptionValue==='Console'" class="none-box">
+        <el-row  :gutter="20" >
+          <el-col :span="16">
+            <div  id="terminalConsole"  class="terminal"/>
+          </el-col>
+          <el-col :span="8">
+            <el-form :model="templateForm" label-width="auto" style="max-width: 600px">
+              <el-form-item label="Type">
+                <el-select
+                    @click="refreshTextTemplateTypeList"
+                    @change="refreshTextTemplateList"
+                    v-model="selectedTemplateTypeOptionValue"
+                    placeholder="All"
+                    default-first-option
+                    filterable
+                    allow-create
+                    clearable
+                >
+                  <el-option
+                      v-for="item in templateTypeOptions"
+                      :key="item"
+                      :label="item"
+                      :value="item"
+                  />
+
+                </el-select>
+
+              </el-form-item>
+              <el-form-item label="Name">
+                <el-select
+                    @click="refreshTextTemplateList"
+                    v-model="selectedTemplateId"
+                    @change="handleSelectedTemplate"
+                    placeholder="All"
+                    default-first-option
+                    filterable
+                    allow-create
+                    clearable
+                >
+                  <el-option
+                      v-for="item in templateListRaw"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                  />
+
+                </el-select>
+              </el-form-item>
+              <el-divider  content-position="left" >Vars</el-divider>
+              <el-table :data="selectedTemplateVarsTableData" >
+                <el-table-column prop="key" label="Key" >
+
+                </el-table-column>
+
+
+                <el-table-column prop="value" label="Value">
+                  <template #default="scope" >
+                    <el-input ref="focusRef"  v-model="selectedTemplateItem.templateVariables[scope.row.key]"></el-input>
+                  </template>
+                </el-table-column>
+
+              </el-table>
+
+              <el-divider  content-position="left" >Preview</el-divider>
+              <el-input  v-model="templateContentPreview" autosize type="textarea" />
+              <el-row style="margin-top: 10px" justify="end">
+                <el-button @click="socket.send(templateContentPreview)">execute</el-button>
+              </el-row>
+            </el-form>
+          </el-col>
+        </el-row>
+
+      </div>
 
     </div>
 
@@ -91,10 +165,13 @@ import {Terminal} from "xterm";
 import {FitAddon} from '@xterm/addon-fit';
 import {Memo, Monitor, Postcard, Search} from "@element-plus/icons-vue";
 import {useRoute, useRouter} from "vue-router";
-import {apiPodLogs} from "@/services/pod.js";
+import {apiPodGet, apiPodLogs} from "@/services/pod.js";
 import {SearchAddon} from "@xterm/addon-search";
 import {createWS} from "@/services/ws.js";
 import {AttachAddon} from "@xterm/addon-attach";
+import {ref} from "vue";
+import {apiTextTemplateList, apiTextTemplateTypeList} from "@/services/textTemplate.js";
+import Handlebars from "handlebars";
 
 const selectedOptionValue = ref('Logs')
 const operationTypeOptions = [
@@ -124,6 +201,9 @@ const operationTypeOptions = [
   //   icon: Reading,
   // }
 ]
+
+const templateTypeOptions = ref([])
+const selectedTemplateTypeOptionValue = ref('command')
 
 const searchInput = ref('')
 const searchIndex = ref(0)
@@ -164,6 +244,40 @@ window.onresize = async () => {
   // }
 
 }
+
+const templateForm = ref( {
+  id: '1',
+  name: 'name',
+  content: 'content',
+  type: 'command',
+  description: 'description',
+  version: 1,
+  templateVariables: {
+    key1: 'value1'
+  }
+})
+
+
+
+const templateListRaw = ref([
+  {
+    id: '1',
+    name: 'name',
+    content: 'content',
+    type: 'command',
+    description: 'description',
+    version: 1,
+    templateVariables: {
+      key: 'value'
+    }
+  }
+])
+
+const selectedTemplateId = ref(null)
+const selectedTemplateItem = ref(null)
+const selectedTemplateVarsTableData = ref([])
+const templateContentPreview = ref('')
+
 const allFit = () => {
   for (const key in selectState.value) {
     if(key !== route.params.action){
@@ -394,7 +508,74 @@ const handleSelectOption = async () => {
   // },50)
 }
 
+
+const refreshTextTemplateTypeList = () => {
+  apiTextTemplateTypeList().then(async res => {
+    const status = res.status
+    if(status === 200){
+      templateTypeOptions.value = await res.json()
+    }else{
+      ElMessage({
+        message: "request for template type error",
+        type:'error'
+      })
+    }
+
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+}
+
+const refreshTextTemplateList = () => {
+  apiTextTemplateList(searchInput.value,selectedTemplateTypeOptionValue.value).then(async res => {
+    const status = res.status
+    if(status === 200){
+      templateListRaw.value = await res.json()
+    }
+
+  }).catch(err =>{
+    ElMessage({
+      message: "request error: " + err,
+      type:'error'
+    })
+    console.log(err)
+  })
+}
+
+const handleSelectedTemplate = (templateId) =>{
+  selectedTemplateItem.value = templateListRaw.value.find(item => item.id === templateId)
+  selectedTemplateVarsTableData.value = Object.keys(selectedTemplateItem.value.templateVariables).map(key => {
+    return {
+      key: key,
+      value: selectedTemplateItem.value.templateVariables[key]
+    }
+  })
+}
+watch(selectedTemplateItem,()=>{
+  if(! selectedTemplateItem.value){
+    return ''
+  }
+  const template = Handlebars.compile(selectedTemplateItem.value.content)
+  try {
+    templateContentPreview.value =  template(selectedTemplateItem.value.templateVariables)
+
+  }catch (error){
+    templateContentPreview.value = error
+  }
+},{
+  deep:true
+})
+
+
+
+
 onMounted(() => {
+
+
   selectedOptionValue.value = route.params.action
 
   termLog.open(document.getElementById('terminalLog'));
@@ -405,6 +586,8 @@ onMounted(() => {
 
   handleSelectOption()
 
+  refreshTextTemplateTypeList()
+  // updatePodInfo()
 
 
 
@@ -417,6 +600,7 @@ onMounted(() => {
   max-height: 65vh;
 
 }
+
 
 ::v-deep(.el-input-group__append){
   padding: 0 10px 0 15px;

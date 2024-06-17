@@ -20,8 +20,6 @@ import NetworkInfo from "@/components/NetworkInfo.vue";
 import ConfigInfo from "@/components/ConfigInfo.vue";
 import ConfigDetails from "@/components/ConfigDetails.vue";
 
-
-
 const router = VueRouter.createRouter({
     history: VueRouter.createWebHashHistory(),
     routes: [

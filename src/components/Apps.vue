@@ -2,7 +2,7 @@
   <div class="ml-10 mr-10" v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow" >
 
     <el-row align="top">
-      <el-segmented  @change="updateTableData" class="common-margin" v-model="selectedOptionValue.selectedOption" :options="appTypeOptions"  >
+      <el-segmented  @change="updateTableData"  v-model="selectedOptionValue.selectedOption" :options="appTypeOptions"  >
         <template #default="{ item }">
           <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
             <el-icon size="20">
@@ -87,7 +87,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="Operation" width="200">
+        <el-table-column  fixed="right" label="Operation" width="200">
           <template #default="scope">
             <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>
             <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
@@ -148,6 +148,11 @@ const isAutoRefresh = ref(false)
 
 const pageSize = ref(10)
 const pageCurrent = ref(1)
+
+const exportDialogShow = ref(false)
+const exportData = ref('')
+
+const importDialogShow = ref(false)
 
 const appTypeOptions = ref([
   {

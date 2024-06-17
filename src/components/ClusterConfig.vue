@@ -1,7 +1,8 @@
 <template >
    <div  class="ml-10 mr-10" v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  >
      <el-row>
-       <el-table  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="none-box">
+       <el-table @selection-change="handleSelectionChange"  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="none-box">
+         <el-table-column type="selection" ></el-table-column>
          <el-table-column sortable="custom" prop="id" label="Id" width="80" />s
 
          <el-table-column sortable="custom" prop="name" label="Name" width="200">
@@ -21,7 +22,7 @@
 
 
 
-         <el-table-column >
+         <el-table-column  fixed="right" width="300">
            <template #header>
              <el-row>
                <el-input v-model="search" size="small" :prefix-icon="Search" placeholder="Search name or config" />
@@ -44,6 +45,11 @@
        <el-button class="mt-10" style="width: 100%;"  @click="handleAddItem">Add Item</el-button>
      </el-row>
      <el-row class="mt-10" justify="end">
+       <el-button-group>
+         <el-button @click="handleImport" text class="mr-10" type="primary" :icon="Upload">Import</el-button>
+         <el-button @click="handleExport" text type="primary" :icon="Download">Export</el-button>
+       </el-button-group>
+
        <el-pagination
            v-model:current-page="pageCurrent"
            v-model:page-size="pageSize"
@@ -91,9 +97,31 @@
     </template>
   </el-dialog>
 
+  <import-dialog v-model="importDialogShow"  @import-success="updateClusterConfig"></import-dialog>
+  <share-dialog v-model="exportDialogShow" :exportData="exportData" title="Cluster Config"></share-dialog>
+<!--  <el-dialog-->
+<!--      class="none-box"-->
+<!--      v-model="exportDialogShow"-->
+<!--      title="Cluster Config"-->
+<!--      width="80vw"-->
+<!--  >-->
+<!--    <el-segmented   v-model="selectedExportOption" :options="exportOptions"  >-->
+<!--      <template #default="{ item }">-->
+<!--        <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">-->
 
-  </template>
-  
+<!--          <div>{{ item.label }}</div>-->
+<!--        </div>-->
+<!--      </template>-->
+<!--    </el-segmented>-->
+<!--    <el-input class="mt-10" type="textarea" :autosize="{maxRows: 24,minRows: 6}" style="width: 100%"  v-model="exportData[selectedExportOption]" />-->
+<!--    <el-row justify="end">-->
+<!--      <el-button class="mt-10" @click="exportDialogShow=false">cancel</el-button>-->
+<!--      <el-button type="success" @click="handleCopy(exportData[selectedExportOption])" plain class="mt-10" >copy</el-button>-->
+
+<!--    </el-row>-->
+<!--  </el-dialog>-->
+</template>
+
 <script setup>
 import {ref} from "vue"
 import {
@@ -105,7 +133,10 @@ import {
   apiClusterUpdate
 } from "@/services/clusterConfig.js";
 import {useClusterInfo} from "@/store/clusterStore.js";
-import {Search} from "@element-plus/icons-vue";
+import {Download, Search, Upload} from "@element-plus/icons-vue";
+import {apiClusterConfigExport} from "@/services/share.js";
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 
 
 const item = {
@@ -130,12 +161,14 @@ const filterTableData = computed(() => {
   return filterData
 })
 
+
 const tableEditIndex = ref(undefined);
 const tableEditFieldName = ref(undefined);
 const tableRowInput = ref(undefined);
 const focusRef = ref(null);
-
+const tableMultipleSelection = ref()
 const clusterInfo = useClusterInfo()
+
 
 const pageSize = ref(10)
 const pageCurrent = ref(1)
@@ -148,6 +181,10 @@ const editRowInfo = ref({
   config: ''
 })
 
+const exportDialogShow = ref(false)
+const exportData = ref('')
+
+const importDialogShow = ref(false)
 
 const updateClusterConfig = () => {
   apiClusterList().then(async res => {
@@ -321,7 +358,7 @@ const handleExitEditMode = async (index,row) => {
 }
 
 const handleSave = async (config) => {
-  await apiClusterUpdate(config.id,config).then(async res => {
+  apiClusterUpdate(config.id,config).then(async res => {
     const status = res.status
     if (status === 200) {
       ElMessage({
@@ -357,6 +394,34 @@ const handleArrow = (event) =>{
       pageCurrent.value = prevPage
       break;
   }
+}
+
+
+const handleExport = () => {
+  let exportIds
+  if(tableMultipleSelection.value){
+    exportIds = tableMultipleSelection.value.map(item => item.id)
+  }
+  apiClusterConfigExport(exportIds).then(async res => {
+    const resData = await res.json()
+    exportData.value = JSON.stringify(resData,null,2)
+    exportDialogShow.value = true
+
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+}
+
+const handleImport = ()=>{
+  importDialogShow.value = true
+}
+
+const handleSelectionChange = (selection) => {
+  tableMultipleSelection.value = selection
 }
 
 </script>

@@ -2,7 +2,9 @@
 
   <div class="ml-10 mr-10">
     <el-row>
-      <el-table  v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="none-box" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
+      <el-table @selection-change="handleSelectionChange" v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="none-box" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
+        <el-table-column type="selection"  ></el-table-column>
+
         <el-table-column   sortable="custom" prop="id" label="Id" width="80"/>
         <el-table-column  sortable="custom" :show-overflow-tooltip="true" prop="name" label="Name"  width="180" >
           <template #default="scope">
@@ -150,7 +152,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column  width="220" >
+        <el-table-column  fixed="right" width="220" >
           <template #header>
             <el-input v-model="search" size="small" placeholder="Search name, source or target" />
           </template>
@@ -169,6 +171,10 @@
     </el-row>
 
     <el-row  class="mt-10" justify="end">
+      <el-button-group>
+        <el-button @click="handleImport" text class="mr-10" type="primary" :icon="Upload">Import</el-button>
+        <el-button @click="handleExport" text type="primary" :icon="Download">Export</el-button>
+      </el-button-group>
       <el-pagination
           v-model:current-page="pageCurrent"
           v-model:page-size="pageSize"
@@ -298,7 +304,8 @@
     </template>
   </el-dialog>
 
-
+  <import-dialog v-model="importDialogShow"  @import-success="refreshSyncList"></import-dialog>
+  <share-dialog v-model="exportDialogShow" :exportData="exportData" title="Sync Config"></share-dialog>
 </template>
 
 <script setup>
@@ -313,6 +320,8 @@ import {
   apiSyncTypeList
 } from "@/services/syncConfig.js"
 import {apiNamespaceList, apiPodContainerList, apiPodList} from "@/services/namespace.js";
+import {Download, Upload} from "@element-plus/icons-vue";
+import {apiClusterConfigExport, apiSyncConfigExport} from "@/services/share.js";
 
 const item = {
   id: 1,
@@ -356,6 +365,14 @@ const pageSize = ref(10)
 const pageCurrent = ref(1)
 
 const search = ref('')
+
+const tableMultipleSelection = ref()
+
+const exportDialogShow = ref(false)
+const exportData = ref('')
+
+const importDialogShow = ref(false)
+
 
 
 const syncTypeSelectValue = ref('')
@@ -673,6 +690,33 @@ const handleArrow = (event) =>{
       pageCurrent.value = prevPage
       break;
   }
+}
+
+const handleExport = () => {
+  let exportIds
+  if(tableMultipleSelection.value){
+    exportIds = tableMultipleSelection.value.map(item => item.id)
+  }
+  apiSyncConfigExport(exportIds).then(async res => {
+    const resData = await res.json()
+    exportData.value = JSON.stringify(resData,null,2)
+    exportDialogShow.value = true
+
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+}
+
+const handleImport = ()=>{
+  importDialogShow.value = true
+}
+
+const handleSelectionChange = (selection) => {
+  tableMultipleSelection.value = selection
 }
 
 </script>

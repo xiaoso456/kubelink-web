@@ -60,7 +60,7 @@
 
 
     <el-container>
-      <el-aside width="collapse">
+      <el-aside style="max-height: calc(100vh - 60px)" width="collapse" >
         <!--      <el-scrollbar width="100%" style="height: 100vh">-->
         <!--      <el-row>-->
         <el-menu :collapse-transition="false"    class="el-menu-vertical-demo sidebar-el-menu" router
@@ -128,10 +128,10 @@
       </el-aside>
 
 
-      <el-main>
-        <el-scrollbar>
+      <el-main style="max-height: calc(100vh - 60px)">
+<!--        <el-scrollbar max-height="1000vh">-->
           <router-view/>
-        </el-scrollbar>
+<!--        </el-scrollbar>-->
       </el-main>
 
 
@@ -140,7 +140,17 @@
 </template>
 
 <script  setup>
-import {ArrowRight, Expand, Menu as IconMenu, Message, Moon, Setting, Sunny} from '@element-plus/icons-vue'
+import {
+  ArrowRight,
+  Download,
+  Expand,
+  Menu as IconMenu,
+  Message,
+  Moon,
+  Setting,
+  Sunny,
+  Upload, UploadFilled
+} from '@element-plus/icons-vue'
 import {useClusterInfo} from "@/store/clusterStore.js";
 import {apiClusterActive, apiClusterConnect, apiClusterList} from "@/services/clusterConfig.js";
 import { useDark, useToggle } from '@vueuse/core'

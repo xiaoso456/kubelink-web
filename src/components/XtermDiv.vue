@@ -47,7 +47,7 @@
               <el-divider direction="vertical" />
               <el-button-group class="ml-4">
                 <el-button size="small" @click="searchPrev" style="margin: 0;padding: 4px" :bg="true" plain text><el-icon><ArrowUpBold /></el-icon></el-button>
-                <el-button size="small"  @click="searchNext"  style="margin: 0;padding: 4px" :bg="true" plain text><el-icon><ArrowDownBold /></el-icon></el-button>
+                <el-button size="small" @click="searchNext"  style="margin: 0;padding: 4px" :bg="true" plain text><el-icon><ArrowDownBold /></el-icon></el-button>
 
               </el-button-group>
 
@@ -63,7 +63,7 @@
 
         </el-col>
 
-        <el-col :span="6"  style="min-width: 200px">
+        <el-col :span="6" style="min-width: 200px">
 
           <el-button v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)"  @click="updateTermLog()"  plain type="primary" >Refresh</el-button>
           <el-button @click="downloadTermLog()"  plain type="success" >Download</el-button>
@@ -85,70 +85,74 @@
           <el-col :span="16">
             <div  id="terminalConsole"  class="terminal"/>
           </el-col>
-          <el-col :span="8">
-            <el-form :model="templateForm" label-width="auto" style="max-width: 600px">
-              <el-form-item label="Type">
-                <el-select
-                    @click="refreshTextTemplateTypeList"
-                    @change="refreshTextTemplateList"
-                    v-model="selectedTemplateTypeOptionValue"
-                    placeholder="All"
-                    default-first-option
-                    filterable
-                    allow-create
-                    clearable
-                >
-                  <el-option
-                      v-for="item in templateTypeOptions"
-                      :key="item"
-                      :label="item"
-                      :value="item"
-                  />
+          <el-col :span="8" class="mt-10">
+            <el-scrollbar style="max-height: calc(70vh - 60px);">
+              <el-form :model="templateForm" label-width="auto" style="max-width: 600px;">
+                <el-form-item label="Type">
+                  <el-select
+                      @click="refreshTextTemplateTypeList"
+                      @change="refreshTextTemplateList"
+                      v-model="selectedTemplateTypeOptionValue"
+                      placeholder="All"
+                      default-first-option
+                      filterable
+                      allow-create
+                      clearable
+                  >
+                    <el-option
+                        v-for="item in templateTypeOptions"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                    />
 
-                </el-select>
+                  </el-select>
 
-              </el-form-item>
-              <el-form-item label="Name">
-                <el-select
-                    @click="refreshTextTemplateList"
-                    v-model="selectedTemplateId"
-                    @change="handleSelectedTemplate"
-                    placeholder="All"
-                    default-first-option
-                    filterable
-                    allow-create
-                    clearable
-                >
-                  <el-option
-                      v-for="item in templateListRaw"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                  />
+                </el-form-item>
+                <el-form-item label="Name">
+                  <el-select
+                      @click="refreshTextTemplateList"
+                      v-model="selectedTemplateId"
+                      @change="handleSelectedTemplate"
+                      placeholder="All"
+                      default-first-option
+                      filterable
+                      allow-create
+                      clearable
+                  >
+                    <el-option
+                        v-for="item in templateListRaw"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                    />
 
-                </el-select>
-              </el-form-item>
-              <el-divider  content-position="left" >Vars</el-divider>
-              <el-table :data="selectedTemplateVarsTableData" >
-                <el-table-column prop="key" label="Key" >
+                  </el-select>
+                </el-form-item>
+                <el-divider  content-position="left" >Vars</el-divider>
+                <el-table :data="selectedTemplateVarsTableData" >
+                  <el-table-column prop="key" label="Key" >
 
-                </el-table-column>
+                  </el-table-column>
 
 
-                <el-table-column prop="value" label="Value">
-                  <template #default="scope" >
-                    <el-input ref="focusRef"  v-model="selectedTemplateItem.templateVariables[scope.row.key]"></el-input>
-                  </template>
-                </el-table-column>
+                  <el-table-column prop="value" label="Value">
+                    <template #default="scope" >
+                      <el-input ref="focusRef"  v-model="selectedTemplateItem.templateVariables[scope.row.key]"></el-input>
+                    </template>
+                  </el-table-column>
 
-              </el-table>
+                </el-table>
 
-              <el-divider  content-position="left" >Preview</el-divider>
-              <el-input  v-model="templateContentPreview" autosize type="textarea" />
-              <el-row style="margin-top: 10px" justify="end">
-                <el-button @click="socket.send(templateContentPreview)">execute</el-button>
-              </el-row>
-            </el-form>
+                <el-divider  content-position="left" >Preview</el-divider>
+                <el-input  v-model="templateContentPreview" autosize type="textarea" />
+
+              </el-form>
+
+            </el-scrollbar>
+            <el-row style="margin-top: 10px" justify="end">
+              <el-button @click="socket.send(templateContentPreview)">execute</el-button>
+            </el-row>
           </el-col>
         </el-row>
 
@@ -597,8 +601,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .terminal {
   margin-top:10px;
-  max-height: 65vh;
-
+  max-height: 70vh;
 }
 
 

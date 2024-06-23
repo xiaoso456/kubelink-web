@@ -22,6 +22,17 @@ export function apiSyncConfigExport(ids){
     })
 }
 
+export function apiTextTemplateExport(ids){
+    let idsString = ''
+    if(ids){
+        idsString = ids.join(',')
+    }
+
+    return fetch(`${prefix}/share/text-template/export?ids=${idsString}`, {
+        method: 'GET'
+    })
+}
+
 export function apiImport(text){
     return fetch(`${prefix}/share/common/import`, {
         method: 'POST',

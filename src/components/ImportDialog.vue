@@ -23,7 +23,7 @@
 
 <script setup>
 import {apiImport} from "@/services/share.js";
-import {apiNamespaceList} from "@/services/namespace.js";
+import { Base64 } from 'js-base64';
 
 const dialogVisible = ref(false)
 
@@ -54,6 +54,7 @@ watch(() => props.modelValue, (newVal) => {
 
 
 watch(dialogVisible, (newVal) => {
+  shareText.value = ''
   emit('update:modelValue', newVal)
 })
 
@@ -72,7 +73,7 @@ onMounted(() => {
 const handleImport = (text) => {
   let importText = ''
   if(selectedImportOption.value === 'Base64'){
-    importText = atob(text)
+    importText = Base64.decode(text)
   }else{
     importText = text
   }

@@ -23,6 +23,7 @@
 </template>
 
 <script setup>
+import { Base64 } from 'js-base64';
 import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 const dialogVisible = ref(false)
@@ -61,6 +62,7 @@ const props = defineProps({
 });
 
 watch(() => props.modelValue, (newVal) => {
+  selectedExportOption.value = 'Json'
   sharedJson.value = props.exportData
   shareText.value = props.exportData
   dialogVisible.value = newVal
@@ -79,9 +81,11 @@ watch(() => props.exportData, (newVal) => {
 const shareText = ref('')
 watch(()=>[selectedExportOption.value], (newVal,oldVal) => {
   if (newVal[0] === 'Json') {
-    shareText.value = atob(shareText.value)
+    shareText.value = Base64.decode(shareText.value)
+    // shareText.value = atob(shareText.value)
   } else if(newVal[0] === 'Base64'){
-    shareText.value = btoa(shareText.value)
+    shareText.value = Base64.encode(shareText.value)
+    // shareText.value = btoa(shareText.value)
   }
 })
 

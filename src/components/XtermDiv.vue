@@ -331,7 +331,7 @@ const addAddonToTerm = (term,stateName) => {
   selectState.value[stateName].terminal = term
   setTimeout(()=>{
     fitAddon.fit()
-  },1000)
+  },3000)
 
 
 }

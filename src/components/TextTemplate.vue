@@ -1,59 +1,65 @@
 <template>
-  <el-row align="top">
-    <el-segmented  class="common-margin" v-model="selectedOptionValue" :options="typeOptions"  >
-      <template #default="{ item }">
-        <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
-          <el-icon size="20">
-            <component :is="{...item.icon}" />
-          </el-icon>
-          <div>{{ item.label }}</div>
-        </div>
-      </template>
-    </el-segmented>
-
-  </el-row>
-
-  <el-row >
-
-    <div class="mt-4 common-margin"  style="width: 80%;">
-      <el-input
-          v-model="searchInput"
-          style="max-width: 100%"
-          @change="refreshTextTemplateList"
-          placeholder="Please input"
-          clearable
-      >
-        <template #prepend>
-          <el-select
-              @click="refreshTextTemplateTypeList"
-              @change="refreshTextTemplateList"
-              v-model="selectedTemplateTypeOptionValue"
-              placeholder="All"
-              style="width: 200px"
-              default-first-option
-              filterable
-              allow-create
-              clearable
-          >
-            <el-option
-                v-for="item in templateTypeOptions"
-                :key="item"
-                :label="item"
-                :value="item"
-            />
-
-          </el-select>
+  <div class="ml-10 mr-10">
+    <el-row align="top">
+      <el-segmented  v-model="selectedOptionValue" :options="typeOptions"  >
+        <template #default="{ item }">
+          <div  style="min-width: 100px;margin: 5px 0 5px 0" class="flex flex-col items-center gap-2 p-2">
+            <el-icon size="20">
+              <component :is="{...item.icon}" />
+            </el-icon>
+            <div>{{ item.label }}</div>
+          </div>
         </template>
-        <template #append>
-          <el-button @click="refreshTextTemplateList" :icon="Search" />
-        </template>
-      </el-input>
-    </div>
+      </el-segmented>
 
-  </el-row>
+    </el-row>
 
-  <el-row class="common-margin ">
-    <el-col v-for="item in templateListRaw" :xs="24" :sm="12" :md="6" :xl="4" >
+    <el-row class="mt-10">
+
+      <!--    <div class="mt-4 common-margin"  style="width: 80%;">-->
+      <el-col span="18">
+        <el-input
+            v-model="searchInput"
+            style="max-width: 100%"
+            @change="refreshTextTemplateList"
+            placeholder="Please input"
+            clearable
+        >
+          <template #prepend>
+            <el-select
+                @click="refreshTextTemplateTypeList"
+                @change="refreshTextTemplateList"
+                v-model="selectedTemplateTypeOptionValue"
+                placeholder="All"
+                style="width: 200px"
+                default-first-option
+                filterable
+                allow-create
+                clearable
+            >
+              <el-option
+                  v-for="item in templateTypeOptions"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+              />
+
+            </el-select>
+          </template>
+          <template #append>
+            <el-button @click="refreshTextTemplateList" :icon="Search" />
+          </template>
+        </el-input>
+      </el-col>
+      <el-col span="6" class="ml-10">
+        <el-button type="success" plain @click="importDialogShow=true" >Import</el-button>
+      </el-col>
+      <!--    </div>-->
+
+    </el-row>
+
+    <el-row >
+      <el-col v-for="item in templateListRaw" :xs="24" :sm="12" :md="6" :xl="4" >
         <el-card  class="none-box"  style="max-width: 300px;margin-top: 20px" shadow="never">
           <template #header >
             <div >
@@ -65,6 +71,7 @@
           <template #footer>
             <el-row justify="end">
               <el-button size="small" plain type="success" @click="handleClickCopy(item)">Copy</el-button>
+              <el-button size="small" plain type="warning" @click="handleClickShare(item)">Share</el-button>
               <el-button size="small" plain type="primary" @click="handleClickDetail(item)">Detail</el-button>
               <el-button size="small" plain type="danger" @click="handleClickDelete(item)">Delete</el-button>
             </el-row>
@@ -74,8 +81,10 @@
             {{ item.content }}
           </el-text>
         </el-card>
-    </el-col>
-  </el-row>
+      </el-col>
+    </el-row>
+  </div>
+
 
 <!--  <el-card style="max-width: 360px">-->
 <!--    <template #header>-->
@@ -192,6 +201,9 @@
     </template>
   </el-dialog>
 
+  <import-dialog v-model="importDialogShow"  @import-success="refreshTextTemplateList"></import-dialog>
+  <share-dialog v-model="exportDialogShow" :exportData="exportData" title="Template"></share-dialog>
+
 </template>
 
 <script setup>
@@ -205,6 +217,7 @@ import {
   apiTextTemplateUpdate
 } from "@/services/textTemplate.js";
 import Handlebars from "handlebars";
+import {apiClusterConfigExport, apiTextTemplateExport} from "@/services/share.js";
 
 const searchInput = ref('')
 
@@ -233,6 +246,12 @@ const dialogConfirmFuctionLast = ref(() => {dialogVisible.value = false;dialogCo
 
 const templateTypeOptions = ref([])
 const selectedTemplateTypeOptionValue = ref('')
+
+const exportDialogShow = ref(false)
+const exportData = ref('')
+
+const importDialogShow = ref(false)
+
 const handleIntoEditMode = (index, propName) => {
   tableEditIndex.value = index
   tableEditFieldName.value=propName
@@ -349,6 +368,21 @@ const handleClickCopy = async (item) => {
     console.log(err)
   })
   refreshTextTemplateList()
+}
+
+const handleClickShare = (item) => {
+  apiTextTemplateExport([item.id]).then(async res => {
+    const resData = await res.json()
+    exportData.value = JSON.stringify(resData,null,2)
+    exportDialogShow.value = true
+
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
 }
 
 const handleClickDetail = (item) => {
@@ -493,9 +527,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.common-margin{
-  margin: 0 10px 10px 10px;
-}
 
 
 >>>.el-card__header {
@@ -516,6 +547,11 @@ onMounted(() => {
   right: 60px;
 }
 
+.fixed-button-import{
+  position: fixed;
+  bottom: 60px;
+  right: 20px;
+}
 .my-header {
   display: flex;
   flex-direction: row;

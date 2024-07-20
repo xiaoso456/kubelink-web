@@ -10,7 +10,6 @@ import XtermDiv from "./components/XtermDiv.vue";
 import TextTemplate from "./components/TextTemplate.vue";
 import VueShortKey from 'vue3-shortkey';
 import 'virtual:svg-icons-register'
-
 import * as VueRouter from 'vue-router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { createPinia } from 'pinia'
@@ -19,6 +18,10 @@ import AppDetails from "@/components/AppDetails.vue";
 import NetworkInfo from "@/components/NetworkInfo.vue";
 import ConfigInfo from "@/components/ConfigInfo.vue";
 import ConfigDetails from "@/components/ConfigDetails.vue";
+
+import i18n from '@/locales/i18nconfig.js'
+
+
 
 const router = VueRouter.createRouter({
     history: VueRouter.createWebHashHistory(),
@@ -44,7 +47,11 @@ const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
   }
+
+
 app.use(router)
 app.use(pinia)
 app.use(VueShortKey,{ prevent: ['input', 'textarea','.cm-content'] })
+app.use(i18n)
+
 app.mount('#app')

@@ -12,6 +12,11 @@ export const useSelectedOptionValue = defineStore('selectedOptionValue', {
     },
     persist: {
         enabled: true,
+        strategies:[
+            {
+                storage: localStorage,
+            }
+        ]
     }
 
 })

@@ -20,6 +20,11 @@ export const useClusterInfo = defineStore('clusterInfo', {
     },
     persist: {
         enabled: true,
+        strategies:[
+            {
+                storage: localStorage,
+            }
+        ]
     }
 
 })

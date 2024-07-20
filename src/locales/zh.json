@@ -1,0 +1,45 @@
+{
+    "common": {
+        "search-tip": "请输入搜索关键字",
+        "add-item": "添加",
+        "import": "导入",
+        "export": "导出",
+        "connect": "测试连接",
+        "edit": "编辑",
+        "active": "激活",
+        "cancel": "取消",
+        "save": "保存",
+        "delete": "删除",
+        "confirm": "确认",
+        "console": "控制台",
+        "logs": "日志",
+        "sync": "同步",
+        "sync-type": "同步类型",
+        "content": "内容",
+        "source-file": "源文件(夹)",
+        "target-file": "目标文件(夹)",
+        "enable": "开启",
+        "id": "序号",
+        "namespace": "namespace",
+        "pod": "pod",
+        "container": "container",
+        "name": "名称",
+        "config": "配置"
+
+    },
+    "cluster-page": {
+        "edit-cluster-title": "集群配置",
+        "export-cluster-title": "集群配置"
+
+    },
+    "sidebar":{
+        "cluster": "集群配置",
+        "sync": "同步",
+        "apps": "应用",
+        "network": "网络",
+        "config": "配置",
+        "template": "模板",
+        "fold": "折叠",
+        "extend": "展开"
+    }
+}

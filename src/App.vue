@@ -1,18 +1,11 @@
 <template>
-  <el-container v-shortkey="['tab']" @shortkey="handleShortKeyTable" class="layout-container-demo" style="margin: -8px;height: calc(100vh - 8px)">
+  <el-config-provider :locale="currentLangElKey">
+    <el-container v-shortkey="['tab']" @shortkey="handleShortKeyTable" class="layout-container-demo" style="margin: -8px;height: calc(100vh - 8px)">
     <el-header>
       <el-row style="height: 100%">
         <el-col :span="6" class="software-title">
 
-<!--          <el-text>-->
-<!--              <el-image-->
-<!--                  style="width: 18px; height: 18px;display: block;vertical-align: center;transform: rotate(5deg);"-->
-<!--                  class="logo-color-svg"-->
-<!--                  src="/link.svg"-->
-<!--                  fit="contain"-->
-<!--              />-->
 
-<!--          </el-text>-->
           <el-text>
             <SvgIcon name="link" class="logo-color" color="#66ccff"></SvgIcon>
           </el-text>
@@ -48,6 +41,19 @@
 
           <el-switch  inline-prompt v-model="isDark" :active-action-icon="Moon" :inactive-action-icon="Sunny" @change="toggleDark">
           </el-switch>
+
+
+          <el-dropdown style="margin-right: 15px;margin-left: 15px;"  @command="handleChangeLocale" >
+            <span class="el-dropdown-link" >
+              {{ currentLang }} 
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="lang in langs" :command="lang"  :key="lang.key">{{ lang.title }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+
           <el-link :underline="false" :href="'https://github.com/xiaoso456/kubelink'">
             <SvgIcon class="logo-github-color" style="margin-left: 10px" name="github-mark"   />
           </el-link>
@@ -67,31 +73,31 @@
                  :default-active="$route.path" :collapse="isCollapse"  @open="handleOpen"  @close="handleClose">
           <el-menu-item index="/cluster" >
             <el-icon><SetUp /></el-icon>
-            <template #title><a href="#/cluster" >Cluster</a></template>
+            <template #title><a href="#/cluster" >{{t('sidebar.cluster')}}</a></template>
 
           </el-menu-item>
           <el-menu-item index="/sync">
             <el-icon><Switch /></el-icon>
-            <template #title><a href="#/sync" >Sync</a></template>
+            <template #title><a href="#/sync" >{{t('sidebar.sync')}}</a></template>
           </el-menu-item>
           <el-menu-item index="/apps" >
             <el-icon><Menu /></el-icon>
-            <template #title><a href="#/apps" >Apps</a></template>
+            <template #title><a href="#/apps" >{{t('sidebar.apps')}}</a></template>
           </el-menu-item>
 
           <el-menu-item index="/network" >
             <el-icon><Connection /></el-icon>
-            <template #title><a href="#/network" >Network</a></template>
+            <template #title><a href="#/network" >{{t('sidebar.network')}}</a></template>
           </el-menu-item>
 
           <el-menu-item index="/config" >
             <el-icon><Tools /></el-icon>
-            <template #title><a href="#/config" >Config</a></template>
+            <template #title><a href="#/config" >{{t('sidebar.config')}}</a></template>
           </el-menu-item>
 
           <el-menu-item index="/template" >
             <el-icon><ChatLineSquare /></el-icon>
-            <template #title><a href="#/template" >Template</a></template>
+            <template #title><a href="#/template" >{{t('sidebar.template')}}</a></template>
           </el-menu-item>
 
           <li style="flex:1;"></li>
@@ -99,8 +105,8 @@
             <el-icon v-if="isCollapse"><Expand /></el-icon>
             <el-icon v-else><Fold /></el-icon>
             <template #title>
-              <p v-if="isCollapse">Extend</p>
-              <p v-else>Fold</p>
+              <p v-if="isCollapse">{{t('sidebar.extend')}}</p>
+              <p v-else>{{t('sidebar.fold')}}</p>
             </template>
           </el-menu-item>
           <!--          <el-sub-menu index="1" >-->
@@ -137,6 +143,9 @@
 
     </el-container>
   </el-container>
+  </el-config-provider>
+
+
 </template>
 
 <script  setup>
@@ -152,9 +161,19 @@ import {
   Upload, UploadFilled
 } from '@element-plus/icons-vue'
 import {useClusterInfo} from "@/store/clusterStore.js";
+import {useLocale} from "@/store/langStone.js";
+import { langs } from '@/locales/i18nconfig.js'
+import { ElConfigProvider } from 'element-plus'
+
 import {apiClusterActive, apiClusterConnect, apiClusterList} from "@/services/clusterConfig.js";
 import { useDark, useToggle } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
+const useLocaleStone = useLocale()
+let curLocale = useLocaleStone.locale
+let currentLang = ref(langs.find((cur) => cur.key === curLocale)?.title || '')
+let currentLangElKey = ref(langs.find((cur) => cur.key === curLocale)?.elKey || '')
 
 const isDark = useDark({
   storageKey: 'vue-theme-mode',
@@ -168,6 +187,12 @@ const clusterInfo = useClusterInfo()
 
 const isCollapse = ref(false)
 const namespaceList = ref([])
+
+const handleChangeLocale = (lang)=>{
+ currentLang.value = lang.title
+ useLocaleStone.setLocale(lang.key)
+ currentLangElKey.value = lang.elKey
+}
 
 const handleOpen = (key, keyPath) => {
   // console.log(key, keyPath)

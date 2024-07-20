@@ -1,0 +1,16 @@
+{
+    "common": {
+        "search-tip": "Please enter a keyword for search",
+        "add-item": "Add Item"
+    },
+    "sidebar":{
+        "cluster": "Cluster",
+        "sync": "Sync",
+        "apps": "Apps",
+        "network": "Network",
+        "config": "Config",
+        "template": "Template",
+        "fold": "Fold",
+        "extend": "Extend"
+    }
+}

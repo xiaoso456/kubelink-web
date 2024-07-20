@@ -3,9 +3,9 @@
      <el-row>
        <el-table @selection-change="handleSelectionChange"  @sort-change="tableSort" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="none-box">
          <el-table-column type="selection" ></el-table-column>
-         <el-table-column sortable="custom" prop="id" label="Id" width="80" />s
+         <el-table-column sortable="custom" prop="id" :label="t('common.id')" width="80" />
 
-         <el-table-column sortable="custom" prop="name" label="Name" width="200">
+         <el-table-column sortable="custom" prop="name" :label="t('common.name')" width="200">
            <template #default="scope" >
              <el-input ref="focusRef"  v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
              <p v-else  @click="handleIntoEditMode(scope.$index,scope.row,'name')"  >{{ scope.row.name?scope.row.name:'-' }}</p>
@@ -13,7 +13,7 @@
          </el-table-column>
 
 
-         <el-table-column prop="config" label="Config" >
+         <el-table-column prop="config" :label="t('common.config')" >
            <template #default="scope" >
              <el-input :autosize="{minRows:1,maxRows:3}" resize="none" type="textarea" ref="focusRef"  v-if="scope.$index === tableEditIndex && 'config'===tableEditFieldName" v-model="tableRowInput" @keyup.enter.native="$event.target.blur()" @blur="handleExitEditMode(scope.$index,scope.row)"></el-input>
              <p v-else class="text-ellipsis" @click="handleIntoEditMode(scope.$index,scope.row,'config')"  >{{ scope.row.config?scope.row.config:'-' }}</p>
@@ -25,16 +25,16 @@
          <el-table-column  fixed="right" width="300">
            <template #header>
              <el-row>
-               <el-input v-model="search" size="small" :prefix-icon="Search" placeholder="Search name or config" />
+               <el-input v-model="search" size="small" :prefix-icon="Search" :placeholder="t('common.search-tip')" />
 
 
              </el-row>
 
            </template>
            <template #default="scope">
-             <el-button size="small" type="default" plain @click="handleConnect(scope.row)">connect</el-button>
-             <el-button size="small" type="primary"  plain @click="handleEdit(scope.row)">edit</el-button>
-             <el-button size="small" type="success" plain @click="handleActive(scope.row)">active</el-button>
+             <el-button size="small" type="default" plain @click="handleConnect(scope.row)">{{ t('common.connect') }}</el-button>
+             <el-button size="small" type="primary"  plain @click="handleEdit(scope.row)">{{t('common.edit') }}</el-button>
+             <el-button size="small" type="success" plain @click="handleActive(scope.row)">{{ t('common.active') }}</el-button>
 
            </template>
          </el-table-column>
@@ -42,12 +42,12 @@
 
      </el-row>
      <el-row class="mt-10">
-       <el-button class="mt-10" style="width: 100%;"  @click="handleAddItem">Add Item</el-button>
+       <el-button class="mt-10" style="width: 100%;"  @click="handleAddItem">{{t('common.add-item')}}</el-button>
      </el-row>
      <el-row class="mt-10" justify="end">
        <el-button-group>
-         <el-button @click="handleImport" text class="mr-10" type="primary" :icon="Upload">Import</el-button>
-         <el-button @click="handleExport" text type="primary" :icon="Download">Export</el-button>
+         <el-button @click="handleImport" text class="mr-10" type="primary" :icon="Upload">{{t('common.import')}}</el-button>
+         <el-button @click="handleExport" text type="primary" :icon="Download">{{t('common.export')}}</el-button>
        </el-button-group>
 
        <el-pagination
@@ -66,39 +66,39 @@
   <el-dialog
       class="none-box"
       v-model="editMode"
-      title="Cluster Config"
+      :title="t('cluster-page.edit-cluster-title')"
       width="80vw"
   >
     <el-form :model="editRowInfo" label-width="auto" style="max-width: 78vw">
-      <el-form-item label="id">
+      <el-form-item :label="t('common.id')">
         <el-input readonly v-model="editRowInfo.id" />
       </el-form-item>
-      <el-form-item label="Name">
+      <el-form-item :label="t('common.name')">
         <el-input v-model="editRowInfo.name" />
       </el-form-item>
-      <el-form-item label="content"  >
+      <el-form-item :label="t('common.content')"  >
         <el-input v-model="editRowInfo.config" autosize type="textarea" />
       </el-form-item>
 
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-          <el-button  text @click="editMode = false">Cancel</el-button>
+          <el-button  text @click="editMode = false">{{ t('common.cancel') }}</el-button>
 
           <el-button-group style="margin-left: 20px">
-            <el-button  text @click="handleSave(editRowInfo)" type="success">Save</el-button>
-            <el-button  text @click="handleConnect(editRowInfo)"  type="success" >Connect</el-button>
-            <el-button  text @Click="handleActive(editRowInfo)" type="success">Active</el-button>
+            <el-button  text @click="handleSave(editRowInfo)" type="success">{{ t('common.save') }}</el-button>
+            <el-button  text @click="handleConnect(editRowInfo)"  type="success" >{{ t('common.connect') }}</el-button>
+            <el-button  text @Click="handleActive(editRowInfo)" type="success">{{ t('common.active') }}</el-button>
           </el-button-group>
 
-          <el-button style="margin-left: 20px" text @click="handleDelete(editRowInfo);editMode=false" type="danger" >Delete</el-button>
+          <el-button style="margin-left: 20px" text @click="handleDelete(editRowInfo);editMode=false" type="danger" >{{ t('common.delete') }}</el-button>
 
       </div>
     </template>
   </el-dialog>
 
   <import-dialog v-model="importDialogShow"  @import-success="updateClusterConfig"></import-dialog>
-  <share-dialog v-model="exportDialogShow" :exportData="exportData" title="Cluster Config"></share-dialog>
+  <share-dialog v-model="exportDialogShow" :exportData="exportData" :title="t('cluster-page.export-cluster-title')"></share-dialog>
 <!--  <el-dialog-->
 <!--      class="none-box"-->
 <!--      v-model="exportDialogShow"-->
@@ -136,6 +136,9 @@ import {useClusterInfo} from "@/store/clusterStore.js";
 import {Download, Search, Upload} from "@element-plus/icons-vue";
 import {apiClusterConfigExport} from "@/services/share.js";
 import useClipboard from 'vue-clipboard3';
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+
 const { toClipboard } = useClipboard();
 
 

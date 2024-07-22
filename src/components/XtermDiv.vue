@@ -16,9 +16,9 @@
 
           <el-descriptions  style="margin-top: 10px;width: 70%"  border size="default" :column="4">
 
-            <el-descriptions-item  label="Namespace">{{ route.params.namespace }}</el-descriptions-item>
-            <el-descriptions-item  label="Pod">{{ route.params.pod }}</el-descriptions-item>
-            <el-descriptions-item  label="Container">{{ route.params.container }}</el-descriptions-item>
+            <el-descriptions-item  :label="t('common.namespace')">{{ route.params.namespace }}</el-descriptions-item>
+            <el-descriptions-item  :label="t('common.pod')">{{ route.params.pod }}</el-descriptions-item>
+            <el-descriptions-item  :label="t('common.container')">{{ route.params.container }}</el-descriptions-item>
 
           </el-descriptions>
 
@@ -27,7 +27,7 @@
         <el-col :span="10" style="min-width: 480px">
           <el-input
               v-model="searchInput"
-              placeholder="Please input"
+              :placeholder="t('common.search-tip')"
               @keyup.enter="highlightKeyword"
               clearable
           >
@@ -57,7 +57,7 @@
 
 
         <el-col :span="3"  style="min-width: 160px" v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)">
-          <el-tooltip  effect="light" content="tail lines">
+          <el-tooltip  effect="light" :content="t('xterm-page.tail-lines-tooltip')">
             <el-input-number  style="width: 100%" v-model="tailLines" :min="1" :step="5000" />
           </el-tooltip>
 
@@ -65,8 +65,8 @@
 
         <el-col :span="6" style="min-width: 200px">
 
-          <el-button v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)"  @click="updateTermLog()"  plain type="primary" >Refresh</el-button>
-          <el-button @click="downloadTermLog()"  plain type="success" >Download</el-button>
+          <el-button v-show="['Logs','PreviousLogs'].includes(selectedOptionValue)"  @click="updateTermLog()"  plain type="primary" >{{ t('common.refresh') }}</el-button>
+          <el-button @click="downloadTermLog()"  plain type="success" >{{ t('common.download') }}</el-button>
 
         </el-col>
 
@@ -88,7 +88,7 @@
           <el-col :span="8" class="mt-10">
             <el-scrollbar style="max-height: calc(70vh - 60px);">
               <el-form :model="templateForm" label-width="auto" style="max-width: 600px;">
-                <el-form-item label="Type">
+                <el-form-item :label="t('common.type')">
                   <el-select
                       @click="refreshTextTemplateTypeList"
                       @change="refreshTextTemplateList"
@@ -109,7 +109,7 @@
                   </el-select>
 
                 </el-form-item>
-                <el-form-item label="Name">
+                <el-form-item :label="t('common.name')">
                   <el-select
                       @click="refreshTextTemplateList"
                       v-model="selectedTemplateId"
@@ -129,7 +129,7 @@
 
                   </el-select>
                 </el-form-item>
-                <el-divider  content-position="left" >Vars</el-divider>
+                <el-divider  content-position="left" >{{ t('common.vars') }}</el-divider>
                 <el-table :data="selectedTemplateVarsTableData" >
                   <el-table-column prop="key" label="Key" >
 
@@ -144,14 +144,14 @@
 
                 </el-table>
 
-                <el-divider  content-position="left" >Preview</el-divider>
+                <el-divider  content-position="left" >{{ t('common.preview') }}</el-divider>
                 <el-input  v-model="templateContentPreview" autosize type="textarea" />
 
               </el-form>
 
             </el-scrollbar>
             <el-row style="margin-top: 10px" justify="end">
-              <el-button @click="socket.send(templateContentPreview)">execute</el-button>
+              <el-button @click="socket.send(templateContentPreview)">{{ t('common.execute') }}</el-button>
             </el-row>
           </el-col>
         </el-row>
@@ -159,8 +159,6 @@
       </div>
 
     </div>
-
-
 
 </template>
 
@@ -176,7 +174,8 @@ import {AttachAddon} from "@xterm/addon-attach";
 import {ref} from "vue";
 import {apiTextTemplateList, apiTextTemplateTypeList} from "@/services/textTemplate.js";
 import Handlebars from "handlebars";
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const selectedOptionValue = ref('Logs')
 const operationTypeOptions = [
   {
@@ -217,7 +216,7 @@ const route = useRoute()
 const router = useRouter()
 const highlightLimit = ref(1000)
 const highlightContent = computed(()=>{
-  return "highlight limit: " + highlightLimit.value
+  return t("xterm-page.highlight-limit-tooltip") + highlightLimit.value
 })
 
 const selectState = ref({

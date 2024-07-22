@@ -18,19 +18,56 @@
         "content": "内容",
         "source-file": "源文件(夹)",
         "target-file": "目标文件(夹)",
-        "enable": "开启",
+        "enable": "开关",
         "id": "序号",
         "namespace": "namespace",
         "pod": "pod",
         "container": "container",
         "name": "名称",
-        "config": "配置"
-
-    },
-    "cluster-page": {
-        "edit-cluster-title": "集群配置",
-        "export-cluster-title": "集群配置"
-
+        "config": "配置",
+        "all": "全部",
+        "status": "状态",
+        "operation": "操作",
+        "suspend": "挂起",
+        "tips": "提示",
+        "type": "类型",
+        "mapping": "映射",
+        "refresh-tooltip": "每十秒更新一次",
+        "data-count": "数据数量",
+        "binary-data-count": "二进制数据数量",
+        "binary-data-size": "二进制数据数量",
+        "string-data-count": "字符串数据数量",
+        "create-time": "创建时间",
+        "new": "新增",
+        "template": "模板",
+        "description": "描述",
+        "vars": "变量",
+        "preview": "预览",
+        "copy": "复制",
+        "share": "分享",
+        "detail": "详情",
+        "create": "创建",
+        "Create": "创建",
+        "Update": "更新",
+        "download": "下载",
+        "network": "网络",
+        "condition": "状态",
+        "replicas": "副本数",
+        "restart-policy": "重启策略",
+        "generation": "版本",
+        "node": "节点",
+        "protocol": "协议",
+        "image": "镜像",
+        "restart-count": "重启次数",
+        "started-at": "启动时间",
+        "restart-times": "重启次数",
+        "created-time": "创建时间",
+        "reason": "原因",
+        "message": "消息",
+        "last-update-time": "最后更新时间",
+        "pull-image-policy": "镜像拉取策略",
+        "execute": "执行",
+        "refresh": "刷新"
     },
     "sidebar":{
         "cluster": "集群配置",
@@ -41,5 +78,31 @@
         "template": "模板",
         "fold": "折叠",
         "extend": "展开"
+    },
+    "cluster-page": {
+        "edit-cluster-title": "集群配置",
+        "export-cluster-title": "集群配置"
+
+    },
+    "sync-page": {
+        "edit-sync-title": "同步配置",
+        "export-sync-title": "同步配置"
+    },
+    "config-page": {
+        "create-configmap-title": "创建ConfigMap",
+        "create-secret-title": "创建Secret"
+
+    },
+    "app-details-page": {
+        "base-info": "基本信息",
+        "container-ports": "容器端口",
+        "port-name": "端口名称"
+    },
+    "xterm-page": {
+        "tail-lines-tooltip": "末尾行数",
+        "highlight-limit-tooltip": "高亮行数限制: "
+    },
+    "text-template-page": {
+        "add-or-edit-template-tooltip": "基于Handlebars.js实现,  {{ key1 }} 或 {{{ key1 }}} 代表变量 key1"
     }
 }

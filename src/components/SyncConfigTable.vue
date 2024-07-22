@@ -5,8 +5,8 @@
       <el-table @selection-change="handleSelectionChange" v-shortkey="{right:['arrowright'],left:['arrowleft']}" @shortkey="handleArrow"  @sort-change="tableSort"  class="none-box" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
         <el-table-column type="selection"  ></el-table-column>
 
-        <el-table-column   sortable="custom" prop="id" label="Id" width="80"/>
-        <el-table-column  sortable="custom" :show-overflow-tooltip="true" prop="name" label="Name"  width="180" >
+        <el-table-column   sortable="custom" prop="id" :label="t('common.id')" width="80"/>
+        <el-table-column  sortable="custom" :show-overflow-tooltip="true" prop="name" :label="t('common.name')"  width="180" >
           <template #default="scope">
             <el-input  sortable="custom" ref="focusRef" v-if="scope.$index === tableEditIndex && 'name'===tableEditFieldName"
                        v-model="tableRowInput" @keyup.enter.native="$event.target.blur()"
@@ -18,7 +18,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column  sortable="custom" prop="syncType" label="SyncType" width="180">
+        <el-table-column  sortable="custom" prop="syncType" :label="t('common.sync-type')" width="180">
           <template #default="scope">
             <el-select
                 @change="updateSyncConfigAndRefresh(scope.row)"
@@ -36,7 +36,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column sortable="custom" :show-overflow-tooltip="true"  prop="namespace" label="Namespace" >
+        <el-table-column sortable="custom" :show-overflow-tooltip="true"  prop="namespace" :label="t('common.namespace')" >
           <template #default="scope">
             <el-select
                 @change="updateSyncConfigAndRefresh(scope.row)"
@@ -154,12 +154,12 @@
 
         <el-table-column  fixed="right" width="220" >
           <template #header>
-            <el-input v-model="search" size="small" placeholder="Search name, source or target" />
+            <el-input v-model="search" size="small" :placeholder="t('common.search-tip')" />
           </template>
           <template #default="scope">
-            <el-button size="small" type="success" plain @click="handleSync(scope.row)">sync</el-button>
-            <el-button size="small" type="primary" plain @click="handleEdit(scope.row)">edit</el-button>
-            <el-button size="small" type="danger" plain @click="handleDelete(scope.row)">delete</el-button>
+            <el-button size="small" type="success" plain @click="handleSync(scope.row)">{{ t('common.sync') }}</el-button>
+            <el-button size="small" type="primary" plain @click="handleEdit(scope.row)">{{ t('common.edit') }}</el-button>
+            <el-button size="small" type="danger" plain @click="handleDelete(scope.row)">{{ t('common.delete') }}</el-button>
 
           </template>
         </el-table-column>
@@ -167,13 +167,13 @@
     </el-row>
 
     <el-row class="mt-10">
-      <el-button style="width: 100%" @click="handleAddItem">Add Item</el-button>
+      <el-button style="width: 100%" @click="handleAddItem">{{ t('common.add-item') }}</el-button>
     </el-row>
 
     <el-row  class="mt-10" justify="end">
       <el-button-group>
-        <el-button @click="handleImport" text class="mr-10" type="primary" :icon="Upload">Import</el-button>
-        <el-button @click="handleExport" text type="primary" :icon="Download">Export</el-button>
+        <el-button @click="handleImport" text class="mr-10" type="primary" :icon="Upload">{{ t('common.import') }}</el-button>
+        <el-button @click="handleExport" text type="primary" :icon="Download">{{ t('common.export') }}</el-button>
       </el-button-group>
       <el-pagination
           v-model:current-page="pageCurrent"
@@ -189,30 +189,30 @@
 
   <el-dialog
       v-model="editMode"
-      title="Sync Config"
+      :title="t('sync-page.edit-sync-title')"
       width="80vw"
       style="max-width: 1000px"
   >
     <el-form class="none-box" :model="editRowInfo" label-width="auto" style="max-width: 1000px"  >
       <el-row>
         <el-col :span="8">
-          <el-form-item  label="id">
+          <el-form-item  :label="t('common.id')">
             <el-input readonly v-model="editRowInfo.id" />
           </el-form-item>
         </el-col>
         <el-col :span="16">
-          <el-form-item label="enable">
+          <el-form-item :label="t('common.enable')">
             <el-switch  v-model="editRowInfo.enable"/>
           </el-form-item>
         </el-col>
       </el-row>
 
-      <el-form-item label="name">
+      <el-form-item :label="t('common.name')">
         <el-input v-model="editRowInfo.name" />
       </el-form-item>
 
 
-      <el-form-item label="syncType"  >
+      <el-form-item :label="t('common.sync-type')"  >
         <template #default="scope">
           <el-select
               v-model="editRowInfo.syncType"
@@ -228,7 +228,7 @@
         </template>
       </el-form-item>
 
-      <el-form-item label="namespace"  >
+      <el-form-item :label="t('common.namespace')"  >
         <el-select
             v-model="editRowInfo.namespace"
             default-first-option
@@ -246,7 +246,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="pod">
+      <el-form-item :label="t('common.pod')">
         <el-select
             @click="updateNamespacePod(editRowInfo)"
             default-first-option
@@ -264,7 +264,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="container">
+      <el-form-item :label="t('common.container')">
         <el-select
             @click="updateNamespacePodContainer(editRowInfo)"
             default-first-option
@@ -283,11 +283,11 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="source">
+      <el-form-item :label="t('common.source-file')">
         <el-input v-model="editRowInfo.source" type="textarea" autosize />
       </el-form-item>
 
-      <el-form-item label="target">
+      <el-form-item :label="t('common.target-file')">
         <el-input v-model="editRowInfo.target" type="textarea" autosize />
       </el-form-item>
 
@@ -295,10 +295,10 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button text @click="editMode = false;refreshSyncList()">Cancel</el-button>
-        <el-button text @click="handleSave(editRowInfo)" type="success">Save</el-button>
-        <el-button text @click="handleSync(editRowInfo)" type="success">Sync</el-button>
-        <el-button text @click="handleDelete(editRowInfo);editMode=false" type="danger" >Delete</el-button>
+        <el-button text @click="editMode = false;refreshSyncList()">{{ t('common.cancel') }}</el-button>
+        <el-button text @click="handleSave(editRowInfo)" type="success">{{ t('common.save') }}</el-button>
+        <el-button text @click="handleSync(editRowInfo)" type="success">{{ t('common.sync') }}</el-button>
+        <el-button text @click="handleDelete(editRowInfo);editMode=false" type="danger" >{{ t('common.delete') }}</el-button>
 
       </div>
     </template>
@@ -322,6 +322,8 @@ import {
 import {apiNamespaceList, apiPodContainerList, apiPodList} from "@/services/namespace.js";
 import {Download, Upload} from "@element-plus/icons-vue";
 import {apiClusterConfigExport, apiSyncConfigExport} from "@/services/share.js";
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const item = {
   id: 1,

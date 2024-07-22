@@ -30,7 +30,7 @@
       <el-input
           v-model="searchInput"
           style="max-width: 100%"
-          placeholder="Please input"
+          :placeholder="t('common.search-tip')"
           @change="updateTableData"
           clearable
       >
@@ -39,7 +39,7 @@
               @click="refreshNamespaceOptions"
               @change="updateTableData"
               v-model="selectedOptionValue.selectedNamespaceOption"
-              placeholder="All"
+              :placeholder="t('common.all')"
               style="width: 200px"
               default-first-option
               filterable
@@ -64,21 +64,21 @@
 
     <el-row  class="mt-10">
       <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
-        <el-table-column label="Id" width="80"   >
+        <el-table-column :label="t('common.id')" width="80"   >
           <template #default="scope">
             {{ scope.$index + 1  }}
           </template>
         </el-table-column>
 
-        <el-table-column sortable="custom" prop="namespace" label="Namespace"  />
+        <el-table-column sortable="custom" prop="namespace" :label="t('common.namespace')"  />
 
-        <el-table-column sortable="custom" prop="name" label="Name">
+        <el-table-column sortable="custom" prop="name" :label="t('common.name')">
           <template #default="scope">
             <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
           </template>
         </el-table-column>
 
-        <el-table-column sortable="custom" prop="status" label="Status" width="120" >
+        <el-table-column sortable="custom" prop="status" :label="t('common.status')" width="120" >
           <template #default="scope" >
             <div style="display: flex;align-items: center">
               <div :class="scope.row.status.runNum===scope.row.status.totalNum?'circle-green':'circle-yellow'"></div>
@@ -87,11 +87,11 @@
           </template>
         </el-table-column>
 
-        <el-table-column  fixed="right" label="Operation" width="200">
+        <el-table-column  fixed="right" :label="t('common.operation')" width="200">
           <template #default="scope">
-            <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>
+            <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">{{ t('common.suspend') }}</el-button>
             <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
-            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
+            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">{{ t('common.delete') }}</el-button>
           </template>
         </el-table-column>
 
@@ -116,9 +116,9 @@
     <span>{{ dialogMessage }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button plain @click="dialogVisible = false">Cancel</el-button>
+        <el-button plain @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
         <el-button plain type="success" @click="dialogConfirmFuctionLast">
-          Confirm
+          {{ t('common.confirm') }}
         </el-button>
       </div>
     </template>
@@ -134,7 +134,8 @@ import {apiStatefulsetContainerSuspend, apiStatefulsetDelete, apiStatefulsetList
 import {apiDaemonsetContainerSuspend, apiDaemonsetDelete, apiDaemonsetList} from "@/services/daemonset.js";
 import {apiJobContainerSuspend, apiJobDelete, apiJobList} from "@/services/job.js";
 import {useSelectedOptionValue} from "@/store/appsStore.js";
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 // const selectedOptionValue = ref('Deployment')
 const selectedOptionValue = useSelectedOptionValue()
 const searchInput = ref('')
@@ -377,7 +378,7 @@ const handleChangeAppType = async (item) => {
 
 const handleSuspend = (row) => {
   dialogVisible.value = true
-  dialogTitle.value = "Tips"
+  dialogTitle.value = t("common.tips")
   dialogMessage.value = `Suspend ${selectedOptionValue.selectedOption} '${row.name}' first container`
   dialogConfirmFuction.value = () => {
     if(selectedOptionValue.selectedOption === 'Deployment'){
@@ -447,7 +448,7 @@ const handleSuspend = (row) => {
 
 const handleDelete = (row) => {
   dialogVisible.value = true
-  dialogTitle.value = "Tips"
+  dialogTitle.value = t("common.tips")
   dialogMessage.value = `Delete ${selectedOptionValue.selectedOption} '${row.name}'`
   dialogConfirmFuction.value = () => {
     if(selectedOptionValue.selectedOption === 'Deployment'){

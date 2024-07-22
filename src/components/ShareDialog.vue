@@ -15,9 +15,9 @@
     </el-segmented>
     <el-input class="mt-10" type="textarea" :autosize="{maxRows: 24,minRows: 6}" style="width: 100%"  v-model="shareText" />
     <el-row justify="end">
-      <el-button class="mt-10" @click="emit('update:modelValue', false);">cancel</el-button>
-      <el-button type="primary" @click="handleCopy(shareText)" plain class="mt-10" >copy</el-button>
-      <el-button type="success" @click="handleDownload(shareText)" plain class="mt-10" >download</el-button>
+      <el-button class="mt-10" @click="emit('update:modelValue', false);">{{ t('common.cancel') }}</el-button>
+      <el-button type="primary" @click="handleCopy(shareText)" plain class="mt-10" >{{ t('common.copy') }}</el-button>
+      <el-button type="success" @click="handleDownload(shareText)" plain class="mt-10" >{{ t('common.download') }}</el-button>
     </el-row>
   </el-dialog>
 </template>
@@ -27,7 +27,8 @@ import { Base64 } from 'js-base64';
 import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 const dialogVisible = ref(false)
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const exportOptions = [
   {
     label: 'Json',

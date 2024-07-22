@@ -2,7 +2,7 @@
   <el-dialog
       class="none-box"
       v-model="dialogVisible"
-      title="Import"
+      :title="t('common.import')"
       width="80vw"
   >
 
@@ -15,8 +15,8 @@
     </el-segmented>
     <el-input class="mt-10" type="textarea" :autosize="{maxRows: 24,minRows: 6}" style="width: 100%"  v-model="shareText" />
     <el-row justify="end">
-      <el-button class="mt-10" @click="emit('update:modelValue', false);">cancel</el-button>
-      <el-button type="primary" @click="handleImport(shareText)" plain class="mt-10" >import</el-button>
+      <el-button class="mt-10" @click="emit('update:modelValue', false);">{{ t('common.cancel') }}</el-button>
+      <el-button type="primary" @click="handleImport(shareText)" plain class="mt-10" >{{ t('common.import') }}</el-button>
     </el-row>
   </el-dialog>
 </template>
@@ -24,7 +24,8 @@
 <script setup>
 import {apiImport} from "@/services/share.js";
 import { Base64 } from 'js-base64';
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const dialogVisible = ref(false)
 
 const exportOptions = [

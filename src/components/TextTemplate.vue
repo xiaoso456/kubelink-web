@@ -22,7 +22,7 @@
             v-model="searchInput"
             style="max-width: 100%"
             @change="refreshTextTemplateList"
-            placeholder="Please input"
+            :placeholder="t('common.search-tip')"
             clearable
         >
           <template #prepend>
@@ -30,7 +30,7 @@
                 @click="refreshTextTemplateTypeList"
                 @change="refreshTextTemplateList"
                 v-model="selectedTemplateTypeOptionValue"
-                placeholder="All"
+                :placeholder="t('common.all')"
                 style="width: 200px"
                 default-first-option
                 filterable
@@ -52,7 +52,7 @@
         </el-input>
       </el-col>
       <el-col span="6" class="ml-10">
-        <el-button type="success" plain @click="importDialogShow=true" >Import</el-button>
+        <el-button type="success" plain @click="importDialogShow=true" >{{ t('common.import') }}</el-button>
       </el-col>
       <!--    </div>-->
 
@@ -70,10 +70,10 @@
           </template>
           <template #footer>
             <el-row justify="end">
-              <el-button size="small" plain type="success" @click="handleClickCopy(item)">Copy</el-button>
-              <el-button size="small" plain type="warning" @click="handleClickShare(item)">Share</el-button>
-              <el-button size="small" plain type="primary" @click="handleClickDetail(item)">Detail</el-button>
-              <el-button size="small" plain type="danger" @click="handleClickDelete(item)">Delete</el-button>
+              <el-button size="small" plain type="success" @click="handleClickCopy(item)">{{ t('common.copy') }}</el-button>
+              <el-button size="small" plain type="warning" @click="handleClickShare(item)">{{ t('common.share') }}</el-button>
+              <el-button size="small" plain type="primary" @click="handleClickDetail(item)">{{ t('common.detail') }}</el-button>
+              <el-button size="small" plain type="danger" @click="handleClickDelete(item)">{{ t('common.delete') }}</el-button>
             </el-row>
 
           </template>
@@ -98,18 +98,17 @@
 
   <el-dialog
       v-model="templateDialogVisible"
-      title="Template"
       width="80%"
       :before-close="handleClose"
       class="none-box"
   >
     <template #header="{ close, titleId, titleClass }">
       <div>
-        <span>Template</span>
+        <span>{{ t('common.template') }}</span>
         <el-tooltip
             class="box-item"
             effect="light"
-            content="Base on Handlebars.js,  {{ key1 }} or {{{ key1 }}} represents var key1"
+            :content="t('text-template-page.add-or-edit-template-tooltip')"
             placement="top-start"
         >
           <el-icon style="margin-left: 4px" size="14"><QuestionFilled /></el-icon>
@@ -119,21 +118,21 @@
     </template>
 
     <el-form :model="templateForm" label-width="auto" style="max-width: 1000px">
-      <el-form-item label="Name">
+      <el-form-item :label="t('common.name')">
         <el-input v-model="templateForm.name" />
       </el-form-item>
-      <el-form-item label="type">
+      <el-form-item :label="t('common.type')">
         <el-input v-model="templateForm.type" />
       </el-form-item>
-      <el-form-item label="content"  >
+      <el-form-item :label="t('common.content')"  >
         <el-input v-model="templateForm.content" autosize type="textarea" />
       </el-form-item>
-      <el-form-item label="description"  >
+      <el-form-item :label="t('common.description')"  >
         <el-input v-model="templateForm.description" autosize type="textarea" />
       </el-form-item>
 
 
-      <el-divider  content-position="left" >Vars</el-divider>
+      <el-divider  content-position="left" >{{ t('common.vars') }}</el-divider>
 <!--      <el-form-item v-for="(value,key) in templateForm.templateVariables" :label="key">-->
 <!--        <el-input v-model="templateForm.templateVariables[key]" autosize  />-->
 <!--      </el-form-item>-->
@@ -155,24 +154,24 @@
         </el-table-column>
 
 
-        <el-table-column label="Operation">
+        <el-table-column :label="t('common.operation')">
           <template #default="scope">
-            <el-button size="small" type="danger"  plain @click="delete(templateForm.templateVariables[scope.row.key])">delete</el-button>
+            <el-button size="small" type="danger"  plain @click="delete(templateForm.templateVariables[scope.row.key])">{{ t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-button style="width: 100%;margin-top: 10px"  @click="handleAddTemplateVariablesItem">Add Item</el-button>
+      <el-button style="width: 100%;margin-top: 10px"  @click="handleAddTemplateVariablesItem">{{ t('common.add-item') }}</el-button>
 
 
-      <el-divider  content-position="left" >Preview</el-divider>
+      <el-divider  content-position="left" >{{ t('common.preview') }}</el-divider>
       <el-input readonly v-model="templateContentPreview" autosize type="textarea" />
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button plain @click="templateDialogVisible = false">Cancel</el-button>
+        <el-button plain @click="templateDialogVisible = false">{{ t('common.cancel') }}</el-button>
 <!--        <el-button plain type="primary">Create Instance</el-button>-->
         <el-button plain type="success" @click="handleCreateOrUpdateTemplate">
-          {{ templateAction }}
+          {{ t('common.'+templateAction) }}
         </el-button>
       </div>
     </template>
@@ -193,9 +192,9 @@
     <span>{{ dialogMessage }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button plain @click="dialogVisible = false">Cancel</el-button>
+        <el-button plain @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
         <el-button plain type="success" @click="dialogConfirmFuctionLast">
-          Confirm
+          {{ t('common.confirm') }}
         </el-button>
       </div>
     </template>
@@ -218,7 +217,8 @@ import {
 } from "@/services/textTemplate.js";
 import Handlebars from "handlebars";
 import {apiClusterConfigExport, apiTextTemplateExport} from "@/services/share.js";
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const searchInput = ref('')
 
 const templateDialogVisible = ref(false)
@@ -394,7 +394,7 @@ const handleClickDetail = (item) => {
 const handleClickDelete = (row) => {
 
   dialogVisible.value = true
-  dialogTitle.value = "Tips"
+  dialogTitle.value = t("common.tips")
   dialogMessage.value = `delete template '${row.name}'`
   dialogConfirmFuction.value = async () => {
     await apiTextTemplateDelete(row.id).then(async res => {

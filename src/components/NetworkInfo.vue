@@ -14,7 +14,7 @@
         </template>
       </el-segmented>
 
-      <el-tooltip  placement="top-start" effect="light" content="Refresh data every 10s">
+      <el-tooltip  placement="top-start" effect="light" :content="t('common.refresh-tooltip')">
         <el-button style="margin-left: 10px;" round plain link @click="() => {isAutoRefresh = !isAutoRefresh;updateTableData()}">
           <el-icon size="18px" :class="{'is-loading':isAutoRefresh}" >
             <Refresh />
@@ -40,7 +40,7 @@
                 @click="refreshNamespaceOptions"
                 @change="updateTableData"
                 v-model="selectedOptionValue.selectedNamespaceOption"
-                placeholder="All"
+                :placeholder="t('common.all')"
                 style="width: 200px"
                 default-first-option
                 filterable
@@ -66,21 +66,21 @@
     </el-row>
     <el-row >
       <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="mt-10">
-        <el-table-column label="Id" width="80">
+        <el-table-column :label="t('common.id')" width="80">
           <template #default="scope">
             {{ scope.$index + 1  }}
           </template>
         </el-table-column>
 
-        <el-table-column sortable="custom" prop="namespace" label="Namespace"  width="180"></el-table-column>
+        <el-table-column sortable="custom" prop="namespace" :label="t('common.namespace')"  width="180"></el-table-column>
 
-        <el-table-column sortable="custom" prop="name" label="Name">
+        <el-table-column sortable="custom" prop="name" :label="t('common.name')">
           <template #default="scope">
             <!--          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedNetworkOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>-->
           </template>
         </el-table-column>
 
-        <el-table-column sortable="custom" prop="type" label="Type" width="140" >
+        <el-table-column sortable="custom" prop="type" :label="t('common.type')" width="140" >
           <template #default="scope" >
             <div class="flex flex-wrap gap-4 items-center" >
               <el-select
@@ -120,11 +120,11 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="Operation" width="140">
+        <el-table-column :label="t('common.operation')" width="140">
           <template #default="scope">
             <!--          <el-button size="small" type="primary" plain @click="handleSuspend(scope.row)">suspend</el-button>-->
             <!--          <el-button size="small" type="success" plain @click="handleActive(scope.$index,scope.row)">edit</el-button>-->
-            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
+            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">{{ t('common.delete') }}</el-button>
           </template>
         </el-table-column>
 
@@ -150,9 +150,9 @@
     <span>{{ dialogMessage }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button plain @click="dialogVisible = false">Cancel</el-button>
+        <el-button plain @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
         <el-button plain type="success" @click="dialogConfirmFuctionLast">
-          Confirm
+          {{ t('common.confirm') }}
         </el-button>
       </div>
     </template>
@@ -166,7 +166,8 @@ import {Coin, Postcard, Search} from "@element-plus/icons-vue";
 import {apiNamespaceList} from "@/services/namespace.js";
 import {useSelectedOptionValue} from "@/store/appsStore.js";
 import {apiServiceDelete, apiServiceList, apiServiceUpdate} from "@/services/service.js";
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const selectedOptionValue = useSelectedOptionValue()
 
 // const selectedNamespaceOptionValue = ref('')
@@ -384,7 +385,7 @@ const portInfoToStr = (portInfo)=>{
 
 const handleDelete = (row) => {
   dialogVisible.value = true
-  dialogTitle.value = "Tips"
+  dialogTitle.value = t("common.tips")
   dialogMessage.value = `Delete ${selectedOptionValue.selectedNetworkOption} '${row.name}'`
   dialogConfirmFuction.value = () => {
     if(selectedOptionValue.selectedNetworkOption === 'Service'){

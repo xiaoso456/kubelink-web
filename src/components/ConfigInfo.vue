@@ -32,7 +32,7 @@
         <el-input
             v-model="searchInput"
             style="max-width: 100%"
-            placeholder="Please input"
+            :placeholder="t('common.search-tip')"
             @change="updateTableData"
             clearable
         >
@@ -41,7 +41,7 @@
                 @click="refreshNamespaceOptions"
                 @change="updateTableData"
                 v-model="selectedOptionValue.selectedNamespaceOption"
-                placeholder="All"
+                :placeholder="t('common.all')"
                 style="width: 200px"
                 default-first-option
                 filterable
@@ -63,57 +63,55 @@
         </el-input>
       </el-col>
       <el-col :span="4">
-        <el-button @click="handleAddConfig">New</el-button>
+        <el-button @click="handleAddConfig">{{ t('common.new') }}</el-button>
       </el-col>
     </el-row>
 
 
     <el-row class="mt-10">
       <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" >
-        <el-table-column label="Id" width="80">
+        <el-table-column :label="t('common.id')" width="80">
           <template #default="scope">
             {{ scope.$index + 1  }}
           </template>
         </el-table-column>
 
-        <el-table-column sortable="custom" prop="namespace" label="Namespace"  width="180"></el-table-column>
+        <el-table-column sortable="custom" prop="namespace" :label="t('common.namespace')"  width="180"></el-table-column>
 
-        <el-table-column sortable="custom" prop="name" label="Name">
+        <el-table-column sortable="custom" prop="name" :label="t('common.name')">
           <template #default="scope">
             <el-link :href="`/#/config/namespace/${scope.row.namespace}/${selectedOptionValue.selectedConfigOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
           </template>
         </el-table-column>
 
-        <el-table-column  key="DataCount"  label="DataCount" >
+        <el-table-column  key="DataCount"  :label="t('common.data-count')" >
           <template #default="scope">
             {{ scope.row.data? Object.keys( scope.row.data).length :0 }}
           </template>
         </el-table-column>
 
-        <el-table-column  v-if="selectedOptionValue.selectedConfigOption === 'ConfigMap'" key="BinaryDataCount" label="BinaryDataCount"  >
+        <el-table-column  v-if="selectedOptionValue.selectedConfigOption === 'ConfigMap'" key="BinaryDataCount" :label="t('common.binary-data-size')"  >
           <template #default="scope">
             {{ scope.row.binaryData? Object.keys( scope.row.binaryData).length:0 }}
           </template>
         </el-table-column>
 
-
-
-        <el-table-column   v-if="selectedOptionValue.selectedConfigOption === 'Secret'"  key="StringDataCount"  label="StringDataCount"  >
+        <el-table-column   v-if="selectedOptionValue.selectedConfigOption === 'Secret'"  key="StringDataCount"  :label="t('common.string-data-count')"  >
           <template #default="scope">
             {{ scope.row.stringData? Object.keys( scope.row.stringData).length : 0 }}
           </template>
         </el-table-column>
 
-        <el-table-column sortable="custom" prop="creationTimestamp" label="createTime" >
+        <el-table-column sortable="custom" prop="creationTimestamp" :label="t('common.create-time')" >
           <template #default="scope">
             {{ formattedDate(scope.row.creationTimestamp) }}
           </template>
 
         </el-table-column>
 
-        <el-table-column fixed="right" label="Operation" width="140">
+        <el-table-column fixed="right" :label="t('common.operation')" width="140">
           <template #default="scope">
-            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">delete</el-button>
+            <el-button size="small" type="danger"  plain @click="handleDelete(scope.row)">{{ t('common.delete') }}</el-button>
           </template>
         </el-table-column>
 
@@ -155,16 +153,16 @@
   >
     <el-form class="none-box" :model="newConfig.config" label-width="auto" style="max-width: 78vw">
 
-      <el-form-item label="Name">
+      <el-form-item :label="t('common.name')">
         <el-input v-model="newConfig.config.metadata.name" />
       </el-form-item>
-      <el-form-item label="Namespace"  >
+      <el-form-item :label="t('common.namespace')"  >
 
         <el-select
             @click="refreshNamespaceOptions"
             @change="updateTableData"
             v-model="newConfig.config.metadata.namespace"
-            placeholder="All"
+            :placeholder="t('common.all')"
             default-first-option
             filterable
             allow-create
@@ -207,7 +205,8 @@ import {apiConfigmapCreate, apiConfigmapDelete, apiConfigmapList} from "@/servic
 import {formattedDate} from "@/services/common.js";
 import {apiSecretCreate, apiSecretDelete, apiSecretList} from "@/services/secret.js";
 import {configMapTemplateReader, secretTemplateReader} from "@/template/resourceTemplate.js";
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const selectedOptionValue = useSelectedOptionValue()
 
 // const selectedNamespaceOptionValue = ref('')
@@ -468,7 +467,7 @@ const handleAddConfig = ()=> {
       data: {},
       stringData: {},
     })
-    newConfig.value.dialogTitle = 'Create configmap'
+    newConfig.value.dialogTitle = t('config-page.create-configmap-title')
     newConfig.value.dialogConfirmFuction = ()=>{
       apiConfigmapCreate(newConfig.value.config.metadata.namespace, newConfig.value.config).then(async res => {
         if (res.status === 200 || res.status === 201) {
@@ -500,7 +499,7 @@ const handleAddConfig = ()=> {
       namespace: 'default',
       data: {},
     })
-    newConfig.value.dialogTitle = 'Create secret'
+    newConfig.value.dialogTitle = t('config-page.create-secret-title')
     newConfig.value.dialogConfirmFuction = ()=>{
       apiSecretCreate(newConfig.value.config.metadata.namespace, newConfig.value.config).then(async res => {
         if (res.status === 200 || res.status === 201) {

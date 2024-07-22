@@ -25,14 +25,12 @@
 
         <el-descriptions v-loading="baseInfoLoading"
                          class="margin-top"
-                         title="Base Info"
+                         :title="t('app-details-page.base-info')"
                          :column="3"
                          :size="size"
                          border
         >
           <template #extra>
-
-
 
           </template>
           <el-descriptions-item>
@@ -41,7 +39,7 @@
                 <el-icon :style="iconStyle">
                   <House />
                 </el-icon>
-                Namespace
+                {{ t('common.namespace') }}
               </div>
             </template>
             {{ appInfo.namespace }}
@@ -52,7 +50,7 @@
                 <el-icon :style="iconStyle">
                   <Document />
                 </el-icon>
-                Name
+                {{ t('common.name') }}
               </div>
             </template>
             {{ appInfo.name }}
@@ -63,7 +61,7 @@
                 <el-icon :style="iconStyle">
                   <PieChart />
                 </el-icon>
-                Replicas
+                {{ t('common.replicas') }}
               </div>
             </template>
             {{ appInfo.availableReplicas }}/{{ appInfo.replicas }}
@@ -74,7 +72,7 @@
                 <el-icon :style="iconStyle">
                   <Ticket />
                 </el-icon>
-                RestartPolicy
+                {{ t('common.restart-policy') }}
               </div>
             </template>
             {{ appInfo.restartPolicy }}
@@ -85,7 +83,7 @@
                 <el-icon :style="iconStyle">
                   <TrendCharts />
                 </el-icon>
-                Generation
+                {{ t('common.generation') }}
               </div>
             </template>
             {{ appInfo.generation }}
@@ -97,7 +95,8 @@
                 <el-icon :style="iconStyle">
                   <Calendar />
                 </el-icon>
-                CreatedTime
+                {{ t('common.create-time') }}
+
               </div>
             </template>
             {{ formattedDate(appInfo.createdTime) }}
@@ -113,7 +112,7 @@
       <el-row>
         <el-table style="margin-top: 10px" :data="tablePodData"  v-loading="tablePodsLoading">
 
-          <el-table-column sortable prop="name" label="Name" width="200">
+          <el-table-column sortable prop="name" :label="t('common.name')" width="200">
             <template #default="scope">
               <el-tooltip
                   effect="light"
@@ -122,9 +121,14 @@
               >
                 <template #content>
                   <el-table :data="scope.row.podInfo.containers" >
-                    <el-table-column prop="name" label="Name" min-width="240">
+                    <el-table-column prop="name" :label="t('common.name')" min-width="240">
                       <template #default="scopeContainer">
                         {{ scope.row.podInfo.containers[scopeContainer.$index].name }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column :label="t('common.pull-image-policy')" min-width="140">
+                      <template #default="scopeContainer">
+                        {{ scope.row.podInfo.containers[scopeContainer.$index].imagePullPolicy}}
                       </template>
                     </el-table-column>
                     <el-table-column  label="Started" >
@@ -146,12 +150,12 @@
 
                       </template>
                     </el-table-column>
-                    <el-table-column  label="RestartCount"  width="120">
+                    <el-table-column  :label="t('common.restart-count')"  width="120">
                       <template #default="scopeContainer">
                         {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].restartCount }}
                       </template>
                     </el-table-column>
-                    <el-table-column  label="StartedAt" width="180">
+                    <el-table-column  :label="t('common.started-at')" width="180">
                       <template #default="scopeContainer">
                         {{ formattedDate(
                             // todo use func instead
@@ -160,15 +164,15 @@
                         }}
                       </template>
                     </el-table-column>
-                    <el-table-column  label="Operation" width="180">
+                    <el-table-column  :label="t('common.operation')" width="180">
                       <template #default="scopeContainer">
                         <el-button size="small" type="success" plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/'+scope.row.podInfo.containers[scopeContainer.$index].name + '/Console')
-                        } ">Console</el-button>
+                        } ">{{ t('common.console') }}</el-button>
 
                         <el-button size="small" type="primary" plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/'+scope.row.podInfo.containers[scopeContainer.$index].name + '/Logs')
-                        } ">logs</el-button>
+                        } ">{{ t('common.logs') }}</el-button>
 
 
                       </template>
@@ -182,13 +186,13 @@
           </el-table-column>
 
 
-          <el-table-column sortable label="Node" >
+          <el-table-column sortable :label="t('common.node')" >
             <template #default="scope">
               {{ scope.row.nodeName  }}({{ scope.row.hostIP}})
             </template>
           </el-table-column>
 
-          <el-table-column sortable  label="Status" >
+          <el-table-column sortable  :label="t('common.status')" >
             <template #default="scope">
               <el-row  style="align-items: center">
                 <div :class="{'circle-green':   scope.row.status==='Running' , 'circle-yellow':   scope.row.status==='Pending' , 'circle-red':   scope.row.status==='Failed','circle-grey':   scope.row.status==='Succeeded'}">
@@ -205,30 +209,30 @@
             </template>
           </el-table-column>
 
-          <el-table-column sortable prop="restartTimes" label="RestartTimes" >
+          <el-table-column sortable prop="restartTimes" :label="t('common.restart-times')" >
 
           </el-table-column>
 
-          <el-table-column sortable label="CreatedTime" width="180">
+          <el-table-column sortable :label="t('common.created-time')" width="180">
             <template #default="scope">
               {{ formattedDate(scope.row.CreatedTime)  }}
             </template>
 
           </el-table-column>
 
-          <el-table-column  label="Operation" width="280">
+          <el-table-column  :label="t('common.operation')" width="280">
             <template #default="scope">
               <el-button size="small" type="success"
                          plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Console')
-                        } ">Console
+                        } ">{{ t('common.console') }}
               </el-button>
 
               <el-button size="small" type="primary" plain @click="()=>{
                           $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Logs')
-                        } ">logs
+                        } ">{{ t('common.logs') }}
               </el-button>
-              <el-button size="small" type="danger" plain @click="handleDeletePod(scope.row)">delete
+              <el-button size="small" type="danger" plain @click="handleDeletePod(scope.row)">{{ t('common.delete') }}
               </el-button>
 
             </template>
@@ -252,8 +256,8 @@
         />
       </el-scrollbar>
       <el-row style="max-width: 70vw" class="row-bg" justify="end">
-        <el-button size="default" type="info" plain @click="handleCancelSaveYaml">Cancel</el-button>
-        <el-button size="default" type="success" plain @click="saveAppYaml">Save</el-button>
+        <el-button size="default" type="info" plain @click="handleCancelSaveYaml">{{ t('common.cancel') }}</el-button>
+        <el-button size="default" type="success" plain @click="saveAppYaml">{{ t('common.save') }}</el-button>
       </el-row>
 
 
@@ -265,20 +269,20 @@
         <el-text class="el-descriptions__title">Container</el-text>
         <el-table  v-loading="baseInfoLoading" style="margin-top: 10px" :data="containerInfo">
 
-          <el-table-column label="Id" width="60">
+          <el-table-column :label="t('common.id')" width="60">
             <template #default="scope">
               {{ scope.$index+1  }}
             </template>
           </el-table-column>
 
-          <el-table-column sortable prop="name" label="Name" width="240">
+          <el-table-column sortable prop="name" :label="t('common.name')" width="240">
           </el-table-column>
 
 
-          <el-table-column sortable prop="image" label="image" width="360">
+          <el-table-column sortable prop="image" :label="t('common.image')" width="360">
           </el-table-column>
 
-          <el-table-column label="protocol" >
+          <el-table-column :label="t('common.protocol')" >
             <template #default="scope">
               <el-row v-for="(protocol,index) in scope.row.protocols">
                 {{ protocol }}
@@ -286,7 +290,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="portName" >
+          <el-table-column :label="t('app-details-page.port-name')" >
             <template #default="scope">
               <el-row v-for="(portName,index) in scope.row.portNames">
                 {{ portName }}
@@ -296,7 +300,7 @@
 
 
 
-          <el-table-column label="containerPorts" >
+          <el-table-column :label="t('app-details-page.container-ports')" >
             <template #default="scope">
               <el-row v-for="(containerPort,index) in scope.row.containerPorts">
                 {{ containerPort }}
@@ -312,26 +316,26 @@
 
         <el-table  v-loading="tableServiceLoading" style="margin-top: 10px" :data="appServiceInfo">
 
-          <el-table-column label="Id" width="60">
+          <el-table-column :label="t('common.id')" width="60">
             <template #default="scope">
               {{ scope.$index+1  }}
             </template>
           </el-table-column>
 
-          <el-table-column sortable prop="name" label="Name" width="120">
+          <el-table-column sortable prop="name" :label="t('common.name')" width="120">
           </el-table-column>
 
 
-          <el-table-column sortable prop="namespace" label="namespace" width="160">
+          <el-table-column sortable prop="namespace" :label="t('common.namespace')" width="160">
           </el-table-column>
 
-          <el-table-column sortable prop="type" label="type" width="120">
+          <el-table-column sortable prop="type" :label="t('common.type')" width="120">
           </el-table-column>
 
           <el-table-column sortable prop="clusterIP" label="clusterIP" >
           </el-table-column>
 
-          <el-table-column label="mapping" >
+          <el-table-column :label="t('common.mapping')" >
             <template #default="scope">
               <el-row v-for="(item,index) in scope.row.ports">
                 {{ portInfoToStr(item) }}
@@ -341,7 +345,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column sortable prop="createdTime" label="createdTime" >
+          <el-table-column sortable prop="createdTime" :label="t('common.create-time')" >
             <template #default="scope">
               {{ formattedDate(scope.row.createdTime)  }}
             </template>
@@ -361,26 +365,26 @@
 
         <el-table style="margin-top: 10px" :data="appInfo.conditions">
 
-          <el-table-column label="Id" width="60">
+          <el-table-column :label="t('common.id')" width="60">
             <template #default="scope">
               {{ scope.$index+1  }}
             </template>
           </el-table-column>
 
-          <el-table-column sortable prop="type" label="Type" width="120">
+          <el-table-column sortable prop="type" :label="t('common.type')" width="120">
           </el-table-column>
 
 
-          <el-table-column sortable prop="status" label="status" width="100">
+          <el-table-column sortable prop="status" :label="t('common.status')" width="100">
           </el-table-column>
 
-          <el-table-column sortable prop="reason" label="reason" >
+          <el-table-column sortable prop="reason" :label="t('common.reason')" >
           </el-table-column>
 
-          <el-table-column sortable prop="message" label="message" >
+          <el-table-column sortable prop="message" :label="t('common.message')" >
           </el-table-column>
 
-          <el-table-column sortable prop="lastUpdateTime" label="lastUpdateTime" >
+          <el-table-column sortable prop="lastUpdateTime" :label="t('common.last-update-time')" >
             <template #default="scope">
               {{ formattedDate(scope.row.lastUpdateTime)  }}
             </template>
@@ -403,9 +407,9 @@
     <span>{{ dialogMessage }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button plain @click="dialogVisible = false">Cancel</el-button>
+        <el-button plain @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
         <el-button plain type="success" @click="dialogConfirmFuctionLast">
-          Confirm
+          {{ t('common.confirm') }}
         </el-button>
       </div>
     </template>
@@ -445,7 +449,8 @@ import {apiJobGet, apiJobPodList, apiJobServiceList, apiJobYamlGet, apiJobYamlUp
 import {apiPodDelete} from "@/services/pod.js";
 import {useDark} from "@vueuse/core";
 import {formattedDate} from "../services/common.js";
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]

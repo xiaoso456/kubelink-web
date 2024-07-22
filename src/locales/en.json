@@ -1,16 +1,106 @@
 {
     "common": {
-        "search-tip": "Please enter a keyword for search",
-        "add-item": "Add Item"
-    },
-    "sidebar":{
-        "cluster": "Cluster",
+        "search-tip": "Enter search keyword",
+        "add-item": "Add",
+        "import": "Import",
+        "export": "Export",
+        "connect": "Test Connection",
+        "edit": "Edit",
+        "active": "Active",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "console": "Console",
+        "logs": "Logs",
         "sync": "Sync",
-        "apps": "Apps",
+        "sync-type": "Sync Type",
+        "content": "Content",
+        "source-file": "Source File/Folder",
+        "target-file": "Target File/Folder",
+        "enable": "Enable",
+        "id": "ID",
+        "namespace": "Namespace",
+        "pod": "Pod",
+        "container": "Container",
+        "name": "Name",
+        "config": "Config",
+        "all": "All",
+        "status": "Status",
+        "operation": "Operation",
+        "suspend": "Suspend",
+        "tips": "Tips",
+        "type": "Type",
+        "mapping": "Mapping",
+        "refresh-tooltip": "Refresh every ten seconds",
+        "data-count": "DataCount",
+        "binary-data-count": "BinaryDataCount",
+        "binary-data-size": "BinaryDataSize",
+        "string-data-count": "StringDataCount",
+        "create-time": "CreateTime",
+        "new": "New",
+        "template": "Template",
+        "description": "Description",
+        "vars": "Variables",
+        "preview": "Preview",
+        "copy": "Copy",
+        "share": "Share",
+        "detail": "Detail",
+        "create": "Create",
+        "Create": "Create",
+        "Update": "Update",
+        "download": "Download",
+        "network": "Network",
+        "condition": "Condition",
+        "replicas": "Replicas",
+        "restart-policy": "Restart Policy",
+        "generation": "Generation",
+        "node": "Node",
+        "protocol": "Protocol",
+        "image": "Image",
+        "restart-count": "RestartCount",
+        "started-at": "StartedAt",
+        "restart-times": "RestartTimes",
+        "created-time": "CreatedTime",
+        "reason": "Reason",
+        "message": "Message",
+        "last-update-time": "LastUpdateTime",
+        "pull-image-policy": "PullImagePolicy",
+        "execute": "Execute",
+        "refresh": "Refresh"
+    },
+    "sidebar": {
+        "cluster": "Cluster Config",
+        "sync": "Sync",
+        "apps": "App",
         "network": "Network",
         "config": "Config",
         "template": "Template",
         "fold": "Fold",
         "extend": "Extend"
+    },
+    "cluster-page": {
+        "edit-cluster-title": "Cluster Config",
+        "export-cluster-title": "Cluster Config"
+    },
+    "sync-page": {
+        "edit-sync-title": "Sync Config",
+        "export-sync-title": "Sync Config"
+    },
+    "config-page": {
+        "create-configmap-title": "Create ConfigMap",
+        "create-secret-title": "Create Secret"
+    },
+    "app-details-page": {
+        "base-info": "Basic Information",
+        "container-ports": "Container Ports",
+        "port-name": "Port Name"
+    },
+    "xterm-page": {
+        "tail-lines-tooltip": "Tail Lines",
+        "highlight-limit-tooltip": "Highlight Line Limit: "
+    },
+    "text-template-page": {
+        "add-or-edit-template-tooltip": "Implemented based on Handlebars.js, {{ key1 }} or {{{ key1 }}} represents variable key1"
     }
 }

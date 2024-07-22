@@ -219,7 +219,8 @@ import {
   apiConfigmapYamlUpdate
 } from "@/services/configmap.js";
 import {apiSecretGet, apiSecretUpdate, apiSecretYamlGet, apiSecretYamlUpdate} from "@/services/secret.js";
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]

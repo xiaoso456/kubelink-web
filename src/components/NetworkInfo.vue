@@ -31,7 +31,7 @@
         <el-input
             class="mt-4"
             v-model="searchInput"
-            placeholder="Please input"
+            :placeholder="t('common.search-tip')"
             @change="updateTableData"
             clearable
         >
@@ -68,7 +68,8 @@
       <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)" class="mt-10">
         <el-table-column :label="t('common.id')" width="80">
           <template #default="scope">
-            {{ scope.$index + 1  }}
+            {{ (pageCurrent - 1 ) * pageSize + (scope.$index + 1) }}
+
           </template>
         </el-table-column>
 
@@ -110,7 +111,7 @@
         <el-table-column sortable="custom" prop="clusterIP" label="ClusterIP"  >
         </el-table-column>
 
-        <el-table-column label="mapping" width="280">
+        <el-table-column :label="t('common.mapping')" width="280">
           <template #default="scope">
             <el-row v-for="(item,index) in scope.row.ports">
               {{ portInfoToStr(item) }}

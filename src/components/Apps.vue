@@ -66,7 +66,8 @@
       <el-table @sort-change="tableSort"  v-loading="tableLoading" height="75vh" :data="filterTableData.slice((pageCurrent - 1) * pageSize, pageCurrent * pageSize)">
         <el-table-column :label="t('common.id')" width="80"   >
           <template #default="scope">
-            {{ scope.$index + 1  }}
+            {{ (pageCurrent - 1 ) * pageSize + (scope.$index + 1) }}
+
           </template>
         </el-table-column>
 

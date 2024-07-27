@@ -131,6 +131,11 @@
                         {{ scope.row.podInfo.containers[scopeContainer.$index].imagePullPolicy}}
                       </template>
                     </el-table-column>
+                    <el-table-column show-overflow-tooltip :label="t('common.image')" min-width="140">
+                      <template #default="scopeContainer">
+                        {{ scope.row.podInfo.containers[scopeContainer.$index].image}}
+                      </template>
+                    </el-table-column>
                     <el-table-column  label="Started" >
                       <template #default="scopeContainer">
                         <el-row style="align-items: center">
@@ -361,7 +366,7 @@
 
       <el-row>
 
-        <el-text class="el-descriptions__title">{{route.params.appType}}</el-text>
+        <el-text class="el-descriptions__title">Condition</el-text>
 
         <el-table style="margin-top: 10px" :data="appInfo.conditions">
 

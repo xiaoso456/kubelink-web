@@ -67,7 +67,9 @@
         "last-update-time": "LastUpdateTime",
         "pull-image-policy": "PullImagePolicy",
         "execute": "Execute",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "kind": "kind",
+        "data": "data"
     },
     "sidebar": {
         "cluster": "Cluster Config",
@@ -102,5 +104,8 @@
     },
     "text-template-page": {
         "add-or-edit-template-tooltip": "Implemented based on Handlebars.js, {{ key1 }} or {{{ key1 }}} represents variable key1"
+    },
+    "config-detail-page": {
+        "base-info": "Basic Information"
     }
 }

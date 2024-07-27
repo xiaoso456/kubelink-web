@@ -25,7 +25,7 @@
 
         <el-descriptions v-loading="baseInfoLoading"
                          class="margin-top"
-                         title="Base Info"
+                         :title="t('config-detail-page.base-info')"
                          :column="2"
                          :size="size"
                          border
@@ -39,7 +39,7 @@
                 <el-icon :style="iconStyle">
                   <House />
                 </el-icon>
-                Namespace
+                {{ t('common.namespace') }}
               </div>
             </template>
             {{ configInfo.namespace }}
@@ -50,7 +50,7 @@
                 <el-icon :style="iconStyle">
                   <Document />
                 </el-icon>
-                Name
+                {{ t('common.name') }}
               </div>
             </template>
             {{ configInfo.name }}
@@ -61,7 +61,7 @@
                 <el-icon :style="iconStyle">
                   <PieChart />
                 </el-icon>
-                Kind
+                {{ t('common.kind') }}
               </div>
             </template>
             {{ configInfo.kind }}
@@ -74,7 +74,7 @@
                 <el-icon :style="iconStyle">
                   <Calendar />
                 </el-icon>
-                CreatedTime
+                {{ t('common.created-time') }}
               </div>
             </template>
             {{ formattedDate(configInfo.createdTime) }}
@@ -85,7 +85,7 @@
 
       </el-row>
       <el-row>
-        <el-text class="el-descriptions__title">Data</el-text>
+        <el-text class="el-descriptions__title">{{ t('common.data') }}</el-text>
       </el-row>
       <el-row>
         <el-table style="margin-top: 10px" :data="tableConfigData" v-loading="tableDatasLoading">
@@ -122,7 +122,7 @@
 
 
         </el-table>
-        <el-button class="mt-4 common-margin"  style="width: 100%;margin-top: 10px" @click="handleAddItemData">Add Item</el-button>
+        <el-button class="mt-4 common-margin"  style="width: 100%;margin-top: 10px" @click="handleAddItemData">{{ t('common.add-item') }}</el-button>
 
       </el-row>
 
@@ -142,8 +142,8 @@
         />
       </el-scrollbar>
       <el-row style="max-width: 70vw" class="row-bg" justify="end">
-        <el-button size="default" type="info" plain @click="handleCancelSaveYaml">Cancel</el-button>
-        <el-button size="default" type="success" plain @click="saveAppYaml">Save</el-button>
+        <el-button size="default" type="info" plain @click="handleCancelSaveYaml">{{ t('common.cancel') }}</el-button>
+        <el-button size="default" type="success" plain @click="saveAppYaml">{{ t('common.save') }}</el-button>
       </el-row>
 
 
@@ -162,9 +162,9 @@
     <span>{{ dialogMessage }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button plain @click="dialogVisible = false">Cancel</el-button>
+        <el-button plain @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
         <el-button plain type="success" @click="dialogConfirmFuctionLast">
-          Confirm
+          {{ t('common.confirm') }}
         </el-button>
       </div>
     </template>
@@ -572,11 +572,12 @@ const handleSaveData = async () => {
     wait = apiConfigmapUpdate(route.params.namespace, route.params.configName, configRaw.value).then(async res => {
 
       if (res.status === 200) {
+        refreshData()
         ElMessage({
           message: "update configmap success",
           type: 'success'
         })
-        refreshData()
+
 
       } else {
         let errorMessage = await res.text()
@@ -621,7 +622,9 @@ const handleDeleteConfigData = (row) => {
   dialogConfirmFuction.value = async () => {
     delete configRaw.value.data[row.name]
     await handleSaveData()
-    refreshData()
+    setTimeout(() => {
+      refreshData()
+    }, 500)
 
   }
 }

@@ -145,7 +145,7 @@
                 </el-table>
 
                 <el-divider  content-position="left" >{{ t('common.preview') }}</el-divider>
-                <el-input  v-model="templateContentPreview" autosize type="textarea" />
+                <el-input  v-model="templateContentPreview" :autosize="{ minRows: 2, maxRows: 26 }" type="textarea" />
 
               </el-form>
 

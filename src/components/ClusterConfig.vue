@@ -77,7 +77,7 @@
         <el-input v-model="editRowInfo.name" />
       </el-form-item>
       <el-form-item :label="t('common.content')"  >
-        <el-input v-model="editRowInfo.config" autosize type="textarea" />
+        <el-input v-model="editRowInfo.config" :autosize="{ minRows: 2, maxRows: 26 }" type="textarea" />
       </el-form-item>
 
     </el-form>

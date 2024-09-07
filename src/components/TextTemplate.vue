@@ -125,10 +125,10 @@
         <el-input v-model="templateForm.type" />
       </el-form-item>
       <el-form-item :label="t('common.content')"  >
-        <el-input v-model="templateForm.content" autosize type="textarea" />
+        <el-input v-model="templateForm.content" :autosize="{ minRows: 2, maxRows: 26 }" type="textarea" />
       </el-form-item>
       <el-form-item :label="t('common.description')"  >
-        <el-input v-model="templateForm.description" autosize type="textarea" />
+        <el-input v-model="templateForm.description" :autosize="{ minRows: 2, maxRows: 26 }" type="textarea" />
       </el-form-item>
 
 
@@ -164,7 +164,7 @@
 
 
       <el-divider  content-position="left" >{{ t('common.preview') }}</el-divider>
-      <el-input readonly v-model="templateContentPreview" autosize type="textarea" />
+      <el-input readonly v-model="templateContentPreview" :autosize="{ minRows: 2, maxRows: 26 }" type="textarea" />
     </el-form>
     <template #footer>
       <div class="dialog-footer">

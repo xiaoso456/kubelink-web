@@ -90,14 +90,14 @@
       <el-row>
         <el-table style="margin-top: 10px" :data="tableConfigData" v-loading="tableDatasLoading">
 
-          <el-table-column sortable prop="name" label="Name" width="240">
+          <el-table-column sortable prop="name" :label="t('common.name')" width="240">
             <template #default="scope">
                 {{ scope.row.name }}
             </template>
           </el-table-column>
 
 
-          <el-table-column sortable prop="data" label="Data" >
+          <el-table-column sortable prop="data" :label="t('common.data')" >
             <template #default="scope">
               <el-text style="width: 100%" :line-clamp="2" >
                 {{ route.params.configType === 'ConfigMap'? scope.row.data: '' }}
@@ -107,14 +107,14 @@
             </template>
           </el-table-column>
 
-          <el-table-column  label="Operation" width="280">
+          <el-table-column  :label="t('common.operation')" width="280">
             <template #default="scope">
               <el-button size="small" type="success"
-                         plain @click="handleEditData(scope.row)">edit
+                         plain @click="handleEditData(scope.row)">{{ t('common.edit') }}
               </el-button>
 
 
-              <el-button size="small" type="danger" plain @click="handleDeleteConfigData(scope.row)">delete
+              <el-button size="small" type="danger" plain @click="handleDeleteConfigData(scope.row)">{{ t('common.delete') }}
               </el-button>
 
             </template>
@@ -173,7 +173,7 @@
   <el-dialog
       class="none-box"
       v-model="editMode"
-      title="Data"
+      :title="t('common.data')"
       width="80vw"
   >
     <el-form :model="configRaw" label-width="auto" style="max-width: 78vw">
@@ -182,16 +182,16 @@
         <el-input readonly v-model="editRowName" />
       </el-form-item>
       <el-form-item label="Value"  >
-        <el-input v-model="editRowDecodedText" autosize type="textarea" />
+        <el-input v-model="editRowDecodedText" :autosize="{ minRows: 2, maxRows: 26 }" type="textarea" />
       </el-form-item>
 
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button  text @click="editMode = false;refreshData()">Cancel</el-button>
+        <el-button  text @click="editMode = false;refreshData()">{{ t('common.cancel') }}</el-button>
 
         <el-button-group style="margin-left: 20px">
-          <el-button  text @click="handleSaveData" type="success">Save</el-button>
+          <el-button  text @click="handleSaveData" type="success">{{ t('common.save') }}</el-button>
         </el-button-group>
 
 <!--        <el-button style="margin-left: 20px" text @click="handleDelete(editRowInfo);editMode=false" type="danger" >Delete</el-button>-->

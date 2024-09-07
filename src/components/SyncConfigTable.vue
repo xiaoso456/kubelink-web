@@ -284,11 +284,11 @@
       </el-form-item>
 
       <el-form-item :label="t('common.source-file')">
-        <el-input v-model="editRowInfo.source" type="textarea" autosize />
+        <el-input v-model="editRowInfo.source" type="textarea" :autosize="{ minRows: 2, maxRows: 26 }" />
       </el-form-item>
 
       <el-form-item :label="t('common.target-file')">
-        <el-input v-model="editRowInfo.target" type="textarea" autosize />
+        <el-input v-model="editRowInfo.target" type="textarea" :autosize="{ minRows: 2, maxRows: 26 }" />
       </el-form-item>
 
     </el-form>

@@ -105,7 +105,7 @@
         "highlight-limit-tooltip": "高亮行数限制: "
     },
     "text-template-page": {
-        "add-or-edit-template-tooltip": "基于Handlebars.js实现,  {{ key1 }} 或 {{{ key1 }}} 代表变量 key1"
+        "add-or-edit-template-tooltip": "基于Handlebars.js实现"
     },
     "config-detail-page": {
         "base-info": "基本信息"

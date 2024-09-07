@@ -103,7 +103,7 @@
         "highlight-limit-tooltip": "Highlight Line Limit: "
     },
     "text-template-page": {
-        "add-or-edit-template-tooltip": "Implemented based on Handlebars.js, {{ key1 }} or {{{ key1 }}} represents variable key1"
+        "add-or-edit-template-tooltip": "Implemented based on Handlebars.js"
     },
     "config-detail-page": {
         "base-info": "Basic Information"

@@ -18,6 +18,21 @@ export function apiServiceGet(namespace,service){
     })
 }
 
+export function apiServiceYamlGet(namespace,service){
+
+    return fetch(`${prefix}/namespace/${namespace}/service/${service}/yaml`, {
+        method: 'GET'
+    })
+}
+
+export function apiServiceYamlUpdate(namespace,service,yaml){
+
+    return fetch(`${prefix}/namespace/${namespace}/service/${service}/yaml`, {
+        method: 'PUT',
+        body: yaml
+    })
+}
+
 export function apiServiceDelete(namespace,service){
 
     return fetch(`${prefix}/namespace/${namespace}/service/${service}`, {

@@ -18,6 +18,7 @@ import AppDetails from "@/components/AppDetails.vue";
 import NetworkInfo from "@/components/NetworkInfo.vue";
 import ConfigInfo from "@/components/ConfigInfo.vue";
 import ConfigDetails from "@/components/ConfigDetails.vue";
+import NetworkDetails from "@/components/NetworkDetails.vue";
 
 import i18n from '@/locales/i18nconfig.js'
 
@@ -35,6 +36,7 @@ const router = VueRouter.createRouter({
         {path: '/template',component: TextTemplate},
         {path: '/app/namespace/:namespace/:appType/:appName', component: AppDetails},
         {path: '/config/namespace/:namespace/:configType/:configName', component: ConfigDetails},
+        {path: '/network/namespace/:namespace/:service', component: NetworkDetails},
         {path: '/pod/namespace/:namespace/pod/:pod/container/:container/:action',component: XtermDiv},
         {path: '/:pathMatch(.*)*', redirect: '/'},
 

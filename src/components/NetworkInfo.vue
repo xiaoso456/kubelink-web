@@ -77,7 +77,7 @@
 
         <el-table-column sortable="custom" prop="name" :label="t('common.name')">
           <template #default="scope">
-            <!--          <el-link :href="`/#/app/namespace/${scope.row.namespace}/${selectedOptionValue.selectedNetworkOption}/${scope.row.name}`" >{{ scope.row.name }}</el-link>-->
+            <el-link :href="`/#/network/namespace/${scope.row.namespace}/${scope.row.name}`" >{{ scope.row.name }}</el-link>
           </template>
         </el-table-column>
 

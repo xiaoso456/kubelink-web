@@ -69,7 +69,8 @@
         "execute": "Execute",
         "refresh": "Refresh",
         "kind": "kind",
-        "data": "data"
+        "data": "data",
+        "cluster-ip": "clusterIP"
     },
     "sidebar": {
         "cluster": "Cluster Config",

@@ -69,7 +69,8 @@
         "execute": "执行",
         "refresh": "刷新",
         "kind": "类型",
-        "data": "数据"
+        "data": "数据",
+        "cluster-ip": "clusterIP"
     },
     "sidebar":{
         "cluster": "集群配置",

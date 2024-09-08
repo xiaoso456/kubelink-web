@@ -11,7 +11,6 @@ if (lsLocale) {
   currentLanguage = JSON.parse(lsLocale)?.locale
 }
 
-console.log("ls:",lsLocale)
 export default createI18n({
     locale: currentLanguage,
     legacy: false, // 修复组件引入i18n时vite脚手架报错的问题

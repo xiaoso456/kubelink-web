@@ -18,6 +18,12 @@ export function apiServiceGet(namespace,service){
     })
 }
 
+export function apiServicePods(namespace,service){
+    return fetch(`${prefix}/namespace/${namespace}/service/${service}/pod`, {
+        method: 'GET'
+    })
+}
+
 export function apiServiceYamlGet(namespace,service){
 
     return fetch(`${prefix}/namespace/${namespace}/service/${service}/yaml`, {

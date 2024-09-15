@@ -635,12 +635,16 @@ const refreshData = () => {
   updateAppYaml()
 }
 
-setInterval(() => {
+const timer =setInterval(() => {
   if(isAutoRefresh.value){
     refreshData()
   }
 
 }, 10000)
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
 
 
 onMounted(() => {

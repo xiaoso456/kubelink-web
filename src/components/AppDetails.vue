@@ -109,142 +109,9 @@
       <el-row>
           <el-text class="el-descriptions__title">Pods</el-text>
       </el-row>
-      <el-row>
-        <el-table style="margin-top: 10px" :data="tablePodData"  v-loading="tablePodsLoading">
-
-          <el-table-column sortable prop="name" :label="t('common.name')" width="200">
-            <template #default="scope">
-              <el-tooltip
-                  effect="light"
-                  content="Top Left prompts info"
-                  placement="top-start"
-              >
-                <template #content>
-                  <el-table :data="scope.row.podInfo.containers" >
-                    <el-table-column prop="name" :label="t('common.name')" min-width="240">
-                      <template #default="scopeContainer">
-                        {{ scope.row.podInfo.containers[scopeContainer.$index].name }}
-                      </template>
-                    </el-table-column>
-                    <el-table-column :label="t('common.pull-image-policy')" min-width="140">
-                      <template #default="scopeContainer">
-                        {{ scope.row.podInfo.containers[scopeContainer.$index].imagePullPolicy}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column show-overflow-tooltip :label="t('common.image')" min-width="140">
-                      <template #default="scopeContainer">
-                        {{ scope.row.podInfo.containers[scopeContainer.$index].image}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column  label="Started" >
-                      <template #default="scopeContainer">
-                        <el-row style="align-items: center">
-                          <div :class="scope.row.podInfo.containerStatuses[scopeContainer.$index].started?'circle-green':'circle-red'"></div>
-                          {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].started }}
-
-                        </el-row>
-                      </template>
-                    </el-table-column>
-                    <el-table-column  label="Ready" >
-                      <template #default="scopeContainer">
-                        <el-row style="align-items: center">
-                          <div :class="scope.row.podInfo.containerStatuses[scopeContainer.$index].ready?'circle-green':'circle-red'"></div>
-
-                          {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].ready }}
-                        </el-row>
-
-                      </template>
-                    </el-table-column>
-                    <el-table-column  :label="t('common.restart-count')"  width="120">
-                      <template #default="scopeContainer">
-                        {{ scope.row.podInfo.containerStatuses[scopeContainer.$index].restartCount }}
-                      </template>
-                    </el-table-column>
-                    <el-table-column  :label="t('common.started-at')" width="180">
-                      <template #default="scopeContainer">
-                        {{ formattedDate(
-                            // todo use func instead
-                            scope.row.podInfo.containerStatuses[scopeContainer.$index].state.running?scope.row.podInfo.containerStatuses[scopeContainer.$index].state.running.startedAt:''
-                          )
-                        }}
-                      </template>
-                    </el-table-column>
-                    <el-table-column  :label="t('common.operation')" width="180">
-                      <template #default="scopeContainer">
-                        <el-button size="small" type="success" plain @click="()=>{
-                          $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/'+scope.row.podInfo.containers[scopeContainer.$index].name + '/Console')
-                        } ">{{ t('common.console') }}</el-button>
-
-                        <el-button size="small" type="primary" plain @click="()=>{
-                          $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/'+scope.row.podInfo.containers[scopeContainer.$index].name + '/Logs')
-                        } ">{{ t('common.logs') }}</el-button>
+      <pods-table style="margin-top: 10px" :table-pods-loading="tablePodsLoading" :table-pods-data="tablePodDataRaw"></pods-table>
 
 
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </template>
-
-                {{ scope.row.name }}
-              </el-tooltip>
-            </template>
-          </el-table-column>
-
-
-          <el-table-column sortable :label="t('common.node')" >
-            <template #default="scope">
-              {{ scope.row.nodeName  }}({{ scope.row.hostIP}})
-            </template>
-          </el-table-column>
-
-          <el-table-column sortable  :label="t('common.status')" >
-            <template #default="scope">
-              <el-row  style="align-items: center">
-                <div :class="{'circle-green':   scope.row.status==='Running' , 'circle-yellow':   scope.row.status==='Pending' , 'circle-red':   scope.row.status==='Failed','circle-grey':   scope.row.status==='Succeeded'}">
-                </div>
-                {{ scope.row.status  }}
-              </el-row>
-            </template>
-          </el-table-column>
-
-          <el-table-column sortable prop="podIP" label="PodIP" >
-            <template #default="scope">
-
-              {{ scope.row.podInfo.podIP  }}
-            </template>
-          </el-table-column>
-
-          <el-table-column sortable prop="restartTimes" :label="t('common.restart-times')" >
-
-          </el-table-column>
-
-          <el-table-column sortable :label="t('common.created-time')" width="180">
-            <template #default="scope">
-              {{ formattedDate(scope.row.CreatedTime)  }}
-            </template>
-
-          </el-table-column>
-
-          <el-table-column  :label="t('common.operation')" width="280">
-            <template #default="scope">
-              <el-button size="small" type="success"
-                         plain @click="()=>{
-                          $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Console')
-                        } ">{{ t('common.console') }}
-              </el-button>
-
-              <el-button size="small" type="primary" plain @click="()=>{
-                          $router.push('/pod/namespace/'+appInfo.namespace+'/pod/'+scope.row.podInfo.podName+'/container/_null/Logs')
-                        } ">{{ t('common.logs') }}
-              </el-button>
-              <el-button size="small" type="danger" plain @click="handleDeletePod(scope.row)">{{ t('common.delete') }}
-              </el-button>
-
-            </template>
-          </el-table-column>
-        </el-table>
-
-      </el-row>
     </div>
     <div v-if="selectedOption==='Yaml'">
 
@@ -520,167 +387,7 @@ const blockMargin = computed(() => {
   }
 })
 
-const item = {
-  name: 'remote-k8s',
-  nodeName: 'node1',
-  hostIP: '127.0.0.1',
-  status: 'Running',
-  podInfo:{
-    podName: 'remote-k8s',
-    podIP: '127.0.0.1',
-    containers: [
-      {
-        "env": [
-          {
-            "name": "BITNAMI_DEBUG",
-            "value": "false"
-          },
-          {
-            "name": "KIBANA_PORT_NUMBER",
-            "value": "5601"
-          },
-          {
-            "name": "KIBANA_ELASTICSEARCH_URL",
-            "value": "http://my-elasticsearch:9200"
-          },
-          {
-            "name": "KIBANA_ELASTICSEARCH_PORT_NUMBER",
-            "value": "9200"
-          },
-          {
-            "name": "KIBANA_FORCE_INITSCRIPTS",
-            "value": "false"
-          },
-          {
-            "name": "KIBANA_SERVER_ENABLE_TLS",
-            "value": "false"
-          },
-          {
-            "name": "KIBANA_ELASTICSEARCH_ENABLE_TLS",
-            "value": "false"
-          },
-          {
-            "name": "KIBANA_ELASTICSEARCH_TLS_USE_PEM",
-            "value": "false"
-          },
-          {
-            "name": "KIBANA_ELASTICSEARCH_TLS_VERIFICATION_MODE",
-            "value": "full"
-          }
-        ],
-        "image": "docker.io/bitnami/kibana:8.11.4-debian-11-r0",
-        "imagePullPolicy": "IfNotPresent",
-        "livenessProbe": {
-          "failureThreshold": 6,
-          "httpGet": {
-            "path": "/login",
-            "port": null,
-            "scheme": "HTTP"
-          },
-          "initialDelaySeconds": 120,
-          "periodSeconds": 10,
-          "successThreshold": 1,
-          "timeoutSeconds": 5
-        },
-        "name": "kibana",
-        "ports": [
-          {
-            "containerPort": 5601,
-            "name": "http",
-            "protocol": "TCP"
-          }
-        ],
-        "readinessProbe": {
-          "failureThreshold": 6,
-          "httpGet": {
-            "path": "/status",
-            "port": null,
-            "scheme": "HTTP"
-          },
-          "initialDelaySeconds": 30,
-          "periodSeconds": 10,
-          "successThreshold": 1,
-          "timeoutSeconds": 5
-        },
-        "resources": {
-          "limits": {},
-          "requests": {}
-        },
-        "securityContext": {
-          "allowPrivilegeEscalation": false,
-          "capabilities": {
-            "drop": [
-              "ALL"
-            ]
-          },
-          "privileged": false,
-          "readOnlyRootFilesystem": false,
-          "runAsNonRoot": true,
-          "runAsUser": 1001,
-          "seLinuxOptions": {},
-          "seccompProfile": {
-            "type": "RuntimeDefault"
-          }
-        },
-        "terminationMessagePath": "/dev/termination-log",
-        "terminationMessagePolicy": "File",
-        "volumeMounts": [
-          {
-            "mountPath": "/bitnami/kibana",
-            "name": "kibana-data"
-          },
-          {
-            "mountPath": "/bitnami/kibana/conf",
-            "name": "kibana-config"
-          }
-        ]
-      }
-    ],
-    containerStatuses: [
-      {
-        "allocatedResources": {},
-        "containerID": "docker://99fe92234f9b5bcd2c89568570304e79102b20035eb214b8ef157f2731c4b572",
-        "image": "bitnami/kibana:8.11.4-debian-11-r0",
-        "imageID": "docker-pullable://bitnami/kibana@sha256:fc2b13b68ff40c857c7659cc9b9e18c54b08e42fc43421e9cf9b653e22472f8c",
-        "lastState": {},
-        "name": "kibana",
-        "ready": true,
-        "restartCount": 0,
-        "started": true,
-        "state": {
-          "running": {
-            "startedAt": "2024-05-02T13:27:00Z"
-          }
-        }
-      }
-    ],
-    conditions: [
-      {
-        "lastTransitionTime": "2024-05-02T13:26:59Z",
-        "status": "True",
-        "type": "Initialized"
-      },
-      {
-        "lastTransitionTime": "2024-05-02T13:27:49Z",
-        "status": "True",
-        "type": "Ready"
-      },
-      {
-        "lastTransitionTime": "2024-05-02T13:27:49Z",
-        "status": "True",
-        "type": "ContainersReady"
-      },
-      {
-        "lastTransitionTime": "2024-05-02T13:26:59Z",
-        "status": "True",
-        "type": "PodScheduled"
-      }
-    ],
-  },
-  restartTimes: 0,
-  createdTime: '2024-01-01T00:00:00Z'
-}
-const tablePodData = ref(Array.from({ length: 1 }).fill(item))
+const tablePodDataRaw = ref([])
 
 const appServiceInfoRaw = ref([])
 const appServiceInfo = computed(()=>{
@@ -920,24 +627,7 @@ const updateTablePodData = async () => {
   if (route.params.appType === 'Deployment') {
     wait = apiDeploymentPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
-      tablePodData.value = resData.map(item => {
-        return {
-          name: item.metadata.name,
-          nodeName: item.spec.nodeName,
-          hostIP: item.status.hostIP,
-          status: item.status.phase,
-          podInfo: {
-            podName: item.metadata.name,
-            podIP: item.status.podIP,
-            containers: item.spec.containers,
-            containerStatuses: item.status.containerStatuses,
-            conditions: item.status.conditions
-          },
-          createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
-
-        }
-      })
+      tablePodDataRaw.value = resData
 
     }).catch(err => {
       ElMessage({
@@ -949,24 +639,8 @@ const updateTablePodData = async () => {
   } else if (route.params.appType === 'Statefulset') {
     wait = apiStatefulsetPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
-      tablePodData.value = resData.map(item => {
-        return {
-          name: item.metadata.name,
-          nodeName: item.spec.nodeName,
-          hostIP: item.status.hostIP,
-          status: item.status.phase,
-          podInfo: {
-            podName: item.metadata.name,
-            podIP: item.status.podIP,
-            containers: item.spec.containers,
-            containerStatuses: item.status.containerStatuses,
-            conditions: item.status.conditions
-          },
-          createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
+      tablePodDataRaw.value = resData
 
-        }
-      })
 
     }).catch(err => {
       ElMessage({
@@ -978,24 +652,8 @@ const updateTablePodData = async () => {
   } else if (route.params.appType === 'Daemonset') {
     wait = apiDaemonsetPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
-      tablePodData.value = resData.map(item => {
-        return {
-          name: item.metadata.name,
-          nodeName: item.spec.nodeName,
-          hostIP: item.status.hostIP,
-          status: item.status.phase,
-          podInfo: {
-            podName: item.metadata.name,
-            podIP: item.status.podIP,
-            containers: item.spec.containers,
-            containerStatuses: item.status.containerStatuses,
-            conditions: item.status.conditions
-          },
-          createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
+      tablePodDataRaw.value = resData
 
-        }
-      })
 
     }).catch(err => {
       ElMessage({
@@ -1007,24 +665,8 @@ const updateTablePodData = async () => {
   } else if (route.params.appType === 'Job') {
     wait = apiJobPodList(route.params.namespace, route.params.appName).then(async res => {
       const resData = await res.json()
-      tablePodData.value = resData.map(item => {
-        return {
-          name: item.metadata.name,
-          nodeName: item.spec.nodeName,
-          hostIP: item.status.hostIP,
-          status: item.status.phase,
-          podInfo: {
-            podName: item.metadata.name,
-            podIP: item.status.podIP,
-            containers: item.spec.containers,
-            containerStatuses: item.status.containerStatuses,
-            conditions: item.status.conditions
-          },
-          createdTime: item.metadata.creationTimestamp,
-          restartTimes: item.status.containerStatuses == null ? 0 : item.status.containerStatuses[0].restartCount
+      tablePodDataRaw.value = resData
 
-        }
-      })
 
     }).catch(err => {
       ElMessage({
@@ -1294,13 +936,17 @@ const refreshData = () => {
   updateAppNetworkInfo()
   updateAppYaml()
 }
-
-setInterval(() => {
+const timer = setInterval(() => {
   if(isAutoRefresh.value){
     refreshData()
   }
 
 }, 10000)
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
+
 
 const portInfoToStr = (portInfo)=>{
   let portInfoStr = portInfo.protocol + " "

@@ -50,6 +50,7 @@ declare module 'vue' {
     ImportDialog: typeof import('./components/ImportDialog.vue')['default']
     NetworkDetails: typeof import('./components/NetworkDetails.vue')['default']
     NetworkInfo: typeof import('./components/NetworkInfo.vue')['default']
+    PodsTable: typeof import('./components/pods/PodsTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShareDialog: typeof import('./components/ShareDialog.vue')['default']

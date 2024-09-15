@@ -11,11 +11,11 @@
 
 
       <el-tooltip  placement="top-start" effect="light" content="Refresh data every 10s">
-<!--        <el-button style="margin-left: 10px;" round plain link @click="() => {isAutoRefresh = !isAutoRefresh;refreshData()}">-->
-<!--          <el-icon size="18px" :class="{'is-loading':isAutoRefresh}" >-->
-<!--            <Refresh />-->
-<!--          </el-icon>-->
-<!--        </el-button >-->
+        <el-button style="margin-left: 10px;" round plain link @click="() => {isAutoRefresh = !isAutoRefresh;refreshData()}">
+          <el-icon size="18px" :class="{'is-loading':isAutoRefresh}" >
+            <Refresh />
+          </el-icon>
+        </el-button >
       </el-tooltip>
 
     </el-row>
@@ -99,9 +99,10 @@
 
 
       </el-row>
-<!--      <el-row>-->
-<!--        <el-text class="el-descriptions__title">Pods</el-text>-->
-<!--      </el-row>-->
+      <el-row>
+        <el-text class="el-descriptions__title">Pods</el-text>
+      </el-row>
+      <pods-table :table-pods-loading="tablePodsLoading" :table-pods-data="tablePodsData"></pods-table>
     </div>
     <div v-if="selectedOption==='Yaml'">
 
@@ -156,11 +157,12 @@ import {yaml} from "@codemirror/lang-yaml";
 import {oneDark} from "@codemirror/theme-one-dark";
 import {useDark} from "@vueuse/core";
 import {useRoute} from "vue-router";
-import {apiServiceGet, apiServiceYamlGet, apiServiceYamlUpdate} from "@/services/service.js";
+import {apiServiceGet, apiServicePods, apiServiceYamlGet, apiServiceYamlUpdate} from "@/services/service.js";
 import {apiDeploymentYamlGet, apiDeploymentYamlUpdate} from "@/services/deployment.js";
 import {apiStatefulsetYamlGet} from "@/services/statefulset.js";
 import {apiDaemonsetYamlGet} from "@/services/daemonset.js";
 import {apiJobYamlGet} from "@/services/job.js";
+import PodsTable from "@/components/pods/PodsTable.vue";
 
 const { t } = useI18n()
 const size = ref('large')
@@ -178,12 +180,13 @@ const selectedOption = ref('Info')
 const options = ['Info','Yaml']
 const isAutoRefresh = ref(false)
 const baseInfoLoading = ref(true)
-const tableServiceLoading = ref(true)
 const yamlLoading = ref(true)
 const yamlCode = ref('')
 const yamlCodeRaw = ref('')
 const route = useRoute()
 
+const tablePodsData = ref([])
+const tablePodsLoading = ref(true)
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('')
@@ -203,9 +206,22 @@ onMounted(() => {
   refreshData()
 })
 
+onUnmounted(() => {
+  clearInterval(timer)
+})
+
+const timer = setInterval(() => {
+  if(isAutoRefresh.value){
+    refreshData()
+  }
+
+}, 10000)
+
+
 const refreshData = () => {
   updateServiceInfo()
   updateNetworkYaml()
+  updateNetworkPods()
 }
 
 const serviceInfoRaw = ref(null)
@@ -307,6 +323,24 @@ const updateNetworkYaml = async () => {
 
   await wait
   yamlLoading.value = false
+}
+
+const updateNetworkPods = async () => {
+  tablePodsLoading.value = true
+
+  let wait = apiServicePods(route.params.namespace, route.params.service).then(async res => {
+    const resData = await res.json()
+    tablePodsData.value = resData
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+  })
+
+  await wait
+  tablePodsLoading.value = false
 }
 
 

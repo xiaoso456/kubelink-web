@@ -320,9 +320,10 @@ import {
   apiSyncTypeList
 } from "@/services/syncConfig.js"
 import {apiNamespaceList, apiPodContainerList, apiPodList} from "@/services/namespace.js";
-import {Download, Upload} from "@element-plus/icons-vue";
+import {Download, Upload, Search} from "@element-plus/icons-vue";
 import {apiClusterConfigExport, apiSyncConfigExport} from "@/services/share.js";
 import { useI18n } from 'vue-i18n'
+
 const { t } = useI18n()
 
 const item = {
@@ -361,7 +362,7 @@ const tableEditFieldName = ref(undefined);
 const tableRowInput = ref(undefined);
 const focusRef = ref(null);
 const editMode = ref(false)
-const editRowInfo = ref(undefined)
+const editRowInfo = ref({})
 
 const pageSize = ref(10)
 const pageCurrent = ref(1)
@@ -377,7 +378,6 @@ const importDialogShow = ref(false)
 
 
 
-const syncTypeSelectValue = ref('')
 
 const syncTypeOptions = ref([{
   value: 'Option1',
@@ -420,6 +420,20 @@ const tableSort = (sortInfo) => {
   });
 
 };
+
+
+watch([()=>editRowInfo.value.id,()=>editRowInfo.value.syncType],
+    ([newId,newSyncType],[oldId,oldSyncType]) => {
+  if(newId === oldId){
+    if((newSyncType.includes('POD_TO_LOCAL') && oldSyncType.includes('LOCAL_TO_POD'))
+      || (newSyncType.includes('LOCAL_TO_POD') && oldSyncType.includes('POD_TO_LOCAL'))
+    ){
+      const temp = editRowInfo.value.source;
+      editRowInfo.value.source = editRowInfo.value.target;
+      editRowInfo.value.target = temp;
+    }
+  }
+})
 
 const refreshNamespaceOptions = () => {
   apiNamespaceList().then(async res => {

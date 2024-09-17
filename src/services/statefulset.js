@@ -30,6 +30,17 @@ export function apiStatefulsetDelete(namespace,statefulset){
     })
 }
 
+export function apiStatefulsetUpdate(namespace,statefulsetName,statefulset){
+    return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulsetName}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(statefulset)
+    })
+}
+
+
 export function apiStatefulsetYamlGet(namespace, statefulset){
 
     return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}/yaml`, {

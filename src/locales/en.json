@@ -70,7 +70,9 @@
         "refresh": "Refresh",
         "kind": "kind",
         "data": "data",
-        "cluster-ip": "clusterIP"
+        "cluster-ip": "clusterIP",
+        "key": "Key",
+        "value": "Value"
     },
     "sidebar": {
         "cluster": "Cluster Config",

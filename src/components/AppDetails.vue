@@ -135,6 +135,120 @@
 
 
     </div>
+
+    <div v-if="selectedOption==='Container'">
+<!--      <el-row>-->
+
+<!--        {{selectedContainer}}-->
+<!--      </el-row>-->
+
+      <el-row>
+        <el-radio-group v-model="selectedContainerName" >
+          <el-radio-button v-for="container in appInfoView.spec.template.spec.containers" :label="container.name" :value="container.name" />
+        </el-radio-group>
+      </el-row>
+      <el-row>
+        <el-text class="el-descriptions__title">Info</el-text>
+      </el-row>
+
+      <el-row>
+        <el-form :model="selectedContainer" class="none-box" style="max-width: 1000px;min-width: 80vw" label-width="auto" label-position="left">
+          <el-form-item label="Image" >
+            <el-input v-model="selectedContainer.image"></el-input>
+          </el-form-item>
+          <el-form-item label="ImagePullPolicy" >
+            <el-select
+                default-first-option
+                filterable
+                allow-create
+                v-model="selectedContainer.imagePullPolicy"
+                placeholder="Select"
+            >
+              <el-option
+                  v-for="item in ['Never','Always','IfNotPresent']"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item class="none-box" label="Command" >
+            <el-row  v-for="(item,index) in selectedContainer.command" :key="index">
+              <el-input style="width: 70vw"  @clear="selectedContainer.command.splice(index,1)"   v-model="selectedContainer.command[index]">
+                <template #append>
+                  <el-button-group>
+                    <el-button type="text" @click="selectedContainer.command.splice(index,1)">-</el-button>
+                    <el-button type="text" @click="selectedContainer.command.splice(index+1,0,'')">+</el-button>
+                  </el-button-group>
+                </template>
+              </el-input>
+            </el-row>
+            <el-row v-if="selectedContainer.command===undefined || selectedContainer.command.length===0" style="width: 100%">
+              <el-button style="width: 100%;"@click="selectedContainer.command=['']">{{ t('common.add-item') }}</el-button>
+            </el-row>
+
+          </el-form-item>
+          <el-form-item label="Args" >
+<!--            <el-input clearable @clear="selectedContainer.args.splice(index,1)" v-for="(item,index) in selectedContainer.args" type="textarea" :key="index"  v-model="selectedContainer.args[index]"></el-input>-->
+            <el-row  v-for="(item,index) in selectedContainer.args" :key="index">
+              <el-input style="width: 70vw"  @clear="selectedContainer.args.splice(index,1)"   v-model="selectedContainer.args[index]">
+                <template #append>
+                  <el-button-group>
+                    <el-button type="text" @click="selectedContainer.args.splice(index,1)">-</el-button>
+                    <el-button type="text" @click="selectedContainer.args.splice(index+1,0,'')">+</el-button>
+                  </el-button-group>
+                </template>
+              </el-input>
+            </el-row>
+            <el-row v-if="selectedContainer.args===undefined || selectedContainer.args.length===0" style="width: 100%">
+              <el-button style="width: 100%;"@click="selectedContainer.args=['']">{{ t('common.add-item') }}</el-button>
+            </el-row>
+          </el-form-item>
+        </el-form>
+      </el-row>
+
+      <el-row>
+        <el-text class="el-descriptions__title">Env</el-text>
+      </el-row>
+      <el-row style="width: 80vw">
+        <el-table class="none-box" style="margin-top: 10px" :data="selectedContainer.env" >
+
+          <el-table-column sortable prop="name" :label="t('common.key')" width="240">
+            <template #default="scope">
+              <el-input v-model="scope.row.name"  />
+
+            </template>
+          </el-table-column>
+
+
+          <el-table-column sortable prop="data" :label="t('common.value')" >
+            <template #default="scope">
+              <el-input v-model="scope.row.value"  />
+            </template>
+          </el-table-column>
+
+          <el-table-column  :label="t('common.operation')" width="280">
+            <template #default="scope">
+
+              <el-button size="small" type="danger" plain @click="handleDeleteContainerEnvItem(selectedContainer.env,scope.$index)">{{ t('common.delete') }}
+              </el-button>
+
+            </template>
+          </el-table-column>
+
+
+        </el-table>
+      </el-row>
+      <el-row>
+        <el-button style="width: 80vw" @click="handleAddContainerEnvItem(selectedContainer)">{{ t('common.add-item') }}</el-button>
+      </el-row>
+      <el-row style="max-width: 80vw" class="row-bg" justify="end">
+        <el-button size="default" type="info" plain @click="handleCancelSaveAppJson">{{ t('common.cancel') }}</el-button>
+        <el-button size="default" type="success" plain @click="saveAppJson">{{ t('common.save') }}</el-button>
+      </el-row>
+
+    </div>
+
     <div v-if="selectedOption==='Network'">
       <el-row>
 
@@ -294,30 +408,37 @@ import {useRoute} from 'vue-router'
 import {
   apiDeploymentGet,
   apiDeploymentPodList,
-  apiDeploymentServiceList,
+  apiDeploymentServiceList, apiDeploymentUpdate,
   apiDeploymentYamlGet,
   apiDeploymentYamlUpdate
 } from "@/services/deployment.js";
 import {
   apiStatefulsetGet,
   apiStatefulsetPodList,
-  apiStatefulsetServiceList,
+  apiStatefulsetServiceList, apiStatefulsetUpdate,
   apiStatefulsetYamlGet,
   apiStatefulsetYamlUpdate
 } from "@/services/statefulset.js";
 import {
   apiDaemonsetGet,
   apiDaemonsetPodList,
-  apiDaemonsetServiceList,
+  apiDaemonsetServiceList, apiDaemonsetUpdate,
   apiDaemonsetYamlGet,
   apiDaemonsetYamlUpdate
 } from "@/services/daemonset.js";
-import {Refresh} from '@element-plus/icons-vue'
+import {Refresh, Search} from '@element-plus/icons-vue'
 import {Codemirror} from "vue-codemirror";
 import {yaml} from "@codemirror/lang-yaml";
 
 import {oneDark} from "@codemirror/theme-one-dark";
-import {apiJobGet, apiJobPodList, apiJobServiceList, apiJobYamlGet, apiJobYamlUpdate} from "@/services/job.js";
+import {
+  apiJobGet,
+  apiJobPodList,
+  apiJobServiceList,
+  apiJobUpdate,
+  apiJobYamlGet,
+  apiJobYamlUpdate
+} from "@/services/job.js";
 import {apiPodDelete} from "@/services/pod.js";
 import {useDark} from "@vueuse/core";
 import {formattedDate} from "../services/common.js";
@@ -326,7 +447,7 @@ const { t } = useI18n()
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
-const options = ['Info','Yaml','Network','Condition' ]
+const options = ['Info','Yaml','Container','Network','Condition' ]
 const tablePodsLoading = ref(true)
 const baseInfoLoading = ref(true)
 const tableServiceLoading = ref(true)
@@ -342,6 +463,31 @@ const dialogTitle = ref('')
 const dialogMessage = ref('')
 const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
+
+const selectedContainerName = ref('')
+const selectedContainer = ref({})
+
+const appInfoRaw = ref(null)
+// appInfoView is updated when appInfoRaw is updated, or user edit it.
+const appInfoView = ref(null)
+watch(appInfoRaw, (newValue, oldValue) => {
+  appInfoView.value = JSON.parse(JSON.stringify(newValue));
+})
+
+
+watch(selectedOption, (newSelectedOption)=>{
+  if(newSelectedOption==='Container'){
+    selectedContainerName.value = appInfoView.value.spec.template.spec.containers[0].name
+  }
+})
+watch([selectedContainerName,appInfoView], ([newSelectedContainerName,newAppInfoView])=>{
+  // console.log('selectedContainerName',newSelectedContainerName)
+  if(newSelectedContainerName){
+    selectedContainer.value = appInfoView.value.spec.template.spec.containers.find(item => item.name === newSelectedContainerName)
+  }else{
+    selectedContainer.value = appInfoView.value.spec.template.spec.containers[0]
+  }
+})
 
 const isDark = useDark({
   storageKey: 'vue-theme-mode',
@@ -407,7 +553,6 @@ const appServiceInfo = computed(()=>{
         sessionAffinity: item.spec.sessionAffinity
       }
     })
-    console.log(result)
     return result
   }else if(route.params.appType === 'Statefulset'){
 
@@ -450,30 +595,12 @@ const appServiceInfo = computed(()=>{
   }
 
 })
-// const appServiceInfo = ref([{
-//   name: 'mysql',
-//   namespace: 'default',
-//   createdTime: '2023-10-07T13:38:06Z',
-//   type: 'ClusterIP',
-//   clusterIP: '10.96.0.1',
-//   ports: [
-//     {
-//       "name": "tcp-5005",
-//       "nodePort": 31118,
-//       "port": 5005,
-//       "protocol": "TCP",
-//       "targetPort": 5006
-//     }
-//   ],
-//   sessionAffinity: 'None',
-// }])
 
 
-const appInfoRaw = ref(null)
 const containerInfo = computed(()=>{
 
-  if(appInfoRaw.value){
-    let result = appInfoRaw.value.spec.template.spec.containers.map((item,index)=>{
+  if(appInfoView.value){
+    let result = appInfoView.value.spec.template.spec.containers.map((item,index)=>{
       return {
         name: item.name,
         image: item.image,
@@ -493,56 +620,56 @@ const containerInfo = computed(()=>{
 })
 
 const appInfo = computed(()=>{
-  if(!appInfoRaw.value){
+  if(!appInfoView.value){
     return {}
   }
   if(route.params.appType === 'Deployment'){
     return {
-      namespace: appInfoRaw.value.metadata.namespace,
-      name: appInfoRaw.value.metadata.name,
-      createdTime: appInfoRaw.value.metadata.creationTimestamp,
-      generation: appInfoRaw.value.metadata.generation,
-      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
-      availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
-      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0,
-      conditions: appInfoRaw.value.status.conditions
+      namespace: appInfoView.value.metadata.namespace,
+      name: appInfoView.value.metadata.name,
+      createdTime: appInfoView.value.metadata.creationTimestamp,
+      generation: appInfoView.value.metadata.generation,
+      restartPolicy: appInfoView.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoView.value.status.availableReplicas? appInfoView.value.status.availableReplicas : 0,
+      replicas: appInfoView.value.status.replicas? appInfoView.value.status.replicas : 0,
+      conditions: appInfoView.value.status.conditions
     }
   }else if(route.params.appType === 'Statefulset'){
 
     return {
-      namespace: appInfoRaw.value.metadata.namespace,
-      name: appInfoRaw.value.metadata.name,
-      createdTime: appInfoRaw.value.metadata.creationTimestamp,
-      generation: appInfoRaw.value.metadata.generation,
-      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
-      availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
-      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0,
-      conditions: appInfoRaw.value.status.conditions
+      namespace: appInfoView.value.metadata.namespace,
+      name: appInfoView.value.metadata.name,
+      createdTime: appInfoView.value.metadata.creationTimestamp,
+      generation: appInfoView.value.metadata.generation,
+      restartPolicy: appInfoView.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoView.value.status.availableReplicas? appInfoView.value.status.availableReplicas : 0,
+      replicas: appInfoView.value.status.replicas? appInfoView.value.status.replicas : 0,
+      conditions: appInfoView.value.status.conditions
 
     }
   }else if(route.params.appType === 'Daemonset'){
     return {
-      namespace: appInfoRaw.value.metadata.namespace,
-      name: appInfoRaw.value.metadata.name,
-      createdTime: appInfoRaw.value.metadata.creationTimestamp,
-      generation: appInfoRaw.value.metadata.generation,
-      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
-      availableReplicas: appInfoRaw.value.status.numberAvailable? appInfoRaw.value.status.numberAvailable : 0,
-      replicas: (appInfoRaw.value.status.numberAvailable? appInfoRaw.value.status.numberAvailable : 0)
-          + (appInfoRaw.value.status.numberUnavailable? appInfoRaw.value.status.numberUnavailable : 0),
-      conditions: appInfoRaw.value.status.conditions
+      namespace: appInfoView.value.metadata.namespace,
+      name: appInfoView.value.metadata.name,
+      createdTime: appInfoView.value.metadata.creationTimestamp,
+      generation: appInfoView.value.metadata.generation,
+      restartPolicy: appInfoView.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoView.value.status.numberAvailable? appInfoView.value.status.numberAvailable : 0,
+      replicas: (appInfoView.value.status.numberAvailable? appInfoView.value.status.numberAvailable : 0)
+          + (appInfoView.value.status.numberUnavailable? appInfoView.value.status.numberUnavailable : 0),
+      conditions: appInfoView.value.status.conditions
 
     }
   }else if(route.params.appType === 'Job'){
     return {
-      namespace: appInfoRaw.value.metadata.namespace,
-      name: appInfoRaw.value.metadata.name,
-      createdTime: appInfoRaw.value.metadata.creationTimestamp,
-      generation: appInfoRaw.value.metadata.generation,
-      restartPolicy: appInfoRaw.value.spec.template.spec.restartPolicy,
-      availableReplicas: appInfoRaw.value.status.availableReplicas? appInfoRaw.value.status.availableReplicas : 0,
-      replicas: appInfoRaw.value.status.replicas? appInfoRaw.value.status.replicas : 0,
-      conditions: appInfoRaw.value.status.conditions
+      namespace: appInfoView.value.metadata.namespace,
+      name: appInfoView.value.metadata.name,
+      createdTime: appInfoView.value.metadata.creationTimestamp,
+      generation: appInfoView.value.metadata.generation,
+      restartPolicy: appInfoView.value.spec.template.spec.restartPolicy,
+      availableReplicas: appInfoView.value.status.availableReplicas? appInfoView.value.status.availableReplicas : 0,
+      replicas: appInfoView.value.status.replicas? appInfoView.value.status.replicas : 0,
+      conditions: appInfoView.value.status.conditions
     }
   }
 
@@ -793,87 +920,30 @@ const updateAppYaml = async () => {
 }
 
 const saveAppYaml = () => {
+  let updateAppYaml = undefined;
   if(route.params.appType === 'Deployment'){
-    apiDeploymentYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
-
-      if(res.status === 200){
-        ElMessage({
-          message: "update yaml success",
-          type: 'success'
-        })
-        refreshData()
-
-      }else{
-        let errorMessage = await res.text()
-        ElMessage({
-          message: errorMessage,
-          type: 'error'
-        })
-      }
-    }).catch(err => {
-      ElMessage({
-        message: "request error: " + err,
-        type: 'error'
-      })
-      console.log(err)
-    })
+    updateAppYaml = apiDeploymentYamlUpdate
   }else if(route.params.appType === 'Statefulset'){
-    apiStatefulsetYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
-
-      if(res.status === 200){
-        ElMessage({
-          message: "update yaml success",
-          type: 'success'
-        })
-        refreshData()
-
-      }else{
-        let errorMessage = await res.text()
-        ElMessage({
-          message: errorMessage,
-          type: 'error'
-        })
-      }
-    }).catch(err => {
-      ElMessage({
-        message: "request error: " + err,
-        type: 'error'
-      })
-      console.log(err)
-    })
+    updateAppYaml = apiStatefulsetYamlUpdate
   }else if(route.params.appType === 'Daemonset'){
-    apiDaemonsetYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
-
-      if(res.status === 200){
-        ElMessage({
-          message: "update yaml success",
-          type: 'success'
-        })
-        refreshData()
-
-      }else{
-        let errorMessage = await res.text()
-        ElMessage({
-          message: errorMessage,
-          type: 'error'
-        })
-      }
-    }).catch(err => {
-      ElMessage({
-        message: "request error: " + err,
-        type: 'error'
-      })
-      console.log(err)
-    })
+    updateAppYaml = apiDaemonsetYamlUpdate
   }else if(route.params.appType === 'Job'){
-    apiJobYamlUpdate(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
+    updateAppYaml = apiJobYamlUpdate
+  }
+  if(updateAppYaml){
+    updateAppYaml(route.params.namespace,route.params.appName,yamlCode.value).then(async res => {
 
       if(res.status === 200){
-        ElMessage({
-          message: "update yaml success",
-          type: 'success'
-        })
-        refreshData()
+
+        await res.text()
+        setTimeout(() => {
+          refreshData()
+          ElMessage({
+            message: "update yaml success",
+            type: 'success'
+          })
+        }, 2000)
+
 
       }else{
         let errorMessage = await res.text()
@@ -890,6 +960,7 @@ const saveAppYaml = () => {
       console.log(err)
     })
   }
+
 
 
 }
@@ -898,19 +969,35 @@ const handleCancelSaveYaml = () => {
   yamlCode.value = yamlCodeRaw.value
 }
 
-const handleDeletePod = (row) => {
-  dialogVisible.value = true
-  dialogTitle.value = "Tips"
-  dialogMessage.value = `Delete pod '${row.name}' `
-  dialogConfirmFuction.value = () => {
-    apiPodDelete(route.params.namespace,row.name).then(async res => {
+
+const handleCancelSaveAppJson = () => {
+  appInfoView.value = appInfoRaw.value
+}
+
+const saveAppJson = () => {
+  let updateApp = undefined;
+  if(route.params.appType === 'Deployment'){
+    updateApp = apiDeploymentUpdate
+  }else if(route.params.appType === 'Statefulset'){
+    updateApp = apiStatefulsetUpdate
+  }else if(route.params.appType === 'Daemonset'){
+    updateApp = apiDaemonsetUpdate
+  }else if(route.params.appType === 'Job'){
+    updateApp = apiJobUpdate
+  }
+
+  if(updateApp){
+    updateApp(route.params.namespace,route.params.appName,appInfoView.value).then(async res => {
 
       if(res.status === 200){
         ElMessage({
-          message: "delete pod success",
+          message: "update app success",
           type: 'success'
         })
-        refreshData()
+        await res.text()
+        setTimeout(() => {
+          refreshData()
+        }, 2000)
 
       }else{
         let errorMessage = await res.text()
@@ -926,8 +1013,33 @@ const handleDeletePod = (row) => {
       })
       console.log(err)
     })
+  }else{
+    ElMessage({
+      message: `update app error, unsupport app type ${route.params.appType}`,
+      type: 'error'
+    })
   }
+
+
+
 }
+
+
+
+const handleAddContainerEnvItem = (container) => {
+  if(!container.env){
+    container.env = []
+  }
+  container.env.push({
+    name: 'k',
+    value: 'v',
+  })
+}
+
+const handleDeleteContainerEnvItem = (containerEnvList,index) => {
+  containerEnvList.splice(index,1)
+}
+
 
 
 const refreshData = () => {

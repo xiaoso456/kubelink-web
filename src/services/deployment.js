@@ -30,6 +30,17 @@ export function apiDeploymentDelete(namespace,deployment){
     })
 }
 
+export function apiDeploymentUpdate(namespace,deploymentName,deployment){
+    return fetch(`${prefix}/namespace/${namespace}/deployment/${deploymentName}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(deployment)
+    })
+}
+
+
 export function apiDeploymentYamlGet(namespace, deployment){
 
     return fetch(`${prefix}/namespace/${namespace}/deployment/${deployment}/yaml`, {

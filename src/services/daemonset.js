@@ -30,6 +30,17 @@ export function apiDaemonsetDelete(namespace,daemonset){
     })
 }
 
+export function apiDaemonsetUpdate(namespace,daemonsetName,daemonset){
+    return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonsetName}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(daemonset)
+    })
+}
+
+
 export function apiDaemonsetYamlGet(namespace, daemonset){
 
     return fetch(`${prefix}/namespace/${namespace}/daemonset/${daemonset}/yaml`, {

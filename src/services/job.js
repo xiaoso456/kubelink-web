@@ -30,6 +30,17 @@ export function apiJobDelete(namespace,job){
     })
 }
 
+export function apiJobUpdate(namespace,jobName,job){
+    return fetch(`${prefix}/namespace/${namespace}/job/${jobName}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(job)
+    })
+}
+
+
 export function apiJobYamlGet(namespace, job){
 
     return fetch(`${prefix}/namespace/${namespace}/job/${job}/yaml`, {

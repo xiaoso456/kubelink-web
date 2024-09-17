@@ -70,7 +70,9 @@
         "refresh": "刷新",
         "kind": "类型",
         "data": "数据",
-        "cluster-ip": "clusterIP"
+        "cluster-ip": "clusterIP",
+        "key": "Key",
+        "value": "Value"
     },
     "sidebar":{
         "cluster": "集群配置",

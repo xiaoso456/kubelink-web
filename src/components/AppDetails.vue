@@ -137,7 +137,7 @@
     </div>
 
     <div v-if="selectedOption==='Container'">
-      <container-info :containers="appInfoView.spec.template.spec.containers"></container-info>
+      <container-info v-model:containers="appInfoView.spec.template.spec.containers"></container-info>
       <el-row style="max-width: 80vw" class="row-bg" justify="end">
         <el-button size="default" type="info" plain @click="handleCancelSaveAppJson">{{ t('common.cancel') }}</el-button>
         <el-button size="default" type="success" plain @click="saveAppJson">{{ t('common.save') }}</el-button>

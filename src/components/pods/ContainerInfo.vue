@@ -83,8 +83,7 @@
             </div>
 
           </template>
-
-          <el-form v-if="selectedContainer.startupProbe" :model="selectedContainer" class="none-box" style="max-width: 1000px;min-width: 80vw" label-width="auto" label-position="left">
+          <el-form v-if="selectedContainer.startupProbe" :model="selectedContainer" class="none-box mt-10" style="max-width: 1000px;min-width: 80vw" label-width="auto" label-position="left">
             <el-form-item label="InitialDelaySeconds" >
               <el-input clearable @clear="selectedContainer.startupProbe.initialDelaySeconds=undefined" v-if="selectedContainer.startupProbe.initialDelaySeconds !== undefined" type="number" v-model="selectedContainer.startupProbe.initialDelaySeconds"></el-input>
               <el-button v-else  @click="selectedContainer.startupProbe.initialDelaySeconds=0">{{ t('common.add') }}</el-button>
@@ -124,7 +123,8 @@
             </el-form-item>
 
           </el-form>
-          <el-button style="width: 100%;" v-if="selectedContainer.startupProbe === undefined" @click="selectedContainer.startupProbe={}">{{ t('common.add') }}</el-button>
+          <el-button type="danger" plain  v-if="selectedContainer.startupProbe !== undefined" style="width: 100%;" @click="selectedContainer.startupProbe=undefined">{{ t('common.delete') }}</el-button>
+          <el-button style="width: 100%;" v-else @click="selectedContainer.startupProbe={}">{{ t('common.add') }}</el-button>
 
         </el-collapse-item>
 
@@ -179,13 +179,15 @@
 import {ref} from "vue";
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
-const props = defineProps({
-  containers: {
-    type: Array,
-    default: ()=>[]
-  }
+// const props = defineProps({
+//   containers: {
+//     type: Array,
+//     default: ()=>[]
+//   }
+//
+// })
 
-})
+const containers = defineModel('containers')
 
 const selectedContainerName = ref('')
 const selectedContainer = ref({})
@@ -195,11 +197,11 @@ const selectedContainer = ref({})
 // })
 
 onMounted(()=>{
-  selectedContainerName.value = props.containers[0].name
-  selectedContainer.value = props.containers[0]
+  selectedContainerName.value = containers.value[0].name
+  selectedContainer.value = containers.value[0]
 })
 
-watch([selectedContainerName,props.containers], ([newSelectedContainerName,newContainers])=>{
+watch([selectedContainerName,containers], ([newSelectedContainerName,newContainers])=>{
   if(newSelectedContainerName){
     selectedContainer.value = newContainers.find(item => item.name === newSelectedContainerName)
   }else{

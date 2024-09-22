@@ -2,6 +2,7 @@
     "common": {
         "search-tip": "Enter search keyword",
         "add-item": "Add",
+        "add": "Add",
         "import": "Import",
         "export": "Export",
         "connect": "Test Connection",
@@ -72,7 +73,8 @@
         "data": "data",
         "cluster-ip": "clusterIP",
         "key": "Key",
-        "value": "Value"
+        "value": "Value",
+        "env-vars": "Env Vars"
     },
     "sidebar": {
         "cluster": "Cluster Config",

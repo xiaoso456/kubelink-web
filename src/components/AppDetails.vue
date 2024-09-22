@@ -137,111 +137,7 @@
     </div>
 
     <div v-if="selectedOption==='Container'">
-<!--      <el-row>-->
-
-<!--        {{selectedContainer}}-->
-<!--      </el-row>-->
-
-      <el-row>
-        <el-radio-group v-model="selectedContainerName" >
-          <el-radio-button v-for="container in appInfoView.spec.template.spec.containers" :label="container.name" :value="container.name" />
-        </el-radio-group>
-      </el-row>
-      <el-row>
-        <el-text class="el-descriptions__title">Info</el-text>
-      </el-row>
-
-      <el-row>
-        <el-form :model="selectedContainer" class="none-box" style="max-width: 1000px;min-width: 80vw" label-width="auto" label-position="left">
-          <el-form-item label="Image" >
-            <el-input v-model="selectedContainer.image"></el-input>
-          </el-form-item>
-          <el-form-item label="ImagePullPolicy" >
-            <el-select
-                default-first-option
-                filterable
-                allow-create
-                v-model="selectedContainer.imagePullPolicy"
-                placeholder="Select"
-            >
-              <el-option
-                  v-for="item in ['Never','Always','IfNotPresent']"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item class="none-box" label="Command" >
-            <el-row  v-for="(item,index) in selectedContainer.command" :key="index">
-              <el-input style="width: 70vw"  @clear="selectedContainer.command.splice(index,1)"   v-model="selectedContainer.command[index]">
-                <template #append>
-                  <el-button-group>
-                    <el-button type="text" @click="selectedContainer.command.splice(index,1)">-</el-button>
-                    <el-button type="text" @click="selectedContainer.command.splice(index+1,0,'')">+</el-button>
-                  </el-button-group>
-                </template>
-              </el-input>
-            </el-row>
-            <el-row v-if="selectedContainer.command===undefined || selectedContainer.command.length===0" style="width: 100%">
-              <el-button style="width: 100%;"@click="selectedContainer.command=['']">{{ t('common.add-item') }}</el-button>
-            </el-row>
-
-          </el-form-item>
-          <el-form-item label="Args" >
-<!--            <el-input clearable @clear="selectedContainer.args.splice(index,1)" v-for="(item,index) in selectedContainer.args" type="textarea" :key="index"  v-model="selectedContainer.args[index]"></el-input>-->
-            <el-row  v-for="(item,index) in selectedContainer.args" :key="index">
-              <el-input style="width: 70vw"  @clear="selectedContainer.args.splice(index,1)"   v-model="selectedContainer.args[index]">
-                <template #append>
-                  <el-button-group>
-                    <el-button type="text" @click="selectedContainer.args.splice(index,1)">-</el-button>
-                    <el-button type="text" @click="selectedContainer.args.splice(index+1,0,'')">+</el-button>
-                  </el-button-group>
-                </template>
-              </el-input>
-            </el-row>
-            <el-row v-if="selectedContainer.args===undefined || selectedContainer.args.length===0" style="width: 100%">
-              <el-button style="width: 100%;"@click="selectedContainer.args=['']">{{ t('common.add-item') }}</el-button>
-            </el-row>
-          </el-form-item>
-        </el-form>
-      </el-row>
-
-      <el-row>
-        <el-text class="el-descriptions__title">Env</el-text>
-      </el-row>
-      <el-row style="width: 80vw">
-        <el-table class="none-box" style="margin-top: 10px" :data="selectedContainer.env" >
-
-          <el-table-column sortable prop="name" :label="t('common.key')" width="240">
-            <template #default="scope">
-              <el-input v-model="scope.row.name"  />
-
-            </template>
-          </el-table-column>
-
-
-          <el-table-column sortable prop="data" :label="t('common.value')" >
-            <template #default="scope">
-              <el-input v-model="scope.row.value"  />
-            </template>
-          </el-table-column>
-
-          <el-table-column  :label="t('common.operation')" width="280">
-            <template #default="scope">
-
-              <el-button size="small" type="danger" plain @click="handleDeleteContainerEnvItem(selectedContainer.env,scope.$index)">{{ t('common.delete') }}
-              </el-button>
-
-            </template>
-          </el-table-column>
-
-
-        </el-table>
-      </el-row>
-      <el-row>
-        <el-button style="width: 80vw" @click="handleAddContainerEnvItem(selectedContainer)">{{ t('common.add-item') }}</el-button>
-      </el-row>
+      <container-info :containers="appInfoView.spec.template.spec.containers"></container-info>
       <el-row style="max-width: 80vw" class="row-bg" justify="end">
         <el-button size="default" type="info" plain @click="handleCancelSaveAppJson">{{ t('common.cancel') }}</el-button>
         <el-button size="default" type="success" plain @click="saveAppJson">{{ t('common.save') }}</el-button>
@@ -439,10 +335,12 @@ import {
   apiJobYamlGet,
   apiJobYamlUpdate
 } from "@/services/job.js";
+
 import {apiPodDelete} from "@/services/pod.js";
 import {useDark} from "@vueuse/core";
 import {formattedDate} from "../services/common.js";
 import { useI18n } from 'vue-i18n'
+import ContainerInfo from "@/components/pods/ContainerInfo.vue";
 const { t } = useI18n()
 const selectedOption = ref('Info')
 
@@ -464,8 +362,6 @@ const dialogMessage = ref('')
 const dialogConfirmFuction = ref(() => {dialogVisible.value = false})
 const dialogConfirmFuctionLast = ref(()=>{dialogVisible.value = false;dialogConfirmFuction.value()})
 
-const selectedContainerName = ref('')
-const selectedContainer = ref({})
 
 const appInfoRaw = ref(null)
 // appInfoView is updated when appInfoRaw is updated, or user edit it.
@@ -475,19 +371,7 @@ watch(appInfoRaw, (newValue, oldValue) => {
 })
 
 
-watch(selectedOption, (newSelectedOption)=>{
-  if(newSelectedOption==='Container'){
-    selectedContainerName.value = appInfoView.value.spec.template.spec.containers[0].name
-  }
-})
-watch([selectedContainerName,appInfoView], ([newSelectedContainerName,newAppInfoView])=>{
-  // console.log('selectedContainerName',newSelectedContainerName)
-  if(newSelectedContainerName){
-    selectedContainer.value = appInfoView.value.spec.template.spec.containers.find(item => item.name === newSelectedContainerName)
-  }else{
-    selectedContainer.value = appInfoView.value.spec.template.spec.containers[0]
-  }
-})
+
 
 const isDark = useDark({
   storageKey: 'vue-theme-mode',
@@ -971,6 +855,7 @@ const handleCancelSaveYaml = () => {
 
 
 const handleCancelSaveAppJson = () => {
+  console.log("?!",appInfoView)
   appInfoView.value = appInfoRaw.value
 }
 
@@ -1026,20 +911,6 @@ const saveAppJson = () => {
 
 
 
-const handleAddContainerEnvItem = (container) => {
-  if(!container.env){
-    container.env = []
-  }
-  container.env.push({
-    name: 'k',
-    value: 'v',
-  })
-}
-
-const handleDeleteContainerEnvItem = (containerEnvList,index) => {
-  containerEnvList.splice(index,1)
-}
-
 
 
 const refreshData = () => {
@@ -1084,7 +955,6 @@ onMounted(() => {
 .custom-style .el-row{
   padding-top: 10px;
 }
-
 
 
 </style>

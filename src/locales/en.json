@@ -74,7 +74,11 @@
         "cluster-ip": "clusterIP",
         "key": "Key",
         "value": "Value",
-        "env-vars": "Env Vars"
+        "env-vars": "Env Vars",
+        "setting": "Setting",
+        "command": "Command",
+        "args": "Args"
+
     },
     "sidebar": {
         "cluster": "Cluster Config",
@@ -112,5 +116,30 @@
     },
     "config-detail-page": {
         "base-info": "Basic Information"
+    },
+    "container-info-page": {
+        "command-probe": "Command Probe",
+        "http-probe": "HTTP Probe",
+        "tcp-probe": "TCP Probe",
+        "delay": "Delay",
+        "period": "Period",
+        "timeout": "Timeout",
+        "success": "Success",
+        "failure": "Failure",
+        "probe": "probe",
+        "startup-probe": "Startup Probe",
+        "liveness-probe": "Liveness Probe",
+        "readiness-probe": "Readiness Probe",
+        "initial-delay-seconds": "Initial Delay Seconds",
+        "period-seconds": "Period Seconds",
+        "timeout-seconds": "Timeout Seconds",
+        "success-threshold": "Success Threshold",
+        "failure-threshold": "Failure Threshold",
+        "tcp-socket": "TCP Socket",
+        "command": "Command",
+        "http-get": "HTTP Get",
+        "http-header": "HTTP Header"
+
+
     }
 }

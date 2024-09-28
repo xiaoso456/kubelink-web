@@ -74,7 +74,11 @@
         "cluster-ip": "clusterIP",
         "key": "Key",
         "value": "Value",
-        "env-vars": "环境变量"
+        "env-vars": "环境变量",
+        "setting": "设置",
+        "command": "命令",
+        "args": "参数"
+
 
     },
     "sidebar":{
@@ -115,5 +119,31 @@
     },
     "config-detail-page": {
         "base-info": "基本信息"
+    },
+    "container-info-page": {
+        "command-probe": "命令探针",
+        "http-probe": "HTTP探针",
+        "tcp-probe": "TCP探针",
+        "delay": "延迟",
+        "period": "周期",
+        "timeout": "超时",
+        "success": "成功",
+        "failure": "失败",
+        "probe": "探针",
+        "startup-probe": "启动探针",
+        "liveness-probe": "存活探针",
+        "readiness-probe": "就绪探针",
+        "initial-delay-seconds": "初始延迟秒数",
+        "period-seconds": "周期秒数",
+        "timeout-seconds": "超时秒数",
+        "success-threshold": "成功阈值",
+        "failure-threshold": "失败阈值",
+        "tcp-socket": "TCP 套接字",
+        "command": "命令",
+        "http-get": "HTTP Get",
+        "http-header": "HTTP Header"
+
+
+
     }
 }

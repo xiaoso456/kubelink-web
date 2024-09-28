@@ -388,6 +388,10 @@ onMounted(()=>{
   box-shadow: none;
   background-color: transparent;
 }
+:deep(.none-box .el-input-group__prepend) {
+  box-shadow: none;
+  background-color: transparent;
+}
 
 //:deep(.el-select__wrapper) {
 //  box-shadow: none;

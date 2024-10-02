@@ -17,7 +17,7 @@
     <el-row class="mt-10">
 
       <!--    <div class="mt-4 common-margin"  style="width: 80%;">-->
-      <el-col span="18">
+      <el-col :span="18">
         <el-input
             v-model="searchInput"
             style="max-width: 100%"
@@ -51,7 +51,7 @@
           </template>
         </el-input>
       </el-col>
-      <el-col span="6" class="ml-10">
+      <el-col :span="6" class="ml-10">
         <el-button type="success" plain @click="importDialogShow=true" >{{ t('common.import') }}</el-button>
       </el-col>
       <!--    </div>-->

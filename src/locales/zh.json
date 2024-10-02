@@ -77,7 +77,12 @@
         "env-vars": "环境变量",
         "setting": "设置",
         "command": "命令",
-        "args": "参数"
+        "args": "参数",
+        "event": "事件",
+        "source": "来源",
+        "first-timestamp": "首次发生时间",
+        "last-timestamp": "最后发生时间",
+        "count": "总数"
 
 
     },

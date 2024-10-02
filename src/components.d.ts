@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppDetails: typeof import('./components/AppDetails.vue')['default']
+    AppEvent: typeof import('./components/appdetails/AppEvent.vue')['default']
     Apps: typeof import('./components/Apps.vue')['default']
     ClusterConfig: typeof import('./components/ClusterConfig.vue')['default']
     ConfigDetails: typeof import('./components/ConfigDetails.vue')['default']

@@ -109,7 +109,9 @@
       <el-row>
           <el-text class="el-descriptions__title">Pods</el-text>
       </el-row>
-      <pods-table style="margin-top: 10px" :table-pods-loading="tablePodsLoading" :table-pods-data="tablePodDataRaw"></pods-table>
+      <div style="margin-top: 10px">
+        <pods-table  :table-pods-loading="tablePodsLoading" :table-pods-data="tablePodDataRaw"></pods-table>
+      </div>
 
 
     </div>
@@ -239,6 +241,9 @@
       </el-row>
 
     </div>
+    <div v-if="selectedOption==='Event'">
+      <app-event v-model:apps="eventApps" ></app-event>
+    </div>
     <div v-if="selectedOption==='Condition'">
 
       <el-row>
@@ -345,7 +350,7 @@ const { t } = useI18n()
 const selectedOption = ref('Info')
 
 // const options = ['Info','Env','Metadata','Event' ]
-const options = ['Info','Yaml','Container','Network','Condition' ]
+const options = ['Info','Yaml','Container','Network','Event','Condition' ]
 const tablePodsLoading = ref(true)
 const baseInfoLoading = ref(true)
 const tableServiceLoading = ref(true)
@@ -369,6 +374,7 @@ const appInfoView = ref(null)
 watch(appInfoRaw, (newValue, oldValue) => {
   appInfoView.value = JSON.parse(JSON.stringify(newValue));
 })
+
 
 
 
@@ -479,6 +485,28 @@ const appServiceInfo = computed(()=>{
   }
 
 })
+
+const eventApps = ref([])
+watch(tablePodDataRaw, (newValue, oldValue)=>{
+  let eventAppsList = []
+  const appItem = {
+    name: appInfoView.value.metadata.name,
+    type: appInfoView.value.kind,
+    namespace: appInfoView.value.metadata.namespace
+  }
+  eventAppsList.push(appItem)
+
+  for (const item of tablePodDataRaw.value) {
+    eventAppsList.push({
+      name: item.metadata.name,
+      type: 'Pod',
+      namespace: appInfoView.value.metadata.namespace
+    })
+  }
+  eventApps.value = eventAppsList
+
+})
+
 
 
 const containerInfo = computed(()=>{
@@ -918,6 +946,7 @@ const refreshData = () => {
   updateTablePodData()
   updateAppNetworkInfo()
   updateAppYaml()
+
 }
 const timer = setInterval(() => {
   if(isAutoRefresh.value){

@@ -77,7 +77,12 @@
         "env-vars": "Env Vars",
         "setting": "Setting",
         "command": "Command",
-        "args": "Args"
+        "args": "Args",
+        "event": "Event",
+        "source": "Source",
+        "first-timestamp": "First Timestamp",
+        "last-timestamp": "First Timestamp",
+        "count": "count"
 
     },
     "sidebar": {

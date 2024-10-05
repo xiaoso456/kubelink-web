@@ -40,6 +40,15 @@ export function apiDaemonsetUpdate(namespace,daemonsetName,daemonset){
     })
 }
 
+export function apiDaemonsetCreate(namespace,daemonsetJson){
+    return fetch(`${prefix}/namespace/${namespace}/daemonset`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: daemonsetJson
+    })
+}
 
 export function apiDaemonsetYamlGet(namespace, daemonset){
 

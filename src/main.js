@@ -21,6 +21,8 @@ import ConfigDetails from "@/components/ConfigDetails.vue";
 import NetworkDetails from "@/components/NetworkDetails.vue";
 
 import i18n from '@/locales/i18nconfig.js'
+import "bootstrap-icons/font/bootstrap-icons.css";
+import AddResource from "@/components/resource/AddResource.vue";
 
 
 
@@ -33,11 +35,14 @@ const router = VueRouter.createRouter({
         {path: '/apps', component: Apps},
         {path: '/network',component: NetworkInfo},
         {path: '/config',component: ConfigInfo},
+        {path: '/resources/add',component: AddResource},
+
         {path: '/template',component: TextTemplate},
         {path: '/app/namespace/:namespace/:appType/:appName', component: AppDetails},
         {path: '/config/namespace/:namespace/:configType/:configName', component: ConfigDetails},
         {path: '/network/namespace/:namespace/:service', component: NetworkDetails},
         {path: '/pod/namespace/:namespace/pod/:pod/container/:container/:action',component: XtermDiv},
+
         {path: '/:pathMatch(.*)*', redirect: '/'},
 
     ],

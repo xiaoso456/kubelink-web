@@ -40,6 +40,16 @@ export function apiDeploymentUpdate(namespace,deploymentName,deployment){
     })
 }
 
+export function apiDeploymentCreate(namespace,deploymentJson){
+    return fetch(`${prefix}/namespace/${namespace}/deployment`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: deploymentJson
+    })
+}
+
 
 export function apiDeploymentYamlGet(namespace, deployment){
 

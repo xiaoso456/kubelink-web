@@ -883,7 +883,6 @@ const handleCancelSaveYaml = () => {
 
 
 const handleCancelSaveAppJson = () => {
-  console.log("?!",appInfoView)
   appInfoView.value = appInfoRaw.value
 }
 

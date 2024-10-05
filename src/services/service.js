@@ -62,3 +62,13 @@ export function apiServiceUpdate(namespace,serviceName,service){
         body: JSON.stringify(service)
     })
 }
+
+export function apiServiceCreate(namespace,serviceJson){
+    return fetch(`${prefix}/namespace/${namespace}/service`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: serviceJson
+    })
+}

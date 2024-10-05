@@ -23,6 +23,16 @@ export function apiStatefulsetGet(namespace,statefulset){
     })
 }
 
+export function apiStatefulsetCreate(namespace,statefulsetJson){
+    return fetch(`${prefix}/namespace/${namespace}/statefulset`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: statefulsetJson
+    })
+}
+
 export function apiStatefulsetDelete(namespace,statefulset){
 
     return fetch(`${prefix}/namespace/${namespace}/statefulset/${statefulset}`, {

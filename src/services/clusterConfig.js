@@ -54,3 +54,9 @@ export function apiClusterAdd(name, config) {
         })
     })
 }
+
+export function apiCurrentClusterStatus() {
+    return fetch(`${prefix}/cluster/config/current/status`, {
+        method: 'GET'
+    })
+}

@@ -82,7 +82,9 @@
         "source": "来源",
         "first-timestamp": "首次发生时间",
         "last-timestamp": "最后发生时间",
-        "count": "总数"
+        "count": "总数",
+        "resource": "资源",
+        "add-resource": "添加资源"
 
 
     },
@@ -147,8 +149,15 @@
         "command": "命令",
         "http-get": "HTTP Get",
         "http-header": "HTTP Header"
-
-
+    },
+    "add-resource-page": {
+        "next-step": "下一步",
+        "pre-step": "上一步",
+        "base-info": "基本信息",
+        "kind": "资源类型",
+        "selector": "选择器",
+        "ports": "端口",
+        "namespace": "Namespace"
 
     }
 }

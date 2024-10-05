@@ -82,7 +82,9 @@
         "source": "Source",
         "first-timestamp": "First Timestamp",
         "last-timestamp": "First Timestamp",
-        "count": "count"
+        "count": "count",
+        "resource": "Resource",
+        "add-resource": "Add Resource"
 
     },
     "sidebar": {
@@ -144,7 +146,15 @@
         "command": "Command",
         "http-get": "HTTP Get",
         "http-header": "HTTP Header"
-
+    },
+    "add-resource-page": {
+        "next-step": "Next Step",
+        "pre-step": "Pre Step",
+        "base-info": "Base Info",
+        "kind": "Kind",
+        "selector": "Selector",
+        "ports": "Ports",
+        "namespace": "Namespace"
 
     }
 }

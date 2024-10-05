@@ -16,36 +16,68 @@
         <el-col :span="18" class="toolbar flex gap-2" style="text-align: right">
 <!--          <el-text class="mx-1 " style="margin-right: 10px" ><el-icon><Opportunity /></el-icon>V1.2.6</el-text>-->
 
-          <el-tag v-if="clusterInfo.activeId" type="primary">K8S Version: V{{ clusterInfo.raw.major }}.{{ clusterInfo.raw.minor }}</el-tag>
-          <el-tag v-if="clusterInfo.activeName" type="primary">Platform: {{ clusterInfo.raw.platform }}</el-tag>
+<!--          <el-tag v-if="activeConnection.id" type="primary">K8S Version: V{{ activeConnection.clusterVersionInfo.major }}.{{ activeConnection.clusterVersionInfo.minor }}</el-tag>-->
+<!--          <el-tag v-if="activeConnection.id" type="primary">Platform: {{ activeConnection.clusterVersionInfo.platform }}</el-tag>-->
 
           <el-dropdown style="margin-right: 15px" >
             <span class="el-dropdown-link" @click="updateClusterConfig">
-              {{clusterInfo.activeName}}
+              <i  :class="['main-icon','bi','bi-record2',connectionStatusClass]"></i>
+              <el-text class="main-font"  style="max-width: 120px;" truncated>{{ activeConnection.name}}</el-text>
+
               <el-icon class="el-icon--right">
                 <arrow-down />
               </el-icon>
             </span>
             <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item
-                    v-for="item in namespaceList"
-                    @click="handleSelectNamespace(item)"
-                    :key="item.id"
-                >
-                  {{ item.name }}
-                </el-dropdown-item>
-              </el-dropdown-menu>
+              <el-row style="width: 400px;font-size: 16px">
+                <el-col :span="12">
+                  <el-dropdown-menu>
+                  <el-dropdown-item
+                      v-for="item in clusterConfigList"
+                      @click="handleActiveClusterConfig(item)"
+                      :key="item.id"
+                      style="height: 27px"
+                  >
+                    <div class="config-item">
+                      <i :class="{'bi':true,'bi-circle-fill':true,'connection-status-healthy':item.id===activeConnection.id}" style="font-size: 10px"></i>
+                      <el-text truncated style="font-size: 16px;">{{ item.name }}</el-text>
+                    </div>
+
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+                </el-col>
+                <el-col :span="1"></el-col>
+                <el-col  :span="10">
+                  <p>
+                    <i class="bi bi-send-check"></i> {{ activeConnection.status }}
+                  </p>
+                  <p>
+                    <i class="bi bi-git"></i> {{ activeConnection.clusterVersionInfo.gitVersion }}
+                  </p>
+                  <p>
+                    <i class="bi bi-cpu" ></i>
+<!--                    <b>platform: </b>-->
+                    {{ activeConnection.clusterVersionInfo.platform }}
+                  </p>
+
+                </el-col>
+
+
+              </el-row>
+
+
+
             </template>
           </el-dropdown>
 
-          <el-switch  inline-prompt v-model="isDark" :active-action-icon="Moon" :inactive-action-icon="Sunny" @change="toggleDark">
+          <el-switch  v-model="isDark" :active-action-icon="Moon" :inactive-action-icon="Sunny" @change="toggleDark">
           </el-switch>
 
 
           <el-dropdown style="margin-right: 15px;margin-left: 15px;"  @command="handleChangeLocale" >
             <span class="el-dropdown-link" >
-              {{ currentLang }} 
+<!--              {{ currentLang }} -->
+              <i class="bi bi-translate main-icon" ></i>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -55,7 +87,7 @@
           </el-dropdown>
 
           <el-link :underline="false" :href="'https://github.com/xiaoso456/kubelink'">
-            <SvgIcon class="logo-github-color" style="margin-left: 10px" name="github-mark"   />
+            <SvgIcon class="logo-github-color" name="github-mark"   />
           </el-link>
         </el-col>
       </el-row>
@@ -69,7 +101,7 @@
       <el-aside style="max-height: calc(100vh - 60px)" width="collapse" >
         <!--      <el-scrollbar width="100%" style="height: 100vh">-->
         <!--      <el-row>-->
-        <el-menu :collapse-transition="false"    class="el-menu-vertical-demo sidebar-el-menu" router
+        <el-menu :collapse-transition="false"    class="sidebar-el-menu" router
                  :default-active="$route.path" :collapse="isCollapse"  @open="handleOpen"  @close="handleClose">
           <el-menu-item index="/cluster" >
             <el-icon><SetUp /></el-icon>
@@ -85,7 +117,7 @@
             <template #title><a href="#/apps" >{{t('sidebar.apps')}}</a></template>
           </el-menu-item>
 
-          <el-menu-item index="/network" >
+          <el-menu-item  index="/network" >
             <el-icon><Connection /></el-icon>
             <template #title><a href="#/network" >{{t('sidebar.network')}}</a></template>
           </el-menu-item>
@@ -94,6 +126,23 @@
             <el-icon><Tools /></el-icon>
             <template #title><a href="#/config" >{{t('sidebar.config')}}</a></template>
           </el-menu-item>
+
+          <el-sub-menu index="/resources">
+            <template #title>
+              <el-icon><i class="bi bi-union"></i></el-icon>
+              <span>{{ t('common.resource') }}</span>
+            </template>
+              <el-menu-item index="/resources/add">
+                <el-icon><i class="bi bi-clipboard-plus"></i></el-icon>
+                <template #title><a href="#/resources/add" >{{ t('common.add-resource') }}</a></template>
+              </el-menu-item>
+<!--              <el-menu-item index="/resources/helm">-->
+<!--                <el-icon><i class="bi bi-yelp"></i></el-icon>-->
+<!--                <template #title><a href="#/resources/helm" >Helm</a></template>-->
+<!--              </el-menu-item>-->
+
+          </el-sub-menu>
+
 
           <el-menu-item index="/template" >
             <el-icon><ChatLineSquare /></el-icon>
@@ -160,12 +209,16 @@ import {
   Sunny,
   Upload, UploadFilled
 } from '@element-plus/icons-vue'
-import {useClusterInfo} from "@/store/clusterStore.js";
 import {useLocale} from "@/store/langStone.js";
 import { langs } from '@/locales/i18nconfig.js'
 import { ElConfigProvider } from 'element-plus'
-
-import {apiClusterActive, apiClusterConnect, apiClusterList} from "@/services/clusterConfig.js";
+import './style.css'
+import {
+  apiClusterActive,
+  apiClusterConnect,
+  apiClusterList,
+  apiCurrentClusterStatus
+} from "@/services/clusterConfig.js";
 import { useDark, useToggle } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
@@ -179,14 +232,16 @@ const isDark = useDark({
   storageKey: 'vue-theme-mode',
   valueDark: 'dark',
   valueLight: 'light',
+  disableTransition: true
 })
+
 
 const toggleDark = useToggle(isDark)
 
-const clusterInfo = useClusterInfo()
 
 const isCollapse = ref(false)
-const namespaceList = ref([])
+const clusterConfigList = ref([])
+
 
 const handleChangeLocale = (lang)=>{
  currentLang.value = lang.title
@@ -200,45 +255,7 @@ const handleOpen = (key, keyPath) => {
 const handleClose = (key, keyPath) => {
   // console.log(key, keyPath)
 }
-const activeClusterConfig = (id,name) =>{
 
-  apiClusterActive(id).then(async res => {
-    const status = res.status
-    if(status === 200){
-      if(id !== clusterInfo.activeId){
-        ElMessage({
-          message:`active config id [${id}] success`,
-          type:'success'
-        })
-      }
-
-      clusterInfo.activeId = id
-      clusterInfo.activeName = name
-    }
-
-  }).catch(err =>{
-    ElMessage({
-      message: "request error: " + err,
-      type:'error'
-    })
-    console.log(err)
-  })
-
-  apiClusterConnect(id).then(async res => {
-    clusterInfo.raw = await res.json()
-
-
-  }).catch(err =>{
-    ElMessage({
-      message: "request error: " + err,
-      type:'error'
-    })
-    console.log(err)
-  })
-
-
-
-}
 
 const handleShortKeyTable = (event) => {
   isCollapse.value = !isCollapse.value
@@ -246,7 +263,7 @@ const handleShortKeyTable = (event) => {
 
 const updateClusterConfig = () => {
   apiClusterList().then(async res => {
-    namespaceList.value = await res.json()
+    clusterConfigList.value = await res.json()
   }).catch(err =>{
     ElMessage({
       message: "request error: " + err,
@@ -258,12 +275,11 @@ const updateClusterConfig = () => {
 
 }
 
-const handleSelectNamespace =  (item) => {
-  apiClusterActive(item.id).then(async res => {
+const handleActiveClusterConfig =  async (item) => {
+  await apiClusterActive(item.id).then(async res => {
     const status = res.status
     if (status === 200) {
-      clusterInfo.activeId = item.id
-      clusterInfo.activeName = item.name
+      await res.text()
 
       ElMessage({
         message: `active config id [${item.id}] success`,
@@ -278,38 +294,65 @@ const handleSelectNamespace =  (item) => {
     })
     console.log(err)
   })
-  apiClusterConnect(item.id).then(async res => {
-
-    const text = await res.json()
-    const textB = JSON.stringify(text, null, 2);
-    if(res.status === 200){
-      ElMessage({
-        message: textB,
-        type:'success'
-      })
-    }else{
-      ElMessage({
-        message: textB,
-        type:'error'
-      })
-    }
-
-  }).catch(err =>{
-    ElMessage({
-      message: "request error: " + err,
-      type:'error'
-    })
-    console.log(err)
-  })
+  await updateActiveConnection()
 
 
 }
 
+const activeConnection = ref({
+  id: '',
+  name: '-',
+  status: 'unknown',
+  clusterVersionInfo: {}
+})
+
+const updateActiveConnection = async () => {
+  apiCurrentClusterStatus().then(async res => {
+    const status = res.status
+    if (status === 200) {
+      activeConnection.value = await res.json()
+    }else{
+      activeConnection.value.status = 'unknown'
+    }
+
+  }).catch(err => {
+    ElMessage({
+      message: "request error: " + err,
+      type: 'error'
+    })
+    console.log(err)
+    activeConnection.value.status = 'unknown'
+  })
+
+}
+const connectionStatusClass = ref('connection-status-unknown')
+watch(() => activeConnection.value.status, (newValue, oldValue) => {
+  connectionStatusClass.value = 'connection-status-' + newValue
+})
+// 启动定时任务
+let intervalRefreshConnectionTask;
+
+function startRefreshConnectionTask() {
+  intervalRefreshConnectionTask = setInterval(() => {
+    updateActiveConnection()
+
+  }, 5000);
+}
+
+
+function stopRefreshConnectionTask() {
+  clearInterval(intervalRefreshConnectionTask);
+}
+
+
 onMounted(()=>{
-  if(clusterInfo.activeId){
-    activeClusterConfig(clusterInfo.activeId,clusterInfo.activeName)
-  }
+  startRefreshConnectionTask()
+  updateActiveConnection()
   updateClusterConfig()
+})
+
+onUnmounted(()=>{
+  stopRefreshConnectionTask()
 })
 </script>
 
@@ -353,7 +396,8 @@ onMounted(()=>{
 
 .el-dropdown-link {
   cursor: pointer;
-  color: var(--el-color-primary);
+
+  //color: var(--el-color-primary);
   display: flex;
   align-items: center;
   outline: none;
@@ -365,7 +409,13 @@ onMounted(()=>{
 
 /* menu text and icon size*/
 .el-menu-item{
-  font-size: 16px;
+  font-size: 18px;
+  //font-weight: bold;
+}
+
+.el-sub-menu{
+  font-size: 18px;
+  //font-weight: bold;
 }
 .el-menu-item [class^=el-icon]{
   font-size: 20px;
@@ -393,6 +443,24 @@ onMounted(()=>{
   background-color: transparent;
 }
 
+.connection-status-healthy{
+  color: #1cb263;
+}
+.connection-status-unknown{
+  color: #6c757d;
+}
+.connection-status-unhealthy{
+  color: #dc3545;
+}
+.connection-status-connecting{
+  color: #ffc107;
+}
+
+.config-item{
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  gap: 8px; /* 间距 */
+}
 //:deep(.el-select__wrapper) {
 //  box-shadow: none;
 //}
@@ -409,5 +477,19 @@ onMounted(()=>{
 //:deep(.el-textarea__inner) {
 //  box-shadow: none;
 //}
+
+.main-icon{
+  font-size: var(--main-icon-size);
+}
+.main-font{
+  font-size: var(--main-font-size);
+}
+
+.el-sub-menu{
+  --el-menu-item-font-size: var(--title-font-size);
+}
+.el-sub-menu .el-menu-item{
+  font-size: var(--sub-title-font-size);
+}
 
 </style>

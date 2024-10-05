@@ -5,6 +5,9 @@ export const useClusterInfo = defineStore('clusterInfo', {
         return {
             activeId: 0,
             activeName: '',
+            connection:{
+              status: 'unknown' // healthy、unhealthy、connecting、unknown
+            },
             raw: {
                 "buildDate": "",
                 "compiler": "",

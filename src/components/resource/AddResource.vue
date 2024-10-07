@@ -160,7 +160,7 @@ const resourceFormRef = ref()
 
 const steps = ref([
   {
-    title:t('common.base-info')
+    title:t('add-resource-page.base-info')
   },
   {
     title:t('common.preview')

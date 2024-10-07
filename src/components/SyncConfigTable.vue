@@ -284,11 +284,19 @@
       </el-form-item>
 
       <el-form-item :label="t('common.source-file')">
+
         <el-input v-model="editRowInfo.source" type="textarea" :autosize="{ minRows: 2, maxRows: 26 }" />
+        <el-button class="mt-10" style="width: 100%" @click="selectPath('source')">{{ t('sync-page.select-path') }}</el-button>
+
+
       </el-form-item>
+
+
+
 
       <el-form-item :label="t('common.target-file')">
         <el-input v-model="editRowInfo.target" type="textarea" :autosize="{ minRows: 2, maxRows: 26 }" />
+        <el-button class="mt-10" style="width: 100%" @click="selectPath('target')">{{ t('sync-page.select-path') }}</el-button>
       </el-form-item>
 
     </el-form>
@@ -306,6 +314,27 @@
 
   <import-dialog v-model="importDialogShow"  @import-success="refreshSyncList"></import-dialog>
   <share-dialog v-model="exportDialogShow" :exportData="exportData" title="Sync Config"></share-dialog>
+  <el-dialog v-model="pathDialogShow" class="none-box" title="选择文件或文件夹">
+    <el-input  v-model="selectedPath"/>
+
+    <el-scrollbar v-if="pathDialogShow" max-height="60vh">
+      <el-tree
+          style="max-width: 600px"
+          :props="pathTreeProps"
+          :load="loadNode"
+          @node-click="selectNode"
+          lazy
+      />
+    </el-scrollbar>
+
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="pathDialogShow = false">取消</el-button>
+        <el-button type="primary" @click="confirmPathSelection">确定</el-button>
+      </span>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script setup>
@@ -315,8 +344,8 @@ import {
   apiSyncConfigAdd,
   apiSyncConfigDelete,
   apiSyncConfigList,
-  apiSyncConfigUpdate,
-  apiSyncOnly,
+  apiSyncConfigUpdate, apiSyncLocalPath,
+  apiSyncOnly, apiSyncPodPath,
   apiSyncTypeList
 } from "@/services/syncConfig.js"
 import {apiNamespaceList, apiPodContainerList, apiPodList} from "@/services/namespace.js";
@@ -397,6 +426,103 @@ const namespacePodContainerMap = ref({
   "namespace1-pod1": ['container1','container2']
 })
 
+const pathTreeProps = ref({
+  label: 'name',
+  isLeaf: 'leaf',
+})
+
+const test = ref(null)
+const selectedPath = ref('/')
+const selectedPathType = ref('')
+const selectPath = (type) => {
+  selectedPath.value = '/'
+  selectedPathType.value = type
+  pathDialogShow.value = true
+
+}
+
+
+const pathDialogShow = ref(false)
+const getPath = (node) => {
+  let i = 0
+  if (!node) return '';
+  if(node.data.name === '/') return '/';
+  const path = [node.data.name];
+  let currentNode = node.parent;
+  while (currentNode) {
+    if(currentNode.data.name !== undefined){
+      path.unshift(currentNode.data.name);
+
+    }
+    currentNode = currentNode.parent;
+  }
+
+  path.shift();
+
+  if(path[0].includes(':\\')){
+    return path.join('/');
+  }else{
+    return '/'+path.join('/');
+  }
+};
+const loadNode = (node, resolve, reject) => {
+
+  if (node.level === 0) {
+    return resolve([{ name: '/' }])
+  }
+
+  const path = getPath(node)
+
+  if(selectedPathType.value === 'target' && (editRowInfo.value.syncType === 'FILE_LOCAL_TO_POD' || editRowInfo.value.syncType === 'FOLDER_LOCAL_TO_POD')){
+    apiSyncPodPath('sync',editRowInfo.value.pod,editRowInfo.value.container,path).then(async res => {
+      const data = await res.json()
+      let result = []
+      for (let i = 0; i < data.length; i++) {
+        result.push(
+            {
+              name: data[i].name,
+              leaf: !data[i].dir,
+
+            }
+        )
+      }
+
+      resolve(result)
+
+    }).catch(e => reject())
+  }else{
+    apiSyncLocalPath(path).then(async res => {
+      const data = await res.json()
+      let result = []
+      for (let i = 0; i < data.length; i++) {
+        result.push(
+            {
+              name: data[i].name,
+              leaf: !data[i].dir,
+
+            }
+        )
+      }
+
+      resolve(result)
+
+    }).catch(e => reject())
+  }
+
+
+
+}
+
+const selectNode = (currentNode,node,element,event) => {
+  const path = getPath(node)
+  selectedPath.value = path;
+
+};
+
+const confirmPathSelection = () => {
+  editRowInfo.value[selectedPathType.value] = selectedPath.value;
+  pathDialogShow.value = false;
+};
 
 const tableSort = (sortInfo) => {
 
@@ -669,23 +795,6 @@ const handleExitEditMode = async (index, row) => {
   refreshSyncList()
 }
 
-const handleDeleteResource = (index, row, type) => {
-  apiDeleteResource(row.id, type).then(res => {
-    const status = res.status
-    if (status === 200) {
-      ElMessage({
-        message: `delete file or folder success`,
-        type: 'success'
-      })
-    }
-  }).catch(err => {
-    ElMessage({
-      message: "request error: " + err,
-      type: 'error'
-    })
-    console.log(err)
-  })
-}
 
 const handleArrow = (event) =>{
   const allPage = Math.ceil(filterTableData.value.length / pageSize.value)

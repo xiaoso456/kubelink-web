@@ -103,7 +103,8 @@
     },
     "sync-page": {
         "edit-sync-title": "Sync Config",
-        "export-sync-title": "Sync Config"
+        "export-sync-title": "Sync Config",
+        "select-path": "Select Path"
     },
     "config-page": {
         "create-configmap-title": "Create ConfigMap",

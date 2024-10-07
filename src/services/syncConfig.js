@@ -61,3 +61,20 @@ export function apiDeleteResource(id, type){
         method: 'POST'
     })
 }
+
+export function apiSyncLocalPath(path) {
+    return fetch(`${prefix}/sync/local/path`, {
+        method: 'POST',
+        body: path
+    })
+}
+
+export function apiSyncPodPath(namespace,pod,container,path) {
+    if(container === undefined || container === ''){
+        container = '_first'
+    }
+    return fetch(`${prefix}/sync/namespace/${namespace}/pod/${pod}/container/${container}/path`, {
+        method: 'POST',
+        body: path
+    })
+}

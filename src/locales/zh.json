@@ -105,7 +105,9 @@
     },
     "sync-page": {
         "edit-sync-title": "同步配置",
-        "export-sync-title": "同步配置"
+        "export-sync-title": "同步配置",
+        "select-path": "选择路径"
+
     },
     "config-page": {
         "create-configmap-title": "创建ConfigMap",

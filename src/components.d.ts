@@ -65,6 +65,8 @@ declare module 'vue' {
     ElText: typeof import('element-plus/es')['ElText']
     ElTimePicker: typeof import('element-plus/es')['ElTimePicker']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    ElTree: typeof import('element-plus/es')['ElTree']
+    HelmChart: typeof import('./components/resource/HelmChart.vue')['default']
     ImportDialog: typeof import('./components/ImportDialog.vue')['default']
     NetworkDetails: typeof import('./components/NetworkDetails.vue')['default']
     NetworkInfo: typeof import('./components/NetworkInfo.vue')['default']

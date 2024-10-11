@@ -474,7 +474,7 @@ const loadNode = (node, resolve, reject) => {
   const path = getPath(node)
 
   if(selectedPathType.value === 'target' && (editRowInfo.value.syncType === 'FILE_LOCAL_TO_POD' || editRowInfo.value.syncType === 'FOLDER_LOCAL_TO_POD')){
-    apiSyncPodPath('sync',editRowInfo.value.pod,editRowInfo.value.container,path).then(async res => {
+    apiSyncPodPath(editRowInfo.value.namespace,editRowInfo.value.pod,editRowInfo.value.container,path).then(async res => {
       const data = await res.json()
       let result = []
       for (let i = 0; i < data.length; i++) {

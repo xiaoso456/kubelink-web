@@ -51,7 +51,7 @@
           </template>
         </el-input>
       </el-col>
-      <el-col :span="6" class="ml-10">
+      <el-col :span="4" class="ml-10">
         <el-button type="success" plain @click="importDialogShow=true" >{{ t('common.import') }}</el-button>
       </el-col>
       <!--    </div>-->

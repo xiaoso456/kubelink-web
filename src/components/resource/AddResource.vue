@@ -75,6 +75,12 @@
           </el-form-item>
           <el-form-item :label="t('add-resource-page.ports')" v-if="resourceInfo.kind === 'Service'">
             <el-table :data="resourceInfo.ports" style="width: 100%">
+              <el-table-column prop="name" label="Name" width="180">
+                <template #default="{ row }">
+                  <el-input v-model="row.name" size="small" />
+                </template>
+              </el-table-column>
+
               <el-table-column prop="protocol" label="Protocol" width="180">
                 <template #default="{ row }">
                   <el-select v-model="row.protocol" placeholder="Select"  size="small">
@@ -308,7 +314,7 @@ const createApp = () => {
 }
 
 const addPort = () => {
-  resourceInfo.value.ports.push({ port: '', targetPort: '' });
+  resourceInfo.value.ports.push({ port: '', targetPort: '',name: '' });
 }
 
 const removePort = (index) => {

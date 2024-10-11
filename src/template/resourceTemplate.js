@@ -167,7 +167,9 @@ export const serviceJsonTemplateReader = ({name,namespace,ports,selector})=>{
         const targetPort = !isNaN(parseInt(item.targetPort)) ? parseInt(item.targetPort) : item.targetPort;
         return {
             port,
-            targetPort
+            targetPort,
+            protocol: item.protocol,
+            name: item.name
         };
     });
     const result = {

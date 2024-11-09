@@ -405,7 +405,7 @@ const exportData = ref('')
 
 const importDialogShow = ref(false)
 
-
+const rootPath = "#root#";
 
 
 const syncTypeOptions = ref([{
@@ -431,7 +431,6 @@ const pathTreeProps = ref({
   isLeaf: 'leaf',
 })
 
-const test = ref(null)
 const selectedPath = ref('/')
 const selectedPathType = ref('')
 const selectPath = (type) => {
@@ -444,9 +443,8 @@ const selectPath = (type) => {
 
 const pathDialogShow = ref(false)
 const getPath = (node) => {
-  let i = 0
   if (!node) return '';
-  if(node.data.name === '/') return '/';
+  if(node.data.name === rootPath) return rootPath;
   const path = [node.data.name];
   let currentNode = node.parent;
   while (currentNode) {
@@ -458,7 +456,7 @@ const getPath = (node) => {
   }
 
   path.shift();
-
+  console.log("?,",path)
   if(path[0].includes(':\\')){
     return path.join('/');
   }else{
@@ -468,7 +466,7 @@ const getPath = (node) => {
 const loadNode = (node, resolve, reject) => {
 
   if (node.level === 0) {
-    return resolve([{ name: '/' }])
+    return resolve([{ name: rootPath }])
   }
 
   const path = getPath(node)

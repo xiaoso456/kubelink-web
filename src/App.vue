@@ -136,10 +136,10 @@
                 <el-icon><i class="bi bi-clipboard-plus"></i></el-icon>
                 <template #title><a href="#/resources/add" >{{ t('common.add-resource') }}</a></template>
               </el-menu-item>
-<!--              <el-menu-item index="/resources/helm">-->
-<!--                <el-icon><i class="bi bi-yelp"></i></el-icon>-->
-<!--                <template #title><a href="#/resources/helm" >Helm</a></template>-->
-<!--              </el-menu-item>-->
+              <el-menu-item index="/resources/helm">
+                <el-icon><i class="bi bi-yelp"></i></el-icon>
+                <template #title><a href="#/resources/helm" >Helm</a></template>
+              </el-menu-item>
 
           </el-sub-menu>
 

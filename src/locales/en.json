@@ -84,7 +84,8 @@
         "last-timestamp": "First Timestamp",
         "count": "count",
         "resource": "Resource",
-        "add-resource": "Add Resource"
+        "add-resource": "Add Resource",
+        "version": "Version"
 
     },
     "sidebar": {

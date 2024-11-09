@@ -84,7 +84,8 @@
         "last-timestamp": "最后发生时间",
         "count": "总数",
         "resource": "资源",
-        "add-resource": "添加资源"
+        "add-resource": "添加资源",
+        "version": "版本"
 
 
     },
